@@ -2,6 +2,7 @@ package com.kneelawk.mrmpb.ui
 
 sealed class CurrentScreen {
     object Start : CurrentScreen()
-    object CreateNew : CurrentScreen()
-    class OpenExisting(existing: String) : CurrentScreen()
+    object Settings : CurrentScreen()
+    class CreateNew(val component: CreateNewComponent) : CurrentScreen()
+    class Modpack(val component: ModpackComponent) : CurrentScreen()
 }

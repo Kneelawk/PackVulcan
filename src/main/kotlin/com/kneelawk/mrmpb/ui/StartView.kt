@@ -1,6 +1,5 @@
 package com.kneelawk.mrmpb.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -8,14 +7,13 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.kneelawk.mrmpb.ui.util.ContainerBox
 
 const val WELCOME_TEXT = "Modpack Builder"
 
 @Composable
-fun StartScreen(createNew: () -> Unit, openExisting: () -> Unit, openSettings: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
-    ) {
+fun StartView(createNew: () -> Unit, openExisting: () -> Unit, openSettings: () -> Unit) {
+    ContainerBox {
         Column(
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(IntrinsicSize.Max).align(Alignment.Center)
