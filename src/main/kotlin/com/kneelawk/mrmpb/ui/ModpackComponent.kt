@@ -1,4 +1,6 @@
 package com.kneelawk.mrmpb.ui
 
-class ModpackComponent {
+import com.arkivanov.decompose.ComponentContext
+
+class ModpackComponent(context: ComponentContext) : ComponentContext by context {
 }

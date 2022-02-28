@@ -18,7 +18,7 @@ fun StartView(createNew: () -> Unit, openExisting: () -> Unit, openSettings: () 
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(IntrinsicSize.Max).align(Alignment.Center)
         ) {
-            Text(WELCOME_TEXT, style = MaterialTheme.typography.h2, color = MaterialTheme.colors.onBackground)
+            Text(WELCOME_TEXT, style = MaterialTheme.typography.h2)
             Button(onClick = createNew, modifier = Modifier.fillMaxWidth()) {
                 Text("Create New Project")
             }

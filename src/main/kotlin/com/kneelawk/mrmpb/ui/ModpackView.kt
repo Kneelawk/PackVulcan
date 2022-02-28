@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.kneelawk.mrmpb.ui.util.ContainerBox
 
 @Composable
-fun CreateNewView(component: CreateNewComponent) {
+fun ModpackView(component: ModpackComponent) {
     ContainerBox {
     }
 }

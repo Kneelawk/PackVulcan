@@ -33,4 +33,7 @@ class RootComponent(context: ComponentContext) : ComponentContext by context {
     fun goBack() {
         router.popSafe()
     }
+
+    fun openModpack(modpackPath: String) {
+    }
 }

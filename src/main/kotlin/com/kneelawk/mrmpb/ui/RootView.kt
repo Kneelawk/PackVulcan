@@ -12,17 +12,18 @@ fun RootView(component: RootComponent) {
     if (openProjectDialog) {
         OpenFileDialog("Open Packwiz 'pack.toml'") { selected ->
             openProjectDialog = false
+            selected?.let { component.openModpack(it) }
         }
     }
 
     Children(component.routerState) {
-        when (it.instance) {
+        when (val instance = it.instance) {
             CurrentScreen.Start -> StartView(
                 createNew = { component.openCreateNew() }, openExisting = { openProjectDialog = true },
                 openSettings = { component.openSettings() })
             CurrentScreen.Settings -> SettingsView(finish = { component.goBack() })
-            is CurrentScreen.CreateNew -> {}
-            is CurrentScreen.Modpack -> {}
+            is CurrentScreen.CreateNew -> CreateNewView(instance.component)
+            is CurrentScreen.Modpack -> ModpackView(instance.component)
         }
     }
 }
