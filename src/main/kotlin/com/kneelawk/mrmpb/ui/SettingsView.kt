@@ -22,7 +22,14 @@ fun SettingsView(finish: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Dark Theme")
-                Switch(GlobalSettings.darkMode, onCheckedChange = { GlobalSettings.darkMode = it })
+                Switch(
+                    GlobalSettings.darkMode, onCheckedChange = { GlobalSettings.darkMode = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colors.primary,
+                        checkedTrackColor = MaterialTheme.colors.secondary,
+                        checkedTrackAlpha = 0.8F
+                    )
+                )
             }
         }
 

@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.ui
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.material.MaterialTheme
@@ -22,8 +23,9 @@ fun RootView(component: RootComponent) {
         }
     }
 
+    val backgroundColor by animateColorAsState(MaterialTheme.colors.background)
     Children(
-        component.routerState, animation = crossfade(), modifier = Modifier.background(MaterialTheme.colors.background)
+        component.routerState, animation = crossfade(), modifier = Modifier.background(backgroundColor)
     ) {
         when (val instance = it.instance) {
             CurrentScreen.Start -> StartView(
