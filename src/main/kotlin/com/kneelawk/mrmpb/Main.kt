@@ -13,9 +13,13 @@ import com.kneelawk.mrmpb.ui.GlobalSettings
 import com.kneelawk.mrmpb.ui.RootComponent
 import com.kneelawk.mrmpb.ui.RootView
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
+import com.kneelawk.mrmpb.ui.util.initSwing
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun main() {
+    // Must be the very first thing in the application, so that Swing components have not selected a LAF yet.
+    initSwing()
+
     val lifecycle = LifecycleRegistry()
     val root = RootComponent(DefaultComponentContext(lifecycle))
 

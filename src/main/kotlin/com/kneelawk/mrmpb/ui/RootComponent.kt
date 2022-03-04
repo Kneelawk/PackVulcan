@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.push
 import com.arkivanov.decompose.router.router
 import com.kneelawk.mrmpb.ui.util.popSafe
+import java.nio.file.Path
 
 class RootComponent(context: ComponentContext) : ComponentContext by context {
     private val router = router<CurrentScreenConfig, CurrentScreen>(
@@ -34,6 +35,6 @@ class RootComponent(context: ComponentContext) : ComponentContext by context {
         router.popSafe()
     }
 
-    fun openModpack(modpackPath: String) {
+    fun openModpack(modpackPath: Path) {
     }
 }
