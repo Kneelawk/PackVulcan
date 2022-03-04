@@ -190,7 +190,10 @@ fun FileChooser(title: String, mode: FileChooserMode, finished: (Path?) -> Unit)
                                 }
                             )
                             ) {
-                                Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Icon(
                                         if (path.isDirectory()) {
                                             MrMpBIcons.folder
