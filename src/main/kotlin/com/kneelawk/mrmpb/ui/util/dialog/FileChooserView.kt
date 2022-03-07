@@ -29,7 +29,6 @@ import com.kneelawk.mrmpb.ui.util.ContainerBox
 import kotlinx.coroutines.launch
 import java.awt.event.MouseEvent
 import java.nio.file.Path
-import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
@@ -84,7 +83,9 @@ fun FileChooserView(controller: FileChooserInterface) {
             LazyColumn(
                 state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
             ) {
-                items(controller.fileList, { it.name }) { path ->
+                items(controller.fileList, { it.path.name }) { element ->
+                    val path = element.path
+
                     val background = if (controller.isPathSelected(path)) {
                         MaterialTheme.colors.secondary
                     } else {
@@ -104,10 +105,9 @@ fun FileChooserView(controller: FileChooserInterface) {
                             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(
-                                if (path.isDirectory()) {
-                                    MrMpBIcons.folder
-                                } else {
-                                    MrMpBIcons.file
+                                when (element.type) {
+                                    FileChooserInterface.FileListElementType.FILE -> MrMpBIcons.file
+                                    FileChooserInterface.FileListElementType.FOLDER -> MrMpBIcons.folder
                                 }, "file"
                             )
                             Text(path.name, modifier = Modifier.padding(start = 10.dp))

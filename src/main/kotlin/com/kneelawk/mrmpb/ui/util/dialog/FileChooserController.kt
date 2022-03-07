@@ -31,7 +31,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
 
     val topBarViewingState = remember { mutableStateOf(cViewing) }
 
-    val fileList = remember { mutableStateListOf<Path>() }
+    val fileList = remember { mutableStateListOf<FileChooserInterface.FileListElement>() }
 
     val selectedState = remember { mutableStateOf("") }
     val cSelected by selectedState
@@ -83,14 +83,23 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
     val recalculateFileList = remember {
         Conflator<Unit>(composableScope) {
             fileList.clear()
+
             val list = withContext(Dispatchers.IO) {
-                Files.list(cViewing)
-            }.filter {
-                (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
-            }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.collect(Collectors.toList())
+                Files.list(cViewing).filter {
+                    (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
+                }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
+                    val type = when {
+                        it.isDirectory() -> FileChooserInterface.FileListElementType.FOLDER
+                        else -> FileChooserInterface.FileListElementType.FILE
+                    }
+
+                    FileChooserInterface.FileListElement(it, type)
+                }.collect(Collectors.toList())
+            }
+
             fileList.addAll(list)
 
-            val index = fileList.indexOf(Paths.get(cSelected))
+            val index = fileList.indexOfFirst { it.path == cSelectedPath }
             if (index > 0) {
                 listState.scrollToItem(index)
             } else {
@@ -101,6 +110,8 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
 
     // Calculate everything the first time or when stuff updates
     LaunchedEffect(mode, cViewing, cShowHiddenFiles) {
+        // Note that `cSelected`/`cSelectedPath` is not one of the input variables, because we don't want to
+        // re-calculate every time a new element is selected.
         recalculateFileList.send(Unit)
     }
 

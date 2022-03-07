@@ -7,7 +7,7 @@ import java.nio.file.Path
 interface FileChooserInterface {
     val viewing: Path
     val topBarViewing: Path
-    val fileList: List<Path>
+    val fileList: List<FileListElement>
     val selected: String
     val selectedValid: Boolean
     val selectedError: String?
@@ -39,4 +39,9 @@ interface FileChooserInterface {
     fun select()
 
     fun cancel()
+
+    data class FileListElement(val path: Path, val type: FileListElementType)
+    enum class FileListElementType {
+        FILE, FOLDER;
+    }
 }
