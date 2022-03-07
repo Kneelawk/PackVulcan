@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.ui.util.dialog
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,11 +10,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -38,7 +43,7 @@ import java.nio.file.Path
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalSplitPaneApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalSplitPaneApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun FileChooserView(controller: FileChooserInterface) {
     if (controller.showCreateFolderDialog) {
@@ -73,7 +78,110 @@ fun FileChooserView(controller: FileChooserInterface) {
                             Divider(modifier = Modifier.fillMaxWidth())
                         }
 
-                        items(controller.driveList) { drive ->
+                        item {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                ListButton(
+                                    onClick = { controller.addFavorite() }, modifier = Modifier.weight(1f),
+                                    enabled = controller.favoritesAddEnabled
+                                ) {
+                                    Icon(Icons.Default.Add, "add")
+
+                                    Text("Add Favorite", modifier = Modifier.padding(start = 10.dp))
+                                }
+
+                                TooltipArea(tooltip = {
+                                    Surface(
+                                        modifier = Modifier.shadow(4.dp),
+                                        color = MaterialTheme.colors.surface,
+                                        shape = MaterialTheme.shapes.small
+                                    ) {
+                                        Text("Edit Favorites", modifier = Modifier.padding(10.dp))
+                                    }
+                                }) {
+                                    IconButton(onClick = { controller.editFavorites() }) {
+                                        Icon(Icons.Default.Edit, "edit favorites")
+                                    }
+                                }
+                            }
+                        }
+
+                        items(controller.favoritesList, { it }) { favorite ->
+                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                TooltipArea(
+                                    tooltip = {
+                                        Surface(
+                                            modifier = Modifier.shadow(4.dp),
+                                            color = MaterialTheme.colors.surface,
+                                            shape = MaterialTheme.shapes.small
+                                        ) {
+                                            Text(favorite.pathString, modifier = Modifier.padding(10.dp))
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    ListButton(
+                                        onClick = { controller.favoriteSelect(favorite) },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Icon(MrMpBIcons.folder, "favorite")
+
+                                        Text(favorite.name, modifier = Modifier.padding(start = 10.dp))
+                                    }
+                                }
+
+                                AnimatedVisibility(visible = controller.favoritesEditEnabled) {
+                                    Row {
+                                        TooltipArea(tooltip = {
+                                            Surface(
+                                                modifier = Modifier.shadow(4.dp),
+                                                color = MaterialTheme.colors.surface,
+                                                shape = MaterialTheme.shapes.small
+                                            ) {
+                                                Text("Move Favorite Up", modifier = Modifier.padding(10.dp))
+                                            }
+                                        }) {
+                                            IconButton(onClick = { controller.moveFavoriteUp(favorite) }) {
+                                                Icon(Icons.Default.KeyboardArrowUp, "move up")
+                                            }
+                                        }
+
+                                        TooltipArea(tooltip = {
+                                            Surface(
+                                                modifier = Modifier.shadow(4.dp),
+                                                color = MaterialTheme.colors.surface,
+                                                shape = MaterialTheme.shapes.small
+                                            ) {
+                                                Text("Move Favorite Down", modifier = Modifier.padding(10.dp))
+                                            }
+                                        }) {
+                                            IconButton(onClick = { controller.moveFavoriteDown(favorite) }) {
+                                                Icon(Icons.Default.KeyboardArrowDown, "move down")
+                                            }
+                                        }
+
+                                        TooltipArea(tooltip = {
+                                            Surface(
+                                                modifier = Modifier.shadow(4.dp),
+                                                color = MaterialTheme.colors.surface,
+                                                shape = MaterialTheme.shapes.small
+                                            ) {
+                                                Text("Remove Favorite", modifier = Modifier.padding(10.dp))
+                                            }
+                                        }) {
+                                            IconButton(onClick = { controller.removeFavorite(favorite) }) {
+                                                Icon(Icons.Default.Close, "remove")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        item {
+                            Divider(modifier = Modifier.fillMaxWidth())
+                        }
+
+                        items(controller.driveList, { it.path }) { drive ->
                             ListButton(onClick = {
                                 controller.driveSelect(drive.path)
                             }, modifier = Modifier.fillMaxWidth()) {

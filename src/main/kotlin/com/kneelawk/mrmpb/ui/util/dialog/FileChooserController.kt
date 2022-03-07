@@ -2,6 +2,7 @@ package com.kneelawk.mrmpb.ui.util.dialog
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.util.Conflator
 import kotlinx.coroutines.*
 import java.nio.file.Files
@@ -42,6 +43,9 @@ fun rememberFileChooserController(
 
     val viewingState: MutableState<Path> = remember { mutableStateOf(initialFolder) }
     val cViewing by viewingState
+
+    val favoritesAddEnabledState = derivedStateOf { !GlobalSettings.fileChooserFavoritesList.contains(cViewing) }
+    val favoritesEditEnabledState = remember { mutableStateOf(false) }
 
     val topBarViewingState = remember { mutableStateOf(cViewing) }
 
@@ -169,6 +173,9 @@ fun rememberFileChooserController(
         override var showHiddenFiles by showHiddenFilesState
         override val homeFolderList = homeFolderList
         override val driveList = driveList
+        override val favoritesAddEnabled by favoritesAddEnabledState
+        override var favoritesEditEnabled by favoritesEditEnabledState
+        override val favoritesList = GlobalSettings.fileChooserFavoritesList
         override val listState = listState
         override var showCreateFolderDialog by showCreateFolderState
 
@@ -183,6 +190,46 @@ fun rememberFileChooserController(
         }
 
         override fun driveSelect(path: Path) {
+            composableScope.launch {
+                if (withContext(Dispatchers.IO) { path.exists() }) {
+                    viewing = path
+
+                    if (!topBarViewing.startsWith(path)) {
+                        topBarViewing = path
+                    }
+                }
+            }
+        }
+
+        override fun addFavorite() {
+            GlobalSettings.fileChooserFavoritesList.add(cViewing)
+        }
+
+        override fun editFavorites() {
+            favoritesEditEnabled = !favoritesEditEnabled
+        }
+
+        override fun removeFavorite(path: Path) {
+            GlobalSettings.fileChooserFavoritesList.remove(path)
+        }
+
+        override fun moveFavoriteUp(path: Path) {
+            val index = GlobalSettings.fileChooserFavoritesList.indexOf(path)
+            if (index > 0) {
+                val replaced = GlobalSettings.fileChooserFavoritesList.set(index - 1, path)
+                GlobalSettings.fileChooserFavoritesList[index] = replaced
+            }
+        }
+
+        override fun moveFavoriteDown(path: Path) {
+            val index = GlobalSettings.fileChooserFavoritesList.indexOf(path)
+            if (index < GlobalSettings.fileChooserFavoritesList.size - 1) {
+                val replaced = GlobalSettings.fileChooserFavoritesList.set(index + 1, path)
+                GlobalSettings.fileChooserFavoritesList[index] = replaced
+            }
+        }
+
+        override fun favoriteSelect(path: Path) {
             composableScope.launch {
                 if (withContext(Dispatchers.IO) { path.exists() }) {
                     viewing = path

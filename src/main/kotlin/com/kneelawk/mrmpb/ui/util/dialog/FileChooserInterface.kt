@@ -14,6 +14,9 @@ interface FileChooserInterface {
     val showHiddenFiles: Boolean
     val homeFolderList: List<HomeFolderItem>
     val driveList: List<DriveItem>
+    val favoritesAddEnabled: Boolean
+    val favoritesEditEnabled: Boolean
+    val favoritesList: List<Path>
 
     val listState: LazyListState
 
@@ -22,6 +25,18 @@ interface FileChooserInterface {
     fun homeFolderSelect(item: HomeFolderItem)
 
     fun driveSelect(path: Path)
+
+    fun addFavorite()
+
+    fun editFavorites()
+
+    fun removeFavorite(path: Path)
+
+    fun moveFavoriteUp(path: Path)
+
+    fun moveFavoriteDown(path: Path)
+
+    fun favoriteSelect(path: Path)
 
     fun showHiddenFilesToggle()
 
