@@ -1,11 +1,9 @@
 package com.kneelawk.mrmpb.ui.util.dialog
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -77,40 +75,48 @@ fun FileChooserView(controller: FileChooserInterface) {
             controller.topBarSelect(it)
         }
 
-        LazyColumn(
-            state = controller.listState, modifier = Modifier.fillMaxWidth().weight(1f)
-                .background(MaterialTheme.colors.surface, MaterialTheme.shapes.small)
+        Row(
+            modifier = Modifier.fillMaxWidth().weight(1f)
+                .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
         ) {
-            items(controller.fileList, { it.name }) { path ->
-                val background = if (controller.isPathSelected(path)) {
-                    MaterialTheme.colors.secondary
-                } else {
-                    Color.Transparent
-                }
-
-                TextButton(onClick = {
-                    controller.selectedUpdate(path)
-                }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
-                    if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
-                        controller.doubleClick(path)
+            LazyColumn(
+                state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
+            ) {
+                items(controller.fileList, { it.name }) { path ->
+                    val background = if (controller.isPathSelected(path)) {
+                        MaterialTheme.colors.secondary
+                    } else {
+                        Color.Transparent
                     }
-                }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
+
+                    TextButton(onClick = {
+                        controller.selectedUpdate(path)
+                    }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                        if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
+                            controller.doubleClick(path)
+                        }
+                    }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
                     ) {
-                        Icon(
-                            if (path.isDirectory()) {
-                                MrMpBIcons.folder
-                            } else {
-                                MrMpBIcons.file
-                            }, "file"
-                        )
-                        Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                if (path.isDirectory()) {
+                                    MrMpBIcons.folder
+                                } else {
+                                    MrMpBIcons.file
+                                }, "file"
+                            )
+                            Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                        }
                     }
                 }
             }
+
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(controller.listState), modifier = Modifier.fillMaxHeight()
+            )
         }
 
         TextField(value = controller.selected, onValueChange = {
@@ -154,20 +160,28 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
             Icon(Icons.Default.KeyboardArrowLeft, "scroll current path left")
         }
 
-        Row(
-            modifier = Modifier.weight(1F).background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-                .horizontalScroll(segmentScrollState)
-        ) {
-            var path =
-                fullPath.root ?: throw IllegalStateException("fullPath must be an absolute path! fullPath: $fullPath")
+        Column(modifier = Modifier.weight(1F)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
+                    .horizontalScroll(segmentScrollState)
+            ) {
+                var path =
+                    fullPath.root ?: throw IllegalStateException(
+                        "fullPath must be an absolute path! fullPath: $fullPath"
+                    )
 
-            // Make sure to have a path segment for the root folder
-            PathSegment(path, selectedPath, path.pathString, pathSelected)
+                // Make sure to have a path segment for the root folder
+                PathSegment(path, selectedPath, path.pathString, pathSelected)
 
-            for (segment in fullPath) {
-                path = path.resolve(segment)
-                PathSegment(path, selectedPath, segment.name, pathSelected)
+                for (segment in fullPath) {
+                    path = path.resolve(segment)
+                    PathSegment(path, selectedPath, segment.name, pathSelected)
+                }
             }
+
+            HorizontalScrollbar(
+                adapter = rememberScrollbarAdapter(segmentScrollState), modifier = Modifier.fillMaxWidth()
+            )
         }
 
         IconButton(onClick = {
