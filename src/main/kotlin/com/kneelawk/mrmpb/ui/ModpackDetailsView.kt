@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.util.Form
 import com.kneelawk.mrmpb.ui.util.dialog.OpenDirectoryDialog
+import java.nio.file.Paths
 import kotlin.io.path.pathString
 
 @Composable
@@ -19,7 +20,14 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
     var projectLocationDialog by remember { mutableStateOf(false) }
 
     if (projectLocationDialog) {
-        OpenDirectoryDialog("Select a project location...") { selection ->
+        val initialFolder = if (projectLocation.isBlank()) {
+            Paths.get(System.getProperty("user.home"))
+        } else {
+            Paths.get(projectLocation).normalize().parent ?: Paths.get(System.getProperty("user.home"))
+        }
+        OpenDirectoryDialog(
+            title = "Select a project location...", initialFolder = initialFolder, initialSelection = projectLocation
+        ) { selection ->
             projectLocationDialog = false
             selection?.let { projectLocationChange(it.pathString) }
         }

@@ -9,9 +9,14 @@ import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.ContainerBox
 import java.nio.file.Path
+import java.nio.file.Paths
+
+val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
 
 @Composable
-fun OpenFileDialog(title: String, finished: (Path?) -> Unit) {
+fun OpenFileDialog(
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", finished: (Path?) -> Unit
+) {
 //    AwtWindow(
 //        create = {
 //            object : FileDialog(null as? Frame, title, LOAD) {
@@ -25,12 +30,26 @@ fun OpenFileDialog(title: String, finished: (Path?) -> Unit) {
 //        }, dispose = FileDialog::dispose
 //    )
 
-    FileChooserDialog(title, FileChooserMode.OPEN_FILE, finished)
+    FileChooserDialog(
+        title = title,
+        mode = FileChooserMode.OPEN_FILE,
+        initialFolder = initialFolder,
+        initialSelection = initialSelection,
+        finished = finished
+    )
 }
 
 @Composable
-fun OpenDirectoryDialog(title: String, finished: (Path?) -> Unit) {
-    FileChooserDialog(title, FileChooserMode.OPEN_DIRECTORY, finished)
+fun OpenDirectoryDialog(
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", finished: (Path?) -> Unit
+) {
+    FileChooserDialog(
+        title = title,
+        mode = FileChooserMode.OPEN_DIRECTORY,
+        initialFolder = initialFolder,
+        initialSelection = initialSelection,
+        finished = finished
+    )
 }
 
 enum class FileChooserMode {
@@ -38,7 +57,10 @@ enum class FileChooserMode {
 }
 
 @Composable
-fun FileChooserDialog(title: String, mode: FileChooserMode, finished: (Path?) -> Unit) {
+fun FileChooserDialog(
+    title: String, mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
+    finished: (Path?) -> Unit
+) {
     val state = rememberDialogState(size = DpSize(1280.dp, 800.dp))
 
     Dialog(title = title, state = state, onCloseRequest = {
@@ -60,7 +82,14 @@ fun FileChooserDialog(title: String, mode: FileChooserMode, finished: (Path?) ->
 
         MrMpBTheme(GlobalSettings.darkMode) {
             ContainerBox {
-                FileChooserView(rememberFileChooserController(mode, finished))
+                FileChooserView(
+                    rememberFileChooserController(
+                        mode = mode,
+                        initialFolder = initialFolder,
+                        initialSelection = initialSelection,
+                        finished = finished
+                    )
+                )
             }
         }
     }
