@@ -36,21 +36,41 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
     val selectedState = remember { mutableStateOf("") }
     val cSelected by selectedState
 
-    val selectedProduced by produceState(SelectedProduced(false, Paths.get("")), cSelected) {
+    val selectedProduced by produceState(SelectedProduced(false, null, Paths.get("")), cSelected) {
         // we do this checking in a produceState, so that we can handle cases when filesystem checks like
         // `isRegularFile()` or `isDirectory()` take a significant amount of time.
         val selectedPath = Paths.get(cSelected)
-        val valid = isValidFilename(cSelected) && when (mode) {
-            FileChooserMode.SAVE -> cSelected.isNotEmpty()
-            FileChooserMode.OPEN_FILE -> cSelected.isNotEmpty() &&
-                    withContext(Dispatchers.IO) { selectedPath.isRegularFile() }
-            FileChooserMode.OPEN_DIRECTORY -> selectedState.value.isNotEmpty() &&
-                    withContext(Dispatchers.IO) { selectedPath.isDirectory() }
+        value = if (cSelected.isEmpty()) {
+            SelectedProduced(false, null, selectedPath)
+        } else if (!isValidFilename(cSelected)) {
+            SelectedProduced(
+                false, "Paths must not be blank and must not contain '\"', '*', '<', '>', '?', or '|'.", selectedPath
+            )
+        } else {
+            when (mode) {
+                FileChooserMode.SAVE -> {
+                    SelectedProduced(true, null, selectedPath)
+                }
+                FileChooserMode.OPEN_FILE -> {
+                    if (withContext(Dispatchers.IO) { selectedPath.isRegularFile() }) {
+                        SelectedProduced(true, null, selectedPath)
+                    } else {
+                        SelectedProduced(false, "The selected file is not a regular file.", selectedPath)
+                    }
+                }
+                FileChooserMode.OPEN_DIRECTORY -> {
+                    if (withContext(Dispatchers.IO) { selectedPath.isDirectory() }) {
+                        SelectedProduced(true, null, selectedPath)
+                    } else {
+                        SelectedProduced(false, "The selected file is not a folder.", selectedPath)
+                    }
+                }
+            }
         }
-        value = SelectedProduced(valid, selectedPath)
     }
     val cSelectedPath by derivedStateOf { selectedProduced.selectedPath }
     val selectedValidState = derivedStateOf { selectedProduced.valid }
+    val selectedErrorState = derivedStateOf { selectedProduced.error }
 
     val showHiddenFilesState = remember { mutableStateOf(false) }
     val cShowHiddenFiles by showHiddenFilesState
@@ -91,6 +111,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
         override val fileList = fileList
         override var selected by selectedState
         override val selectedValid by selectedValidState
+        override val selectedError by selectedErrorState
         override var showHiddenFiles by showHiddenFilesState
         override val listState = listState
         override var showCreateFolderDialog by showCreateFolderState
@@ -113,20 +134,33 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
 
             val folderNameState = remember { mutableStateOf("") }
             val cFolderName by folderNameState
-            val folderNameProduced by produceState(FolderNameProduced(false, curViewing.resolve("")), cFolderName) {
+            val folderNameProduced by produceState(
+                FolderNameProduced(false, null, curViewing.resolve("")), cFolderName
+            ) {
                 val newFolder = curViewing.resolve(cFolderName)
-                val valid = isValidFolderName(cFolderName) && withContext(Dispatchers.IO) {
-                    !newFolder.exists()
+                value = if (cFolderName.isEmpty()) {
+                    FolderNameProduced(false, null, newFolder)
+                } else if (!isValidFolderName(cFolderName)) {
+                    FolderNameProduced(
+                        false,
+                        "Folder names must not be blank and must not contain '\"', '*', '<', '>', '?', '|', ':', '/', or '\\'.",
+                        newFolder
+                    )
+                } else if (withContext(Dispatchers.IO) { newFolder.exists() }) {
+                    FolderNameProduced(false, "\"$cFolderName\" already exists.", newFolder)
+                } else {
+                    FolderNameProduced(true, null, newFolder)
                 }
-                value = FolderNameProduced(valid, newFolder)
             }
             val folderNameValidState = derivedStateOf { folderNameProduced.valid }
+            val folderNameErrorState = derivedStateOf { folderNameProduced.error }
             val newFolder by derivedStateOf { folderNameProduced.newFolder }
 
             // No need to remember this as all its state is remembered elsewhere
             return object : CreateFolderInterface {
                 override var folderName by folderNameState
                 override val folderNameValid by folderNameValidState
+                override val folderNameError by folderNameErrorState
 
                 override fun folderNameUpdate(newName: String) {
                     folderName = newName
@@ -176,9 +210,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
         }
 
         override fun selectedFieldUpdate(newText: String) {
-            if (isValidFilename(newText)) {
-                selected = newText
-            }
+            selected = newText
         }
 
         override fun select() {
@@ -193,8 +225,8 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
     }
 }
 
-private val invalidPathChars = charArrayOf('"', '*', ':', '<', '>', '?', '|', 0x7F.toChar())
-private val invalidNameChars = charArrayOf('/', '\\')
+private val invalidPathChars = charArrayOf('"', '*', '<', '>', '?', '|', 0x7F.toChar())
+private val invalidNameChars = charArrayOf('/', '\\', ':')
 
 private fun isValidFilename(name: String): Boolean {
     return name.isNotBlank() && name.length <= 255 && invalidPathChars.none { name.contains(it) }
@@ -204,5 +236,5 @@ private fun isValidFolderName(name: String): Boolean {
     return isValidFilename(name) && invalidNameChars.none { name.contains(it) }
 }
 
-private data class FolderNameProduced(val valid: Boolean, val newFolder: Path)
-private data class SelectedProduced(val valid: Boolean, val selectedPath: Path)
+private data class FolderNameProduced(val valid: Boolean, val error: String?, val newFolder: Path)
+private data class SelectedProduced(val valid: Boolean, val error: String?, val selectedPath: Path)

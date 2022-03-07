@@ -43,6 +43,8 @@ fun FileChooserView(controller: FileChooserInterface) {
     Column(
         modifier = Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        val selectedError = controller.selectedError
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
             modifier = Modifier.fillMaxWidth()
@@ -121,12 +123,18 @@ fun FileChooserView(controller: FileChooserInterface) {
 
         TextField(value = controller.selected, onValueChange = {
             controller.selectedFieldUpdate(it)
-        }, modifier = Modifier.fillMaxWidth())
+        }, modifier = Modifier.fillMaxWidth(), isError = selectedError != null)
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
+            if (selectedError != null) {
+                Text(selectedError)
+            }
+
+            Box(Modifier.weight(1f))
+
             Button(onClick = {
                 controller.cancel()
             }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
@@ -222,12 +230,18 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     val requester = remember { FocusRequester() }
+                    val folderNameError = controller.folderNameError
 
                     Text("New Folder Name:", style = MaterialTheme.typography.h5)
                     TextField(
                         value = controller.folderName, onValueChange = { controller.folderNameUpdate(it) },
-                        modifier = Modifier.fillMaxWidth().focusRequester(requester)
+                        modifier = Modifier.fillMaxWidth().focusRequester(requester),
+                        isError = folderNameError != null
                     )
+
+                    if (folderNameError != null) {
+                        Text(folderNameError)
+                    }
 
                     Box(Modifier.weight(1f))
 

@@ -10,6 +10,7 @@ interface FileChooserInterface {
     val fileList: List<Path>
     val selected: String
     val selectedValid: Boolean
+    val selectedError: String?
     val showHiddenFiles: Boolean
 
     val listState: LazyListState
