@@ -20,7 +20,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.kneelawk.mrmpb.GlobalSettings
@@ -29,12 +31,16 @@ import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.ContainerBox
 import com.kneelawk.mrmpb.ui.util.ListButton
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
+import org.jetbrains.compose.splitpane.HorizontalSplitPane
+import org.jetbrains.compose.splitpane.rememberSplitPaneState
+import java.awt.Cursor
 import java.awt.event.MouseEvent
 import java.nio.file.Path
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun FileChooserView(controller: FileChooserInterface) {
     if (controller.showCreateFolderDialog) {
@@ -44,115 +50,143 @@ fun FileChooserView(controller: FileChooserInterface) {
     Column(
         modifier = Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        val selectedError = controller.selectedError
+        val splitPaneState = rememberSplitPaneState(0.5f)
 
-        // TODO: replace this row with a HorizontalSplitPlane
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
-            Row(
-                modifier = Modifier.weight(0.25f).fillMaxHeight()
-                    .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-            ) {
-                val sideBarListState = rememberLazyListState()
-
-                LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)) {
-                    items(controller.homeFolderList) { type ->
-                        ListButton(onClick = {
-                            controller.homeFolderSelect(type)
-                        }, modifier = Modifier.fillMaxWidth()) {
-                            HomeFolderIcon(type)
-
-                            Text(type.displayName, modifier = Modifier.padding(start = 10.dp))
-                        }
-                    }
-
-                    item {
-                        Divider(modifier = Modifier.fillMaxWidth())
-                    }
-
-                    items(controller.driveList) { drive ->
-                        ListButton(onClick = {
-                            controller.driveSelect(drive.path)
-                        }, modifier = Modifier.fillMaxWidth()) {
-                            Icon(MrMpBIcons.storage, "drive")
-
-                            Text(drive.displayName, modifier = Modifier.padding(start = 10.dp))
-                        }
-                    }
-                }
-
-                VerticalScrollbar(
-                    adapter = rememberScrollbarAdapter(sideBarListState), modifier = Modifier.fillMaxHeight()
-                )
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(0.75f)) {
+        HorizontalSplitPane(splitPaneState = splitPaneState, modifier = Modifier.weight(1f)) {
+            first(150.dp) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextButton(onClick = {
-                        controller.showHiddenFilesToggle()
-                    }) {
-                        val shown = if (controller.showHiddenFiles) {
-                            "Shown"
-                        } else {
-                            "Hidden"
-                        }
-                        Text("Hidden Files: $shown")
-                    }
-
-                    IconButton(onClick = {
-                        controller.openCreateFolderDialog()
-                    }) {
-                        Icon(MrMpBIcons.create_new_folder, "create new folder")
-                    }
-                }
-
-                ParentSelector(controller.topBarViewing, controller.viewing) {
-                    controller.topBarSelect(it)
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f)
+                    modifier = Modifier.fillMaxHeight().padding(end = (5 - 1.5).dp)
                         .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
                 ) {
-                    LazyColumn(
-                        state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
-                    ) {
-                        items(controller.fileList, { it.path.name }) { element ->
-                            val path = element.path
+                    val sideBarListState = rememberLazyListState()
 
-                            val background = if (controller.isPathSelected(path)) {
-                                MaterialTheme.colors.secondary
-                            } else {
-                                Color.Transparent
-                            }
-
+                    LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)) {
+                        items(controller.homeFolderList) { type ->
                             ListButton(onClick = {
-                                controller.selectedUpdate(path)
-                            }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
-                                if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
-                                    controller.doubleClick(path)
-                                }
-                            }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
-                            ) {
-                                Icon(
-                                    when (element.type) {
-                                        FileListItemType.FILE -> MrMpBIcons.file
-                                        FileListItemType.FOLDER -> MrMpBIcons.folder
-                                    }, "file"
-                                )
-                                Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                                controller.homeFolderSelect(type)
+                            }, modifier = Modifier.fillMaxWidth()) {
+                                HomeFolderIcon(type)
+
+                                Text(type.displayName, modifier = Modifier.padding(start = 10.dp))
+                            }
+                        }
+
+                        item {
+                            Divider(modifier = Modifier.fillMaxWidth())
+                        }
+
+                        items(controller.driveList) { drive ->
+                            ListButton(onClick = {
+                                controller.driveSelect(drive.path)
+                            }, modifier = Modifier.fillMaxWidth()) {
+                                Icon(MrMpBIcons.storage, "drive")
+
+                                Text(drive.displayName, modifier = Modifier.padding(start = 10.dp))
                             }
                         }
                     }
 
                     VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(controller.listState), modifier = Modifier.fillMaxHeight()
+                        adapter = rememberScrollbarAdapter(sideBarListState), modifier = Modifier.fillMaxHeight()
+                    )
+                }
+            }
+
+            second(400.dp) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(start = (5 - 1.5).dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextButton(onClick = {
+                            controller.showHiddenFilesToggle()
+                        }) {
+                            val shown = if (controller.showHiddenFiles) {
+                                "Shown"
+                            } else {
+                                "Hidden"
+                            }
+                            Text("Hidden Files: $shown")
+                        }
+
+                        IconButton(onClick = {
+                            controller.openCreateFolderDialog()
+                        }) {
+                            Icon(MrMpBIcons.create_new_folder, "create new folder")
+                        }
+                    }
+
+                    ParentSelector(controller.topBarViewing, controller.viewing) {
+                        controller.topBarSelect(it)
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                            .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
+                    ) {
+                        LazyColumn(
+                            state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
+                        ) {
+                            items(controller.fileList, { it.path.name }) { element ->
+                                val path = element.path
+
+                                val background = if (controller.isPathSelected(path)) {
+                                    MaterialTheme.colors.secondary
+                                } else {
+                                    Color.Transparent
+                                }
+
+                                ListButton(onClick = {
+                                    controller.selectedUpdate(path)
+                                }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                                    if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
+                                        controller.doubleClick(path)
+                                    }
+                                }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
+                                ) {
+                                    Icon(
+                                        when (element.type) {
+                                            FileListItemType.FILE -> MrMpBIcons.file
+                                            FileListItemType.FOLDER -> MrMpBIcons.folder
+                                        }, "file"
+                                    )
+                                    Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                                }
+                            }
+                        }
+
+                        VerticalScrollbar(
+                            adapter = rememberScrollbarAdapter(controller.listState),
+                            modifier = Modifier.fillMaxHeight()
+                        )
+                    }
+                }
+            }
+
+            splitter {
+                visiblePart {
+                    Column(verticalArrangement = Arrangement.Center) {
+                        Box(
+                            Modifier
+                                .width(3.dp)
+                                .height(30.dp)
+                                .background(MaterialTheme.colors.surface, shape = MaterialTheme.shapes.small)
+                        )
+                    }
+                }
+                handle {
+                    Box(
+                        Modifier
+                            .markAsHandle()
+                            .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                            .width(10.dp)
+                            .fillMaxHeight()
                     )
                 }
             }
         }
+
+        val selectedError = controller.selectedError
 
         TextField(value = controller.selected, onValueChange = {
             controller.selectedFieldUpdate(it)
