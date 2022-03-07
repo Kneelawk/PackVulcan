@@ -9,7 +9,6 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import com.kneelawk.mrmpb.ui.GlobalSettings
 import com.kneelawk.mrmpb.ui.RootComponent
 import com.kneelawk.mrmpb.ui.RootView
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
@@ -20,10 +19,13 @@ fun main() {
     // Must be the very first thing in the application, so that Swing components have not selected a LAF yet.
     initSwing()
 
+    // Load the global settings
+    GlobalSettings.load()
+
     val lifecycle = LifecycleRegistry()
     val root = RootComponent(DefaultComponentContext(lifecycle))
 
-    application {
+    application(exitProcessOnExit = false) {
         val windowState = rememberWindowState(size = DpSize(1280.dp, 800.dp))
 
         LifecycleController(lifecycle, windowState)
@@ -37,4 +39,7 @@ fun main() {
             }
         }
     }
+
+    // Store global settings
+    GlobalSettings.store()
 }

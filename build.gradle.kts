@@ -22,6 +22,15 @@ dependencies {
     // Decompose
     implementation("com.arkivanov.decompose:decompose:0.5.1")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:0.5.1")
+
+    // Logging
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
+
+    // TOML4J
+    implementation("com.moandjiezana.toml:toml4j:0.7.2")
+
+    // Use logback logger because nothing seems to have updated their log4j yet
+    runtimeOnly("ch.qos.logback:logback-classic:1.3.0-alpha14")
 }
 
 tasks.withType<KotlinCompile> {
