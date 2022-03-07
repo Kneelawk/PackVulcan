@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -93,7 +91,9 @@ fun FileChooserView(controller: FileChooserInterface) {
             }
 
             second(400.dp) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(start = (5 - 1.5).dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(start = (5 - 1.5).dp)
+                ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                         modifier = Modifier.fillMaxWidth()
@@ -259,11 +259,11 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
                     )
 
                 // Make sure to have a path segment for the root folder
-                PathSegment(path, selectedPath, path.pathString, pathSelected)
+                PathSegment(path, selectedPath, path.pathString, true, fullPath == path, pathSelected)
 
                 for (segment in fullPath) {
                     path = path.resolve(segment)
-                    PathSegment(path, selectedPath, segment.name, pathSelected)
+                    PathSegment(path, selectedPath, segment.name, false, fullPath == path, pathSelected)
                 }
             }
 
@@ -285,16 +285,35 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
 }
 
 @Composable
-private fun PathSegment(path: Path, selectedPath: Path, name: String, pathSelected: (Path) -> Unit) {
+private fun PathSegment(
+    path: Path, selectedPath: Path, name: String, isFirst: Boolean, isLast: Boolean, pathSelected: (Path) -> Unit
+) {
     val background = if (path == selectedPath) {
         MaterialTheme.colors.primary
     } else {
         MaterialTheme.colors.secondary
     }
 
+    val startCorners = if (isFirst) {
+        4.dp
+    } else {
+        0.dp
+    }
+
+    val endCorners = if (isLast) {
+        4.dp
+    } else {
+        0.dp
+    }
+
+    val buttonShape = RoundedCornerShape(
+        topStart = startCorners, bottomStart = startCorners, topEnd = endCorners, bottomEnd = endCorners
+    )
+
     Button(
         onClick = { pathSelected(path) },
-        colors = ButtonDefaults.buttonColors(backgroundColor = background)
+        colors = ButtonDefaults.buttonColors(backgroundColor = background),
+        shape = buttonShape
     ) {
         Text(name)
     }
