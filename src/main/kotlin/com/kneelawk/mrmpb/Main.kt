@@ -12,7 +12,9 @@ import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.kneelawk.mrmpb.ui.RootComponent
 import com.kneelawk.mrmpb.ui.RootView
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
+import com.kneelawk.mrmpb.ui.util.dialog.DriveDetector
 import com.kneelawk.mrmpb.ui.util.initSwing
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun main() {

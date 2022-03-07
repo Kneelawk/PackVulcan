@@ -31,4 +31,6 @@ object MrMpBIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val music = loader.getResourceAsStream("music_note_black_24dp.svg").orError("music")
         .use { loadSvgPainter(it, Density(1f)) }
+    val storage = loader.getResourceAsStream("storage_black_24dp.svg").orError("storage")
+        .use { loadSvgPainter(it, Density(1f)) }
 }

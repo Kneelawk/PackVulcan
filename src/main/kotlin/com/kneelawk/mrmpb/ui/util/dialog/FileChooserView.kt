@@ -54,7 +54,7 @@ fun FileChooserView(controller: FileChooserInterface) {
             ) {
                 val sideBarListState = rememberLazyListState()
 
-                LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight()) {
+                LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)) {
                     items(controller.homeFolderList) { type ->
                         ListButton(onClick = {
                             controller.homeFolderSelect(type)
@@ -62,6 +62,20 @@ fun FileChooserView(controller: FileChooserInterface) {
                             HomeFolderIcon(type)
 
                             Text(type.displayName, modifier = Modifier.padding(start = 10.dp))
+                        }
+                    }
+
+                    item {
+                        Divider(modifier = Modifier.fillMaxWidth())
+                    }
+
+                    items(controller.driveList) { drive ->
+                        ListButton(onClick = {
+                            controller.driveSelect(drive.path)
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            Icon(MrMpBIcons.storage, "drive")
+
+                            Text(drive.displayName, modifier = Modifier.padding(start = 10.dp))
                         }
                     }
                 }
@@ -186,7 +200,7 @@ private fun HomeFolderIcon(item: HomeFolderItem) {
 
 @Composable
 private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Path) -> Unit) {
-    Row {
+    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         val coroutineScope = rememberCoroutineScope()
         val segmentScrollState = rememberScrollState()
 

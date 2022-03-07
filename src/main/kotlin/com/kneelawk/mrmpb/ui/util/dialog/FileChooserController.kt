@@ -3,9 +3,7 @@ package com.kneelawk.mrmpb.ui.util.dialog
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import com.kneelawk.mrmpb.util.Conflator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -40,6 +38,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
 
     // Setup state
     val homeFolderList = remember { mutableStateListOf<HomeFolderItem>() }
+    val driveList = remember { mutableStateListOf<DriveItem>() }
 
     val viewingState: MutableState<Path> = remember { mutableStateOf(homeFolder) }
     val cViewing by viewingState
@@ -100,16 +99,20 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
             fileList.clear()
 
             val list = withContext(Dispatchers.IO) {
-                Files.list(cViewing).filter {
-                    (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
-                }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
-                    val type = when {
-                        it.isDirectory() -> FileListItemType.FOLDER
-                        else -> FileListItemType.FILE
-                    }
+                // Note, we must have a `use` here, as the stream *must* be closed after it is used, and `collect`
+                // doesn't appear to do that for us.
+                Files.list(cViewing).use { stream ->
+                    stream.filter {
+                        (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
+                    }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
+                        val type = when {
+                            it.isDirectory() -> FileListItemType.FOLDER
+                            else -> FileListItemType.FILE
+                        }
 
-                    FileListItem(it, type)
-                }.collect(Collectors.toList())
+                        FileListItem(it, type)
+                    }.collect(Collectors.toList())
+                }
             }
 
             fileList.addAll(list)
@@ -132,6 +135,17 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
         }
     }
 
+    // Refresh drives
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            val newDriveList = DriveDetector.detectDrives()
+            driveList.clear()
+            driveList.addAll(newDriveList)
+
+            delay(5000)
+        }
+    }
+
     // Calculate everything the first time or when stuff updates
     LaunchedEffect(mode, cViewing, cShowHiddenFiles) {
         // Note that `cSelected`/`cSelectedPath` is not one of the input variables, because we don't want to
@@ -149,6 +163,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
         override val selectedError by selectedErrorState
         override var showHiddenFiles by showHiddenFilesState
         override val homeFolderList = homeFolderList
+        override val driveList = driveList
         override val listState = listState
         override var showCreateFolderDialog by showCreateFolderState
 
@@ -162,12 +177,20 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
             }
         }
 
-        override fun showHiddenFilesToggle() {
-            showHiddenFiles = !showHiddenFiles
+        override fun driveSelect(path: Path) {
+            composableScope.launch {
+                if (withContext(Dispatchers.IO) { path.exists() }) {
+                    viewing = path
+
+                    if (!topBarViewing.startsWith(path)) {
+                        topBarViewing = path
+                    }
+                }
+            }
         }
 
-        override fun setViewingHome() {
-            viewing = homeFolder
+        override fun showHiddenFilesToggle() {
+            showHiddenFiles = !showHiddenFiles
         }
 
         override fun openCreateFolderDialog() {

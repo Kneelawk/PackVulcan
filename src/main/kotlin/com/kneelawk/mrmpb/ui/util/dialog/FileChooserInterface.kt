@@ -13,12 +13,15 @@ interface FileChooserInterface {
     val selectedError: String?
     val showHiddenFiles: Boolean
     val homeFolderList: List<HomeFolderItem>
+    val driveList: List<DriveItem>
 
     val listState: LazyListState
 
     val showCreateFolderDialog: Boolean
 
     fun homeFolderSelect(item: HomeFolderItem)
+
+    fun driveSelect(path: Path)
 
     fun showHiddenFilesToggle()
 
