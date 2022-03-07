@@ -67,7 +67,7 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
                 Files.list(cViewing)
             }.filter {
                 (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
-            }.sorted { o1, o2 -> o1.name.compareTo(o2.name) }.collect(Collectors.toList())
+            }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.collect(Collectors.toList())
             fileList.addAll(list)
 
             val index = fileList.indexOf(Paths.get(cSelected))
