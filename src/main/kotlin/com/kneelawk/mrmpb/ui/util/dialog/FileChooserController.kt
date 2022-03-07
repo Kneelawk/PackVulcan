@@ -13,6 +13,19 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.stream.Collectors
 import kotlin.io.path.*
 
+private val homeFolder = Paths.get(System.getProperty("user.home"))
+
+// A map of home folder items to their paths relative to 'user.home'
+private val homeFolders = mapOf(
+    HomeFolderItem.HOME to homeFolder,
+    HomeFolderItem.DESKTOP to homeFolder.resolve("Desktop"),
+    HomeFolderItem.DOCUMENTS to homeFolder.resolve("Documents"),
+    HomeFolderItem.DOWNLOADS to homeFolder.resolve("Downloads"),
+    HomeFolderItem.MUSIC to homeFolder.resolve("Music"),
+    HomeFolderItem.PICTURES to homeFolder.resolve("Pictures"),
+    HomeFolderItem.VIDEOS to homeFolder.resolve("Videos")
+)
+
 @Composable
 fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Unit): FileChooserInterface {
     // Keep input updated with recompositions
@@ -26,12 +39,14 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
     val composableScope = rememberCoroutineScope()
 
     // Setup state
-    val viewingState: MutableState<Path> = remember { mutableStateOf(Paths.get(System.getProperty("user.home"))) }
+    val homeFolderList = remember { mutableStateListOf<HomeFolderItem>() }
+
+    val viewingState: MutableState<Path> = remember { mutableStateOf(homeFolder) }
     val cViewing by viewingState
 
     val topBarViewingState = remember { mutableStateOf(cViewing) }
 
-    val fileList = remember { mutableStateListOf<FileChooserInterface.FileListElement>() }
+    val fileList = remember { mutableStateListOf<FileListItem>() }
 
     val selectedState = remember { mutableStateOf("") }
     val cSelected by selectedState
@@ -89,11 +104,11 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
                     (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
                 }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
                     val type = when {
-                        it.isDirectory() -> FileChooserInterface.FileListElementType.FOLDER
-                        else -> FileChooserInterface.FileListElementType.FILE
+                        it.isDirectory() -> FileListItemType.FOLDER
+                        else -> FileListItemType.FILE
                     }
 
-                    FileChooserInterface.FileListElement(it, type)
+                    FileListItem(it, type)
                 }.collect(Collectors.toList())
             }
 
@@ -104,6 +119,15 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
                 listState.scrollToItem(index)
             } else {
                 listState.scrollToItem(0)
+            }
+        }
+    }
+
+    // Find the home folders
+    LaunchedEffect(Unit) {
+        for ((key, path) in homeFolders) {
+            if (withContext(Dispatchers.IO) { path.exists() }) {
+                homeFolderList.add(key)
             }
         }
     }
@@ -124,15 +148,26 @@ fun rememberFileChooserController(mode: FileChooserMode, finished: (Path?) -> Un
         override val selectedValid by selectedValidState
         override val selectedError by selectedErrorState
         override var showHiddenFiles by showHiddenFilesState
+        override val homeFolderList = homeFolderList
         override val listState = listState
         override var showCreateFolderDialog by showCreateFolderState
+
+        override fun homeFolderSelect(item: HomeFolderItem) {
+            val newViewing =
+                homeFolders[item] ?: throw IllegalStateException("Encountered unimplemented home folder type: $item")
+            viewing = newViewing
+
+            if (!topBarViewing.startsWith(newViewing)) {
+                topBarViewing = newViewing
+            }
+        }
 
         override fun showHiddenFilesToggle() {
             showHiddenFiles = !showHiddenFiles
         }
 
         override fun setViewingHome() {
-            viewing = Paths.get(System.getProperty("user.home"))
+            viewing = homeFolder
         }
 
         override fun openCreateFolderDialog() {

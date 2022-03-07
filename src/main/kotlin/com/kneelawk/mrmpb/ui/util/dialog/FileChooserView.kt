@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -26,6 +27,7 @@ import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.ContainerBox
+import com.kneelawk.mrmpb.ui.util.ListButton
 import kotlinx.coroutines.launch
 import java.awt.event.MouseEvent
 import java.nio.file.Path
@@ -44,81 +46,98 @@ fun FileChooserView(controller: FileChooserInterface) {
     ) {
         val selectedError = controller.selectedError
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextButton(onClick = {
-                controller.showHiddenFilesToggle()
-            }) {
-                val shown = if (controller.showHiddenFiles) {
-                    "Shown"
-                } else {
-                    "Hidden"
-                }
-                Text("Hidden Files: $shown")
-            }
-
-            IconButton(onClick = {
-                controller.setViewingHome()
-            }) {
-                Icon(Icons.Default.Home, "go home")
-            }
-
-            IconButton(onClick = {
-                controller.openCreateFolderDialog()
-            }) {
-                Icon(MrMpBIcons.create_new_folder, "create new folder")
-            }
-        }
-
-        ParentSelector(controller.topBarViewing, controller.viewing) {
-            controller.topBarSelect(it)
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth().weight(1f)
-                .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-        ) {
-            LazyColumn(
-                state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
+        // TODO: replace this row with a HorizontalSplitPlane
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+            Row(
+                modifier = Modifier.weight(0.25f).fillMaxHeight()
+                    .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
             ) {
-                items(controller.fileList, { it.path.name }) { element ->
-                    val path = element.path
+                val sideBarListState = rememberLazyListState()
 
-                    val background = if (controller.isPathSelected(path)) {
-                        MaterialTheme.colors.secondary
-                    } else {
-                        Color.Transparent
-                    }
+                LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight()) {
+                    items(controller.homeFolderList) { type ->
+                        ListButton(onClick = {
+                            controller.homeFolderSelect(type)
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            HomeFolderIcon(type)
 
-                    TextButton(onClick = {
-                        controller.selectedUpdate(path)
-                    }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
-                        if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
-                            controller.doubleClick(path)
-                        }
-                    }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                when (element.type) {
-                                    FileChooserInterface.FileListElementType.FILE -> MrMpBIcons.file
-                                    FileChooserInterface.FileListElementType.FOLDER -> MrMpBIcons.folder
-                                }, "file"
-                            )
-                            Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                            Text(type.displayName, modifier = Modifier.padding(start = 10.dp))
                         }
                     }
                 }
+
+                VerticalScrollbar(
+                    adapter = rememberScrollbarAdapter(sideBarListState), modifier = Modifier.fillMaxHeight()
+                )
             }
 
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(controller.listState), modifier = Modifier.fillMaxHeight()
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(0.75f)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(onClick = {
+                        controller.showHiddenFilesToggle()
+                    }) {
+                        val shown = if (controller.showHiddenFiles) {
+                            "Shown"
+                        } else {
+                            "Hidden"
+                        }
+                        Text("Hidden Files: $shown")
+                    }
+
+                    IconButton(onClick = {
+                        controller.openCreateFolderDialog()
+                    }) {
+                        Icon(MrMpBIcons.create_new_folder, "create new folder")
+                    }
+                }
+
+                ParentSelector(controller.topBarViewing, controller.viewing) {
+                    controller.topBarSelect(it)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                        .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
+                ) {
+                    LazyColumn(
+                        state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
+                    ) {
+                        items(controller.fileList, { it.path.name }) { element ->
+                            val path = element.path
+
+                            val background = if (controller.isPathSelected(path)) {
+                                MaterialTheme.colors.secondary
+                            } else {
+                                Color.Transparent
+                            }
+
+                            ListButton(onClick = {
+                                controller.selectedUpdate(path)
+                            }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                                if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
+                                    controller.doubleClick(path)
+                                }
+                            }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
+                            ) {
+                                Icon(
+                                    when (element.type) {
+                                        FileListItemType.FILE -> MrMpBIcons.file
+                                        FileListItemType.FOLDER -> MrMpBIcons.folder
+                                    }, "file"
+                                )
+                                Text(path.name, modifier = Modifier.padding(start = 10.dp))
+                            }
+                        }
+                    }
+
+                    VerticalScrollbar(
+                        adapter = rememberScrollbarAdapter(controller.listState), modifier = Modifier.fillMaxHeight()
+                    )
+                }
+            }
         }
 
         TextField(value = controller.selected, onValueChange = {
@@ -149,6 +168,19 @@ fun FileChooserView(controller: FileChooserInterface) {
                 Text("Select", modifier = Modifier.padding(start = 5.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun HomeFolderIcon(item: HomeFolderItem) {
+    when (item) {
+        HomeFolderItem.HOME -> Icon(Icons.Default.Home, "home")
+        HomeFolderItem.DESKTOP -> Icon(MrMpBIcons.desktop, "desktop")
+        HomeFolderItem.DOCUMENTS -> Icon(MrMpBIcons.file, "documents")
+        HomeFolderItem.DOWNLOADS -> Icon(MrMpBIcons.download, "downloads")
+        HomeFolderItem.MUSIC -> Icon(MrMpBIcons.music, "music")
+        HomeFolderItem.PICTURES -> Icon(MrMpBIcons.image, "pictures")
+        HomeFolderItem.VIDEOS -> Icon(MrMpBIcons.movie, "videos")
     }
 }
 

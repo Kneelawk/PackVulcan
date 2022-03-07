@@ -39,7 +39,7 @@ enum class FileChooserMode {
 
 @Composable
 fun FileChooserDialog(title: String, mode: FileChooserMode, finished: (Path?) -> Unit) {
-    val state = rememberDialogState(size = DpSize(1280.dp, 720.dp))
+    val state = rememberDialogState(size = DpSize(1280.dp, 800.dp))
 
     Dialog(title = title, state = state, onCloseRequest = {
         finished(null)

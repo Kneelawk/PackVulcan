@@ -7,19 +7,20 @@ import java.nio.file.Path
 interface FileChooserInterface {
     val viewing: Path
     val topBarViewing: Path
-    val fileList: List<FileListElement>
+    val fileList: List<FileListItem>
     val selected: String
     val selectedValid: Boolean
     val selectedError: String?
     val showHiddenFiles: Boolean
+    val homeFolderList: List<HomeFolderItem>
 
     val listState: LazyListState
 
     val showCreateFolderDialog: Boolean
 
-    fun showHiddenFilesToggle()
+    fun homeFolderSelect(item: HomeFolderItem)
 
-    fun setViewingHome()
+    fun showHiddenFilesToggle()
 
     fun openCreateFolderDialog()
 
@@ -39,9 +40,4 @@ interface FileChooserInterface {
     fun select()
 
     fun cancel()
-
-    data class FileListElement(val path: Path, val type: FileListElementType)
-    enum class FileListElementType {
-        FILE, FOLDER;
-    }
 }
