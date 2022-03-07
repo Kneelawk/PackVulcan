@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.util.Form
-import com.kneelawk.mrmpb.ui.util.OpenDirectoryDialog
+import com.kneelawk.mrmpb.ui.util.dialog.OpenDirectoryDialog
 import kotlin.io.path.pathString
 
 @Composable
