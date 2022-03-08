@@ -62,7 +62,9 @@ fun rememberFileChooserController(
             SelectedProduced(false, null, selectedPath)
         } else if (!isValidFilename(cSelected)) {
             SelectedProduced(
-                false, "Paths must not be blank and must not contain '\"', '*', '<', '>', '?', or '|'.", selectedPath
+                false,
+                "Paths must not be blank or longer than 255 characters and must not contain '\"', '*', '<', '>', '?', '|', newline, or tab characters.",
+                selectedPath
             )
         } else {
             when (mode) {
@@ -264,7 +266,7 @@ fun rememberFileChooserController(
                 } else if (!isValidFolderName(cFolderName)) {
                     FolderNameProduced(
                         false,
-                        "Folder names must not be blank and must not contain '\"', '*', '<', '>', '?', '|', ':', '/', or '\\'.",
+                        "Folder names must not be blank or longer than 255 characters and must not contain '\"', '*', '<', '>', '?', '|', ':', '/', '\\', newline, or tab characters.",
                         newFolder
                     )
                 } else if (withContext(Dispatchers.IO) { newFolder.exists() }) {
@@ -288,14 +290,16 @@ fun rememberFileChooserController(
                 }
 
                 override fun createFolder() {
-                    showCreateFolderDialog = false
-                    composableScope.launch {
-                        withContext(Dispatchers.IO) {
-                            Files.createDirectory(newFolder)
-                        }
-                        selected = newFolder.pathString
+                    if (folderNameValid) {
+                        showCreateFolderDialog = false
+                        composableScope.launch {
+                            withContext(Dispatchers.IO) {
+                                Files.createDirectory(newFolder)
+                            }
+                            selected = newFolder.pathString
 
-                        recalculateFileList.send(Unit)
+                            recalculateFileList.send(Unit)
+                        }
                     }
                 }
 
@@ -346,7 +350,7 @@ fun rememberFileChooserController(
     }
 }
 
-private val invalidPathChars = charArrayOf('"', '*', '<', '>', '?', '|', 0x7F.toChar())
+private val invalidPathChars = charArrayOf('"', '*', '<', '>', '?', '|', 0x7F.toChar(), '\n', '\t')
 private val invalidNameChars = charArrayOf('/', '\\', ':')
 
 private fun isValidFilename(name: String): Boolean {

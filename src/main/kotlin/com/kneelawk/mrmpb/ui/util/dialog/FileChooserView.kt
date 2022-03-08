@@ -17,7 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -26,8 +26,10 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
@@ -247,7 +249,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                 ListButton(onClick = {
                                     controller.selectedUpdate(path)
                                 }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
-                                    if (it.awtEvent.button == MouseEvent.BUTTON1 && it.awtEvent.clickCount == 2) {
+                                    if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
                                         controller.doubleClick(path)
                                     }
                                 }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
@@ -296,9 +298,10 @@ fun FileChooserView(controller: FileChooserInterface) {
 
         val selectedError = controller.selectedError
 
-        TextField(value = controller.selected, onValueChange = {
-            controller.selectedFieldUpdate(it)
-        }, modifier = Modifier.fillMaxWidth(), isError = selectedError != null)
+        TextField(
+            value = controller.selected, onValueChange = { controller.selectedFieldUpdate(it) },
+            modifier = Modifier.fillMaxWidth(), isError = selectedError != null, singleLine = true
+        )
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -429,7 +432,10 @@ private fun PathSegment(
 
 @Composable
 private fun CreateFolderDialog(controller: CreateFolderInterface) {
-    Dialog(title = "Create New Folder...", onCloseRequest = { controller.cancel() }) {
+    Dialog(
+        title = "Create New Folder...", onCloseRequest = { controller.cancel() },
+        state = rememberDialogState(size = DpSize(500.dp, 350.dp))
+    ) {
         MrMpBTheme(darkTheme = GlobalSettings.darkMode) {
             ContainerBox {
                 Column(
@@ -443,7 +449,8 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                     TextField(
                         value = controller.folderName, onValueChange = { controller.folderNameUpdate(it) },
                         modifier = Modifier.fillMaxWidth().focusRequester(requester),
-                        isError = folderNameError != null
+                        isError = folderNameError != null,
+                        singleLine = true
                     )
 
                     if (folderNameError != null) {
