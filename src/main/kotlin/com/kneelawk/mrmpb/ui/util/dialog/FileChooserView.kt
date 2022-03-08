@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -35,6 +35,7 @@ import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.ContainerBox
 import com.kneelawk.mrmpb.ui.util.ListButton
+import com.kneelawk.mrmpb.ui.util.SmallTextField
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -59,13 +60,13 @@ fun FileChooserView(controller: FileChooserInterface) {
 
         HorizontalSplitPane(splitPaneState = splitPaneState, modifier = Modifier.weight(1f)) {
             first(150.dp) {
-                Row(
-                    modifier = Modifier.fillMaxHeight().padding(end = (5 - 1.5).dp)
-                        .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-                ) {
+                Row(modifier = Modifier.fillMaxHeight().padding(end = (5 - 1.5).dp)) {
                     val sideBarListState = rememberLazyListState()
 
-                    LazyColumn(state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)) {
+                    LazyColumn(
+                        state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)
+                            .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
+                    ) {
                         items(controller.homeFolderList) { type ->
                             ListButton(onClick = {
                                 controller.homeFolderSelect(type)
@@ -195,7 +196,8 @@ fun FileChooserView(controller: FileChooserInterface) {
                     }
 
                     VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(sideBarListState), modifier = Modifier.fillMaxHeight()
+                        adapter = rememberScrollbarAdapter(sideBarListState),
+                        modifier = Modifier.fillMaxHeight()
                     )
                 }
             }
@@ -230,12 +232,10 @@ fun FileChooserView(controller: FileChooserInterface) {
                         controller.topBarSelect(it)
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth().weight(1f)
-                            .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
                         LazyColumn(
                             state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
+                                .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
                         ) {
                             items(controller.fileList, { it.path.name }) { element ->
                                 val path = element.path
@@ -298,7 +298,7 @@ fun FileChooserView(controller: FileChooserInterface) {
 
         val selectedError = controller.selectedError
 
-        TextField(
+        SmallTextField(
             value = controller.selected, onValueChange = { controller.selectedFieldUpdate(it) },
             modifier = Modifier.fillMaxWidth(), isError = selectedError != null, singleLine = true
         )
@@ -379,7 +379,8 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
             }
 
             HorizontalScrollbar(
-                adapter = rememberScrollbarAdapter(segmentScrollState), modifier = Modifier.fillMaxWidth()
+                adapter = rememberScrollbarAdapter(segmentScrollState),
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -405,21 +406,15 @@ private fun PathSegment(
         MaterialTheme.colors.secondary
     }
 
-    val startCorners = if (isFirst) {
-        4.dp
-    } else {
-        0.dp
+    var buttonShape = MaterialTheme.shapes.small
+
+    if (!isFirst) {
+        buttonShape = buttonShape.copy(topStart = CornerSize(0.dp), bottomStart = CornerSize(0.dp))
     }
 
-    val endCorners = if (isLast) {
-        4.dp
-    } else {
-        0.dp
+    if (!isLast) {
+        buttonShape = buttonShape.copy(topEnd = CornerSize(0.dp), bottomEnd = CornerSize(0.dp))
     }
-
-    val buttonShape = RoundedCornerShape(
-        topStart = startCorners, bottomStart = startCorners, topEnd = endCorners, bottomEnd = endCorners
-    )
 
     Button(
         onClick = { pathSelected(path) },
