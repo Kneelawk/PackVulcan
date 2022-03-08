@@ -2,7 +2,6 @@ package com.kneelawk.mrmpb.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -11,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.Form
+import com.kneelawk.mrmpb.ui.util.SmallButton
 import com.kneelawk.mrmpb.ui.util.SmallTextField
 import com.kneelawk.mrmpb.ui.util.dialog.OpenDirectoryDialog
 import java.nio.file.Paths
@@ -44,7 +44,7 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
 
         Text("Project Location:", modifier = Modifier.formLabel())
         SmallTextField(projectLocation, projectLocationChange, modifier = Modifier.formField())
-        Button(onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure()) {
+        SmallButton(onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure()) {
             Text("...")
         }
 
@@ -69,13 +69,13 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
 
         Text("Minecraft Version:", modifier = Modifier.formLabel())
         SmallTextField("1.18.1", {}, modifier = Modifier.formField())
-        Button(onClick = {}, modifier = Modifier.formConfigure()) {
+        SmallButton(onClick = {}, modifier = Modifier.formConfigure()) {
             Text("...")
         }
 
         Text("Loader Version:", modifier = Modifier.formLabel())
         SmallTextField("Fabric 0.10.2", {}, modifier = Modifier.formField())
-        Button(onClick = {}, modifier = Modifier.formConfigure()) {
+        SmallButton(onClick = {}, modifier = Modifier.formConfigure()) {
             Text("...")
         }
     }

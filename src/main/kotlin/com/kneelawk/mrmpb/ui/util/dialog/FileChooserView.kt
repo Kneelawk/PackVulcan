@@ -33,9 +33,7 @@ import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.ContainerBox
-import com.kneelawk.mrmpb.ui.util.ListButton
-import com.kneelawk.mrmpb.ui.util.SmallTextField
+import com.kneelawk.mrmpb.ui.util.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -101,7 +99,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                         Text("Edit Favorites", modifier = Modifier.padding(10.dp))
                                     }
                                 }) {
-                                    IconButton(onClick = { controller.editFavorites() }) {
+                                    SmallIconButton(onClick = { controller.editFavorites() }) {
                                         Icon(Icons.Default.Edit, "edit favorites")
                                     }
                                 }
@@ -143,7 +141,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                                 Text("Move Favorite Up", modifier = Modifier.padding(10.dp))
                                             }
                                         }) {
-                                            IconButton(onClick = { controller.moveFavoriteUp(favorite) }) {
+                                            SmallIconButton(onClick = { controller.moveFavoriteUp(favorite) }) {
                                                 Icon(Icons.Default.KeyboardArrowUp, "move up")
                                             }
                                         }
@@ -157,7 +155,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                                 Text("Move Favorite Down", modifier = Modifier.padding(10.dp))
                                             }
                                         }) {
-                                            IconButton(onClick = { controller.moveFavoriteDown(favorite) }) {
+                                            SmallIconButton(onClick = { controller.moveFavoriteDown(favorite) }) {
                                                 Icon(Icons.Default.KeyboardArrowDown, "move down")
                                             }
                                         }
@@ -171,7 +169,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                                 Text("Remove Favorite", modifier = Modifier.padding(10.dp))
                                             }
                                         }) {
-                                            IconButton(onClick = { controller.removeFavorite(favorite) }) {
+                                            SmallIconButton(onClick = { controller.removeFavorite(favorite) }) {
                                                 Icon(Icons.Default.Close, "remove")
                                             }
                                         }
@@ -210,7 +208,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        TextButton(onClick = {
+                        SmallTextButton(onClick = {
                             controller.showHiddenFilesToggle()
                         }) {
                             val shown = if (controller.showHiddenFiles) {
@@ -221,7 +219,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                             Text("Hidden Files: $shown")
                         }
 
-                        IconButton(onClick = {
+                        SmallIconButton(onClick = {
                             controller.openCreateFolderDialog()
                         }) {
                             Icon(MrMpBIcons.create_new_folder, "create new folder")
@@ -313,14 +311,14 @@ fun FileChooserView(controller: FileChooserInterface) {
 
             Box(Modifier.weight(1f))
 
-            Button(onClick = {
+            SmallButton(onClick = {
                 controller.cancel()
             }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
                 Icon(Icons.Default.Close, "cancel")
                 Text("Cancel", modifier = Modifier.padding(start = 5.dp))
             }
 
-            Button(onClick = {
+            SmallButton(onClick = {
                 controller.select()
             }, enabled = controller.selectedValid) {
                 Icon(Icons.Default.Check, "select")
@@ -349,7 +347,7 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
         val coroutineScope = rememberCoroutineScope()
         val segmentScrollState = rememberScrollState()
 
-        IconButton(onClick = {
+        SmallIconButton(onClick = {
             coroutineScope.launch {
                 segmentScrollState.scroll {
                     scrollBy(-50F)
@@ -384,7 +382,7 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
             )
         }
 
-        IconButton(onClick = {
+        SmallIconButton(onClick = {
             coroutineScope.launch {
                 segmentScrollState.scroll {
                     scrollBy(50F)
@@ -416,7 +414,7 @@ private fun PathSegment(
         buttonShape = buttonShape.copy(topEnd = CornerSize(0.dp), bottomEnd = CornerSize(0.dp))
     }
 
-    Button(
+    SmallButton(
         onClick = { pathSelected(path) },
         colors = ButtonDefaults.buttonColors(backgroundColor = background),
         shape = buttonShape
@@ -458,14 +456,14 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Button(onClick = {
+                        SmallButton(onClick = {
                             controller.cancel()
                         }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
                             Icon(Icons.Default.Close, "cancel")
                             Text("Cancel", modifier = Modifier.padding(start = 5.dp))
                         }
 
-                        Button(onClick = {
+                        SmallButton(onClick = {
                             controller.createFolder()
                         }, enabled = controller.folderNameValid) {
                             Icon(MrMpBIcons.create_new_folder, "create")
