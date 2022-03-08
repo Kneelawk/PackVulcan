@@ -173,7 +173,6 @@ class FormMeasurePolicy(
         val formLines = arrayOfNulls<PlaceableFormLine>(measurableFormLines.size)
 
         // Measure label column and section headers
-        var sectionUsedHeight = 0
         var sectionCount = 0
         var lineCount = 0
         var labelWidth = 0
@@ -194,7 +193,6 @@ class FormMeasurePolicy(
                     val header = line.header.measure(constraints.copy(minWidth = 0, minHeight = 0))
                     formLines[i] = PlaceableFormLine.SectionHeader(header)
                     sectionCount++
-                    sectionUsedHeight += header.height
                 }
             }
         }
@@ -243,7 +241,7 @@ class FormMeasurePolicy(
         // Layout the components
         val layoutWidth = constraints.maxWidth
         val layoutHeight = maxOf(
-            formLines.sumOf { it!!.height } + sectionUsedHeight + (rowArrangement.spacing * (sectionCount + lineCount)).roundToPx(),
+            formLines.sumOf { it!!.height } + (rowArrangement.spacing * (sectionCount + lineCount - 1)).roundToPx(),
             constraints.minHeight)
 
         return layout(layoutWidth, layoutHeight) {
