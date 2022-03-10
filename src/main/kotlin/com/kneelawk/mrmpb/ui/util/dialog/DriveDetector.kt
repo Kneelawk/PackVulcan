@@ -56,8 +56,12 @@ object DriveDetector {
         }
 
         return paths.asFlow()
-            .map { path ->
-                val fileStore = withContext(Dispatchers.IO) { path.fileStore() }
+            .mapNotNull { path ->
+                val fileStore = try {
+                    withContext(Dispatchers.IO) { path.fileStore() }
+                } catch (e: java.nio.file.FileSystemException) {
+                    return@mapNotNull null
+                }
                 val name = fileStore.name()
 
                 DriveItem(path, "${path.pathString} ($name)")
