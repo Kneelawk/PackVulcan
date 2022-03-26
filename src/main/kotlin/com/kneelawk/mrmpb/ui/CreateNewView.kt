@@ -6,8 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kneelawk.mrmpb.ui.util.ContainerBox
-import com.kneelawk.mrmpb.ui.util.SmallButton
+import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
 
 @Composable
 fun CreateNewView(root: RootComponent, component: CreateNewComponent) {

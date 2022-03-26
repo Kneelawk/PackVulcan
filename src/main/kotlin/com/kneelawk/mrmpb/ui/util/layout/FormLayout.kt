@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util
+package com.kneelawk.mrmpb.ui.util.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.LayoutScopeMarker

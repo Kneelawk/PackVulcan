@@ -7,7 +7,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
 import java.nio.file.Path
 import java.nio.file.Paths
 

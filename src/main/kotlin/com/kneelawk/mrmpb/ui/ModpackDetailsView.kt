@@ -9,10 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.Form
-import com.kneelawk.mrmpb.ui.util.SmallButton
-import com.kneelawk.mrmpb.ui.util.SmallTextField
 import com.kneelawk.mrmpb.ui.util.dialog.OpenDirectoryDialog
+import com.kneelawk.mrmpb.ui.util.layout.Form
+import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
+import com.kneelawk.mrmpb.ui.util.widgets.SmallTextField
 import java.nio.file.Paths
 import kotlin.io.path.pathString
 

@@ -33,7 +33,8 @@ import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.*
+import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.widgets.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane

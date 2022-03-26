@@ -8,9 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.kneelawk.mrmpb.GlobalSettings
-import com.kneelawk.mrmpb.ui.theme.Cyan50
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
 
 @Composable
 fun SettingsView(finish: () -> Unit) {
