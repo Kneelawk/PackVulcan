@@ -32,6 +32,9 @@ dependencies {
     // TOML4J
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
+    // SemVer
+    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+
     // Use logback logger because nothing seems to have updated their log4j yet
     runtimeOnly("ch.qos.logback:logback-classic:1.3.0-alpha14")
 }

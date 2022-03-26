@@ -19,7 +19,11 @@ class RootComponent(context: ComponentContext) : ComponentContext by context {
         return when (config) {
             CurrentScreenConfig.Start -> CurrentScreen.Start
             CurrentScreenConfig.Settings -> CurrentScreen.Settings
-            CurrentScreenConfig.CreateNew -> CurrentScreen.CreateNew(CreateNewComponent(context))
+            CurrentScreenConfig.CreateNew -> CurrentScreen.CreateNew(CreateNewComponent(context) { result ->
+                when (result) {
+                    CreateNewResult.Cancel -> goBack()
+                }
+            })
         }
     }
 

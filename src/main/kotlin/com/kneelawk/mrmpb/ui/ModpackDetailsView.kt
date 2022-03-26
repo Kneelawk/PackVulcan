@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -16,21 +17,28 @@ import com.kneelawk.mrmpb.ui.util.widgets.SmallTextField
 import java.nio.file.Paths
 import kotlin.io.path.pathString
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) -> Unit) {
+fun ModpackDetailsView(
+    location: String, locationChange: ((String) -> Unit)?, name: String, nameChange: (String) -> Unit, author: String,
+    authorChange: (String) -> Unit, version: String, versionChange: (String) -> Unit, versionError: Boolean,
+    minecraftVersion: String, minecraftVersionChange: (String) -> Unit, minecraftVersionError: Boolean,
+    loaderVersion: String, loaderVersionChange: (String) -> Unit, loaderVersionError: Boolean
+) {
+    val projectLocationEditable = locationChange != null
     var projectLocationDialog by remember { mutableStateOf(false) }
 
-    if (projectLocationDialog) {
-        val initialFolder = if (projectLocation.isBlank()) {
+    if (projectLocationDialog && projectLocationEditable) {
+        val initialFolder = if (location.isBlank()) {
             Paths.get(System.getProperty("user.home"))
         } else {
-            Paths.get(projectLocation).normalize().parent ?: Paths.get(System.getProperty("user.home"))
+            Paths.get(location).normalize().parent ?: Paths.get(System.getProperty("user.home"))
         }
         OpenDirectoryDialog(
-            title = "Select a project location...", initialFolder = initialFolder, initialSelection = projectLocation
+            title = "Select a project location...", initialFolder = initialFolder, initialSelection = location
         ) { selection ->
             projectLocationDialog = false
-            selection?.let { projectLocationChange(it.pathString) }
+            selection?.let { locationChange!!(it.pathString) }
         }
     }
 
@@ -38,14 +46,16 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
         rowArrangement = Arrangement.spacedBy(10.dp, Alignment.Top), columnSpacing = 10.dp
     ) {
         Text(
-            "File", modifier = Modifier.formSection().padding(top = 10.dp), style = MaterialTheme.typography.h5,
+            "File", modifier = Modifier.formSection(), style = MaterialTheme.typography.h5,
             color = MrMpBTheme.colors.headingColor
         )
 
         Text("Project Location:", modifier = Modifier.formLabel())
-        SmallTextField(projectLocation, projectLocationChange, modifier = Modifier.formField())
-        SmallButton(onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure()) {
-            Text("...")
+        SmallTextField(location, locationChange ?: {}, modifier = Modifier.formField())
+        if (projectLocationEditable) {
+            SmallButton(onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure()) {
+                Text("...")
+            }
         }
 
         Text(
@@ -54,13 +64,15 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
         )
 
         Text("Modpack Name:", modifier = Modifier.formLabel())
-        SmallTextField("", {}, modifier = Modifier.formField())
+        SmallTextField(name, nameChange, modifier = Modifier.formField())
 
         Text("Modpack Author:", modifier = Modifier.formLabel())
-        SmallTextField("", {}, modifier = Modifier.formField())
+        SmallTextField(author, authorChange, modifier = Modifier.formField())
 
         Text("Modpack Version:", modifier = Modifier.formLabel())
-        SmallTextField("0.0.1", {}, modifier = Modifier.formField())
+        SmallTextField(
+            version, versionChange, modifier = Modifier.formField(), isError = versionError
+        )
 
         Text(
             "Versions", modifier = Modifier.formSection().padding(top = 10.dp), style = MaterialTheme.typography.h5,
@@ -68,15 +80,21 @@ fun ModpackDetailsView(projectLocation: String, projectLocationChange: (String) 
         )
 
         Text("Minecraft Version:", modifier = Modifier.formLabel())
-        SmallTextField("1.18.1", {}, modifier = Modifier.formField())
+        SmallTextField(
+            minecraftVersion, minecraftVersionChange, modifier = Modifier.formField(), isError = minecraftVersionError
+        )
         SmallButton(onClick = {}, modifier = Modifier.formConfigure()) {
             Text("...")
         }
+        // TODO: Minecraft version selector
 
         Text("Loader Version:", modifier = Modifier.formLabel())
-        SmallTextField("Fabric 0.10.2", {}, modifier = Modifier.formField())
+        SmallTextField(
+            loaderVersion, loaderVersionChange, modifier = Modifier.formField(), isError = loaderVersionError
+        )
         SmallButton(onClick = {}, modifier = Modifier.formConfigure()) {
             Text("...")
         }
+        // TODO: Loader version selector
     }
 }
