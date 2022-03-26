@@ -97,7 +97,6 @@ private sealed class PlaceableFormLine {
     }
 }
 
-// TODO: Arrangement handling.
 class FormMeasurePolicy(
     private val sectionHeaderAlignment: Alignment.Horizontal, private val labelAlignment: Alignment,
     private val fieldAlignment: Alignment.Vertical, private val configureAlignment: Alignment,
