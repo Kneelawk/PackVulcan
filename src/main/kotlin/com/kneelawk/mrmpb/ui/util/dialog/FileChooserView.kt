@@ -34,6 +34,7 @@ import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.ui.util.widgets.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
@@ -59,9 +60,12 @@ fun FileChooserView(controller: FileChooserInterface) {
 
         HorizontalSplitPane(splitPaneState = splitPaneState, modifier = Modifier.weight(1f)) {
             first(150.dp) {
-                Row(modifier = Modifier.fillMaxHeight().padding(end = (5 - 1.5).dp)) {
-                    val sideBarListState = rememberLazyListState()
+                val sideBarListState = rememberLazyListState()
 
+                VerticalScrollWrapper(
+                    modifier = Modifier.fillMaxHeight().padding(end = (5 - 1.5).dp),
+                    adapter = rememberScrollbarAdapter(sideBarListState)
+                ) {
                     LazyColumn(
                         state = sideBarListState, modifier = Modifier.fillMaxHeight().weight(1f)
                             .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
@@ -193,11 +197,6 @@ fun FileChooserView(controller: FileChooserInterface) {
                             }
                         }
                     }
-
-                    VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(sideBarListState),
-                        modifier = Modifier.fillMaxHeight()
-                    )
                 }
             }
 
@@ -231,10 +230,12 @@ fun FileChooserView(controller: FileChooserInterface) {
                         controller.topBarSelect(it)
                     }
 
-                    Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    VerticalScrollWrapper(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        adapter = rememberScrollbarAdapter(controller.listState)
+                    ) {
                         LazyColumn(
                             state = controller.listState, modifier = Modifier.weight(1f).fillMaxHeight()
-                                .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
                         ) {
                             items(controller.fileList, { it.path.name }) { element ->
                                 val path = element.path
@@ -263,11 +264,6 @@ fun FileChooserView(controller: FileChooserInterface) {
                                 }
                             }
                         }
-
-                        VerticalScrollbar(
-                            adapter = rememberScrollbarAdapter(controller.listState),
-                            modifier = Modifier.fillMaxHeight()
-                        )
                     }
                 }
             }
