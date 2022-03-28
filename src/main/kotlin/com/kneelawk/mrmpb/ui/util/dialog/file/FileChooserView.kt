@@ -249,7 +249,7 @@ fun FileChooserView(controller: FileChooserInterface) {
 
                                 ListButton(onClick = {
                                     controller.selectedUpdate(path)
-                                }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                                }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
                                     if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
                                         controller.doubleClick(path)
                                     }

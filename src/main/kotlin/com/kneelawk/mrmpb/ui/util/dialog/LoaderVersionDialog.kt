@@ -204,7 +204,7 @@ private fun IndependentLoaderVersionSelector(
                         onClick = {
                             selectedVersionChange(version)
                         },
-                        modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                        modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
                             if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
                                 // a double click counts as a selection
                                 finished(version)
@@ -287,7 +287,7 @@ private fun DependentLoaderVersionSelector(
                             onClick = {
                                 selectedVersionChange(version)
                             },
-                            modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                            modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
                                 if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
                                     // a double click counts as a selection
                                     finished(version)

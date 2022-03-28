@@ -117,7 +117,7 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
                                     onClick = {
                                         selectedVersion = version
                                     },
-                                    modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                                    modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
                                         if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
                                             // a double click counts as a selection
                                             finished(version)
