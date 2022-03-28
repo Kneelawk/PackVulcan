@@ -194,7 +194,7 @@ private fun IndependentLoaderVersionSelector(
         ) {
             LazyColumn(modifier = Modifier.weight(1f).fillMaxHeight(), state = versionListState) {
                 items(loaderVersions) { version ->
-                    val background = if (selectedVersion == version) {
+                    val background = if (selectedVersion?.toString() == version.toString()) {
                         MaterialTheme.colors.secondary
                     } else {
                         Color.Transparent
@@ -277,7 +277,7 @@ private fun DependentLoaderVersionSelector(
             ) {
                 LazyColumn(modifier = Modifier.weight(1f).fillMaxHeight(), state = versionListState) {
                     items(loaderVersions) { version ->
-                        val background = if (selectedVersion == version) {
+                        val background = if (selectedVersion?.toString() == version.toString()) {
                             MaterialTheme.colors.secondary
                         } else {
                             Color.Transparent
