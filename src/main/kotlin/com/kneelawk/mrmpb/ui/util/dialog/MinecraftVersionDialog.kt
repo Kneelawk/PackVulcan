@@ -6,9 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,9 +22,9 @@ import com.kneelawk.mrmpb.model.MinecraftVersion
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
+import com.kneelawk.mrmpb.ui.util.widgets.DialogButtonBar
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
-import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
-import com.kneelawk.mrmpb.ui.util.widgets.SmallSurface
+import com.kneelawk.mrmpb.ui.util.widgets.SmallTextButton
 import java.awt.event.MouseEvent
 
 @Composable
@@ -48,6 +45,7 @@ fun MinecraftVersionDialog(title: String, previousVersion: String, finished: (Mi
 fun MinecraftVersionView(title: String, previousVersion: String, finished: (MinecraftVersion?) -> Unit) {
     var loading by remember { mutableStateOf(true) }
     val minecraftVersions = remember { mutableListOf<MinecraftVersion>() }
+    var selectedVersionSelected by remember { mutableStateOf(false) }
     var selectedVersion by remember { mutableStateOf<MinecraftVersion?>(null) }
 
     val versionListState = rememberLazyListState()
@@ -57,23 +55,24 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
     var showOldBetas by remember { mutableStateOf(false) }
     var showOldAlphas by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        // race condition when setting selectedVersion :/
-        MinecraftVersion.forVersion(previousVersion).leftOrNull()?.let { version ->
-            val valid = when (version.type) {
-                MinecraftVersion.Type.OLD_ALPHA -> showOldAlphas
-                MinecraftVersion.Type.OLD_BETA -> showOldBetas
-                MinecraftVersion.Type.RELEASE -> showReleases
-                MinecraftVersion.Type.SNAPSHOT -> showSnapshots
-            }
-            if (valid) {
-                selectedVersion = version
-            }
-        }
-    }
-
     LaunchedEffect(showReleases, showSnapshots, showOldBetas, showOldAlphas) {
         loading = true
+
+        if (!selectedVersionSelected) {
+            selectedVersionSelected = true
+            MinecraftVersion.forVersion(previousVersion).leftOrNull()?.let { version ->
+                val valid = when (version.type) {
+                    MinecraftVersion.Type.OLD_ALPHA -> showOldAlphas
+                    MinecraftVersion.Type.OLD_BETA -> showOldBetas
+                    MinecraftVersion.Type.RELEASE -> showReleases
+                    MinecraftVersion.Type.SNAPSHOT -> showSnapshots
+                }
+                if (valid) {
+                    selectedVersion = version
+                }
+            }
+        }
+
         minecraftVersions.clear()
         minecraftVersions.addAll(MinecraftVersion.minecraftVersionList().filter {
             when (it.type) {
@@ -84,7 +83,6 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
             }
         })
 
-        // race condition when getting selectedVersion :/
         val selected = selectedVersion
         if (selected != null) {
             val index = minecraftVersions.indexOf(selected)
@@ -98,102 +96,72 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
         loading = false
     }
 
-    Column(modifier = Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(title, style = MaterialTheme.typography.h5, color = MrMpBTheme.colors.headingColor)
+    Scaffold(topBar = {
+        TopAppBar(title = { Text(title) })
+    }) {
+        Column(modifier = Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    VerticalScrollWrapper(
+                        modifier = Modifier.fillMaxSize(), adapter = ScrollbarAdapter(versionListState)
+                    ) {
+                        LazyColumn(modifier = Modifier.weight(1f).fillMaxHeight(), state = versionListState) {
+                            items(minecraftVersions) { version ->
+                                val background = if (selectedVersion == version) {
+                                    MaterialTheme.colors.secondary
+                                } else {
+                                    Color.Transparent
+                                }
 
-        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                VerticalScrollWrapper(
-                    modifier = Modifier.fillMaxSize(), adapter = ScrollbarAdapter(versionListState)
-                ) {
-                    LazyColumn(modifier = Modifier.weight(1f).fillMaxHeight(), state = versionListState) {
-                        items(minecraftVersions) { version ->
-                            val background = if (selectedVersion == version) {
-                                MaterialTheme.colors.secondary
-                            } else {
-                                Color.Transparent
-                            }
-
-                            ListButton(
-                                onClick = {
-                                    selectedVersion = version
-                                },
-                                modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
-                                    if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
-                                        // a double click counts as a selection
-                                        finished(version)
-                                    }
-                                }, colors = ButtonDefaults.textButtonColors(backgroundColor = background),
-                                enabled = !loading
-                            ) {
-                                Text(version.toString())
+                                ListButton(
+                                    onClick = {
+                                        selectedVersion = version
+                                    },
+                                    modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Press) {
+                                        if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
+                                            // a double click counts as a selection
+                                            finished(version)
+                                        }
+                                    }, colors = ButtonDefaults.textButtonColors(backgroundColor = background),
+                                    enabled = !loading
+                                ) {
+                                    Text(version.toString())
+                                }
                             }
                         }
                     }
+
+                    if (loading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
 
-                if (loading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SmallSurface(
-                    onClick = { showReleases = !showReleases }, color = Color.Transparent,
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).padding(horizontal = 20.dp)
-                    ) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SmallTextButton(onClick = { showReleases = !showReleases }, enabled = !loading) {
                         Checkbox(
                             showReleases, null, enabled = !loading,
                             colors = CheckboxDefaults.colors(MaterialTheme.colors.primary)
                         )
                         Text("Releases", modifier = Modifier.padding(start = 5.dp))
                     }
-                }
 
-                SmallSurface(
-                    onClick = { showSnapshots = !showSnapshots }, color = Color.Transparent,
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).padding(horizontal = 20.dp)
-                    ) {
+                    SmallTextButton(onClick = { showSnapshots = !showSnapshots }, enabled = !loading) {
                         Checkbox(
                             showSnapshots, null, enabled = !loading,
                             colors = CheckboxDefaults.colors(MaterialTheme.colors.primary)
                         )
                         Text("Snapshots", modifier = Modifier.padding(start = 5.dp))
                     }
-                }
 
-                SmallSurface(
-                    onClick = { showOldBetas = !showOldBetas }, color = Color.Transparent,
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).padding(horizontal = 20.dp)
-                    ) {
+                    SmallTextButton(onClick = { showOldBetas = !showOldBetas }, enabled = !loading) {
                         Checkbox(
                             showOldBetas, null, enabled = !loading,
                             colors = CheckboxDefaults.colors(MaterialTheme.colors.primary)
                         )
                         Text("Old Betas", modifier = Modifier.padding(start = 5.dp))
                     }
-                }
 
-                SmallSurface(
-                    onClick = { showOldAlphas = !showOldAlphas }, color = Color.Transparent,
-                    shape = MaterialTheme.shapes.small
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).padding(horizontal = 20.dp)
-                    ) {
+                    SmallTextButton(onClick = { showOldAlphas = !showOldAlphas }, enabled = !loading) {
                         Checkbox(
                             showOldAlphas, null, enabled = !loading,
                             colors = CheckboxDefaults.colors(MaterialTheme.colors.primary)
@@ -202,24 +170,17 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
                     }
                 }
             }
-        }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End), modifier = Modifier.fillMaxWidth()) {
-            SmallButton(onClick = {
-                finished(null)
-            }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
-                Icon(Icons.Default.Close, "cancel")
-                Text("Cancel", modifier = Modifier.padding(start = 5.dp))
-            }
-
-            SmallButton(onClick = {
-                if (selectedVersion != null) {
-                    finished(selectedVersion)
-                }
-            }, enabled = selectedVersion != null) {
-                Icon(Icons.Default.Check, "select")
-                Text("Select", modifier = Modifier.padding(start = 5.dp))
-            }
+            DialogButtonBar(
+                modifier = Modifier.fillMaxWidth(),
+                onCancel = { finished(null) },
+                onConfirm = {
+                    if (selectedVersion != null) {
+                        finished(selectedVersion)
+                    }
+                },
+                confirmEnabled = selectedVersion != null
+            )
         }
     }
 }

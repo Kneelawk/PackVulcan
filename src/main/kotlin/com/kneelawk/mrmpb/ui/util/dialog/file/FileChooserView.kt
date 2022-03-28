@@ -309,19 +309,11 @@ fun FileChooserView(controller: FileChooserInterface) {
 
             Box(Modifier.weight(1f))
 
-            SmallButton(onClick = {
-                controller.cancel()
-            }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
-                Icon(Icons.Default.Close, "cancel")
-                Text("Cancel", modifier = Modifier.padding(start = 5.dp))
-            }
-
-            SmallButton(onClick = {
-                controller.select()
-            }, enabled = controller.selectedValid) {
-                Icon(Icons.Default.Check, "select")
-                Text("Select", modifier = Modifier.padding(start = 5.dp))
-            }
+            DialogButtonBar(
+                onCancel = { controller.cancel() },
+                onConfirm = { controller.select() },
+                confirmEnabled = controller.selectedValid
+            )
         }
     }
 }
@@ -450,24 +442,16 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
 
                     Box(Modifier.weight(1f))
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        SmallButton(onClick = {
-                            controller.cancel()
-                        }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
-                            Icon(Icons.Default.Close, "cancel")
-                            Text("Cancel", modifier = Modifier.padding(start = 5.dp))
-                        }
-
-                        SmallButton(onClick = {
-                            controller.createFolder()
-                        }, enabled = controller.folderNameValid) {
+                    DialogButtonBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        onCancel = { controller.cancel() },
+                        onConfirm = { controller.createFolder() },
+                        confirmEnabled = controller.folderNameValid,
+                        confirmContent = {
                             Icon(MrMpBIcons.create_new_folder, "create")
                             Text("Create", modifier = Modifier.padding(start = 5.dp))
                         }
-                    }
+                    )
 
                     SideEffect {
                         requester.requestFocus()

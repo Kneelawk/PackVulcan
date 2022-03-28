@@ -33,4 +33,10 @@ object MrMpBIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val storage = loader.getResourceAsStream("storage_black_24dp.svg").orError("storage")
         .use { loadSvgPainter(it, Density(1f)) }
+    val fabric = loader.getResourceAsStream("fabric_24dp.svg").orError("fabric")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val forge = loader.getResourceAsStream("conda_forge_filled_24dp.svg").orError("forge")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val quilt = loader.getResourceAsStream("quilt_logo_mono_black_transparent_24dp.svg").orError("quilt")
+        .use { loadSvgPainter(it, Density(1f)) }
 }

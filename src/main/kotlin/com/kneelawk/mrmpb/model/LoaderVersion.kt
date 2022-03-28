@@ -2,6 +2,7 @@ package com.kneelawk.mrmpb.model
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.mrmpb.model.manifest.fabric.FabricLoaderJson
+import com.kneelawk.mrmpb.model.manifest.quilt.QuiltLoaderJson
 import com.kneelawk.mrmpb.net.manifest.ManifestCaches
 import com.kneelawk.mrmpb.util.Either
 import com.kneelawk.mrmpb.util.suspendGet
@@ -23,6 +24,10 @@ sealed class LoaderVersion {
             }
         }
 
+        private fun fromQuiltJson(json: QuiltLoaderJson): Quilt {
+            return Quilt(json.version)
+        }
+
         private val fabricLoaderListCache = Caffeine.newBuilder().buildAsync<Unit, List<Fabric>>()
         private val fabricLoaderMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, Fabric>>()
         private val forgeListMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, List<Forge>>>()
@@ -30,6 +35,8 @@ sealed class LoaderVersion {
         private val forgeFullMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, Forge>>()
         private val forgeListCache = Caffeine.newBuilder().buildAsync<String, List<Forge>>()
         private val forgeMapCache = Caffeine.newBuilder().buildAsync<String, Map<String, Forge>>()
+        private val quiltLoaderListCache = Caffeine.newBuilder().buildAsync<Unit, List<Quilt>>()
+        private val quiltLoaderMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, Quilt>>()
 
         suspend fun fabricLoaderList(): List<Fabric> = fabricLoaderListCache.suspendGet(Unit) {
             ManifestCaches.fabricLoaders().map { fromFabricJson(it) }
@@ -37,6 +44,14 @@ sealed class LoaderVersion {
 
         private suspend fun fabricLoaderMap(): Map<String, Fabric> = fabricLoaderMapCache.suspendGet(Unit) {
             fabricLoaderList().associateBy { it.version }
+        }
+
+        suspend fun quiltLoaderList(): List<Quilt> = quiltLoaderListCache.suspendGet(Unit) {
+            ManifestCaches.quiltManifest().map { fromQuiltJson(it) }
+        }
+
+        private suspend fun quiltLoaderMap(): Map<String, Quilt> = quiltLoaderMapCache.suspendGet(Unit) {
+            quiltLoaderList().associateBy { it.version }
         }
 
         private suspend fun forgeListMap(): Map<String, List<Forge>> = forgeListMapCache.suspendGet(Unit) {
@@ -90,6 +105,10 @@ sealed class LoaderVersion {
                     val version = loaderVersion.substring("fabric".length).trim()
                     Either.leftOr(fabricLoaderMap()[version], InvalidLoaderVersionError.Fabric(version))
                 }
+                lowerCase.startsWith("quilt") -> {
+                    val version = loaderVersion.substring("quilt".length).trim()
+                    Either.leftOr(quiltLoaderMap()[version], InvalidLoaderVersionError.Quilt(version))
+                }
                 lowerCase.startsWith("forge") -> {
                     val version = loaderVersion.substring("forge".length).trim()
                     Either.leftOr(
@@ -112,6 +131,12 @@ sealed class LoaderVersion {
             return "Forge $version"
         }
     }
+
+    class Quilt internal constructor(val version: String) : LoaderVersion() {
+        override fun toString(): String {
+            return "Quilt $version"
+        }
+    }
 }
 
 sealed class InvalidLoaderVersionError {
@@ -128,6 +153,12 @@ sealed class InvalidLoaderVersionError {
             } else {
                 "'$loaderVersion' is not a real Forge version for Minecraft '$minecraftVersion'"
             }
+        }
+    }
+
+    data class Quilt(val loaderVersion: String) : InvalidLoaderVersionError() {
+        override fun toString(): String {
+            return "'$loaderVersion' is not a real Quilt version"
         }
     }
 

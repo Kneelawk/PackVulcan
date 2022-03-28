@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.mrmpb.model.manifest.fabric.FabricLoaderJson
 import com.kneelawk.mrmpb.model.manifest.forge.ForgeManifestJson
 import com.kneelawk.mrmpb.model.manifest.minecraft.MinecraftManifestJson
+import com.kneelawk.mrmpb.model.manifest.quilt.QuiltLoaderJson
 import com.kneelawk.mrmpb.util.suspendGet
 import kotlinx.coroutines.DelicateCoroutinesApi
 
@@ -12,6 +13,7 @@ object ManifestCaches {
     private val fabricLoadersCache = Caffeine.newBuilder().buildAsync<Unit, List<FabricLoaderJson>>()
     private val forgeManifestCache = Caffeine.newBuilder().buildAsync<Unit, ForgeManifestJson>()
     private val minecraftManifestCache = Caffeine.newBuilder().buildAsync<Unit, MinecraftManifestJson>()
+    private val quiltManifestCache = Caffeine.newBuilder().buildAsync<Unit, List<QuiltLoaderJson>>()
 
     suspend fun fabricLoaders(): List<FabricLoaderJson> = fabricLoadersCache.suspendGet(Unit) {
         ManifestApis.fabricLoaders()
@@ -23,5 +25,9 @@ object ManifestCaches {
 
     suspend fun minecraftManifest(): MinecraftManifestJson = minecraftManifestCache.suspendGet(Unit) {
         ManifestApis.minecraftManifest()
+    }
+
+    suspend fun quiltManifest(): List<QuiltLoaderJson> = quiltManifestCache.suspendGet(Unit) {
+        ManifestApis.quiltManifest()
     }
 }
