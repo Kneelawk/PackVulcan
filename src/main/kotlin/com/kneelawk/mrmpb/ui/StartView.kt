@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.dialog.OpenFileDialog
+import com.kneelawk.mrmpb.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
 import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
 import java.nio.file.Path

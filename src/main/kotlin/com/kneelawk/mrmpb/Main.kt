@@ -9,6 +9,7 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.kneelawk.mrmpb.net.shutdownHttpClient
 import com.kneelawk.mrmpb.ui.RootComponent
 import com.kneelawk.mrmpb.ui.RootView
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
@@ -39,6 +40,9 @@ fun main() {
             }
         }
     }
+
+    // Shutdown http client
+    shutdownHttpClient()
 
     // Store global settings
     GlobalSettings.store()

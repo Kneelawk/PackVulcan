@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun VerticalScrollWrapper(modifier: Modifier, adapter: ScrollbarAdapter, content: @Composable RowScope.() -> Unit) {
-    Row(modifier = modifier.background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)) {
+    Row(modifier = modifier.background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium).clip(MaterialTheme.shapes.medium)) {
         content()
 
         var containerSize by remember { mutableStateOf(0) }

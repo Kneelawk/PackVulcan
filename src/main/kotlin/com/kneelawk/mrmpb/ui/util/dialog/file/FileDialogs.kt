@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util.dialog
+package com.kneelawk.mrmpb.ui.util.dialog.file
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize

@@ -3,12 +3,15 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.0"
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+    id("org.jetbrains.compose")
 }
 
-group = "com.kneelawk"
-version = "1.0"
+val projectGroup: String by project
+group = projectGroup
+val projectVersion: String by project
+version = projectVersion
 
 repositories {
     google()
@@ -20,23 +23,48 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     // Special Compose UI Elements
-    implementation("org.jetbrains.compose.components:components-splitpane-desktop:1.1.0")
+    val composeVersion: String by project
+    implementation("org.jetbrains.compose.components:components-splitpane-desktop:$composeVersion")
 
     // Decompose
-    implementation("com.arkivanov.decompose:decompose:0.5.1")
-    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:0.5.1")
+    val decomposeVersion: String by project
+    implementation("com.arkivanov.decompose:decompose:$decomposeVersion")
+    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decomposeVersion")
+
+    // Coroutines
+    val coroutinesVersion: String by project
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
+
+    // Serialization
+    val serializationVersion: String by project
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+
+    // Ktor Client
+    val ktorVersion: String by project
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+
+    // Caffine
+    val caffeineVersion: String by project
+    implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
 
     // Logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
+    val kotlinLoggingVersion: String by project
+    implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")
 
     // TOML4J
-    implementation("com.moandjiezana.toml:toml4j:0.7.2")
+    val toml4jVersion: String by project
+    implementation("com.moandjiezana.toml:toml4j:$toml4jVersion")
 
     // SemVer
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    val javaSemverVersion: String by project
+    implementation("com.github.zafarkhaja:java-semver:$javaSemverVersion")
 
     // Use logback logger because nothing seems to have updated their log4j yet
-    runtimeOnly("ch.qos.logback:logback-classic:1.3.0-alpha14")
+    val logbackVersion: String by project
+    runtimeOnly("ch.qos.logback:logback-classic:$logbackVersion")
 }
 
 tasks.withType<KotlinCompile> {

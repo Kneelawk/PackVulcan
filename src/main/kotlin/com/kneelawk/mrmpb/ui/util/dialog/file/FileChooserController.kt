@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util.dialog
+package com.kneelawk.mrmpb.ui.util.dialog.file
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*

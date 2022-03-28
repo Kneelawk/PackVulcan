@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util.dialog
+package com.kneelawk.mrmpb.ui.util.dialog.file
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

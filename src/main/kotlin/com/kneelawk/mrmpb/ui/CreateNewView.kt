@@ -20,8 +20,8 @@ fun CreateNewView(component: CreateNewComponent) {
                 component.name, { component.name = it },
                 component.author, { component.author = it },
                 component.version, { component.version = it }, component.versionError,
-                component.minecraftVersion, { component.minecraftVersion = it }, component.minecraftVersionError,
-                component.loaderVersion, { component.loaderVersion = it }, component.loaderVersionError
+                component.editMinecraftVersion, { component.setMinecraftVersion(it) }, component.minecraftVersionError,
+                component.editLoaderVersion, { component.setLoaderVersion(it) }, component.loaderVersionError
             )
 
             Row(

@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util.dialog
+package com.kneelawk.mrmpb.ui.util.dialog.file
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -357,7 +358,7 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
         Column(modifier = Modifier.weight(1F)) {
             Row(
                 modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
-                    .horizontalScroll(segmentScrollState)
+                    .clip(MaterialTheme.shapes.medium).horizontalScroll(segmentScrollState)
             ) {
                 var path =
                     fullPath.root ?: throw IllegalStateException(

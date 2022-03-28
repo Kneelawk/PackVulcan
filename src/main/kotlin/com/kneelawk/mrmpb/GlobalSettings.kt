@@ -9,14 +9,13 @@ import com.moandjiezana.toml.TomlWriter
 import mu.KotlinLogging
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.*
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
+import kotlin.io.path.pathString
 
 object GlobalSettings {
     private val log = KotlinLogging.logger {}
-
-    private const val folderName = ".mrmpb"
-    private val folder = Paths.get(System.getProperty("user.home"), folderName)
-    private val settingsFile = folder.resolve("settings.toml")
 
     private val defaultDarkMode = true
     private lateinit var darkModeState: MutableState<Boolean>
@@ -27,12 +26,8 @@ object GlobalSettings {
     fun load() {
         log.info("Loading global settings...")
 
-        if (!folder.exists()) {
-            folder.createDirectories()
-        }
-
-        if (settingsFile.exists()) {
-            val root = Toml().read(settingsFile.inputStream())
+        if (GlobalConstants.SETTINGS_FILE.exists()) {
+            val root = Toml().read(GlobalConstants.SETTINGS_FILE.inputStream())
 
             val uiSettings = root.getTable("ui") ?: Toml()
             darkModeState = mutableStateOf(uiSettings.getBoolean("dark-mode", defaultDarkMode))
@@ -50,10 +45,6 @@ object GlobalSettings {
     fun store() {
         log.info("Storing settings...")
 
-        if (!folder.exists()) {
-            folder.createDirectories()
-        }
-
         val writer = TomlWriter()
 
         val root = mapOf(
@@ -62,7 +53,7 @@ object GlobalSettings {
                 "file-chooser-favorites" to fileChooserFavoritesList.map { it.pathString }
             )
         )
-        writer.write(root, settingsFile.outputStream())
+        writer.write(root, GlobalConstants.SETTINGS_FILE.outputStream())
     }
 
     var darkMode

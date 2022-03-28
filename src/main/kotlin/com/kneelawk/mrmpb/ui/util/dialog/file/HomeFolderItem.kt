@@ -1,4 +1,4 @@
-package com.kneelawk.mrmpb.ui.util.dialog
+package com.kneelawk.mrmpb.ui.util.dialog.file
 
 enum class HomeFolderItem(val displayName: String) {
     HOME("Home"),

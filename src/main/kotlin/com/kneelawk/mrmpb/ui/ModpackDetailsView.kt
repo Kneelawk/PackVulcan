@@ -10,7 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.dialog.OpenDirectoryDialog
+import com.kneelawk.mrmpb.ui.util.dialog.MinecraftVersionDialog
+import com.kneelawk.mrmpb.ui.util.dialog.file.OpenDirectoryDialog
 import com.kneelawk.mrmpb.ui.util.layout.Form
 import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
 import com.kneelawk.mrmpb.ui.util.widgets.SmallTextField
@@ -27,6 +28,7 @@ fun ModpackDetailsView(
 ) {
     val projectLocationEditable = locationChange != null
     var projectLocationDialog by remember { mutableStateOf(false) }
+    var minecraftVersionDialog by remember { mutableStateOf(false) }
 
     if (projectLocationDialog && projectLocationEditable) {
         val initialFolder = if (location.isBlank()) {
@@ -39,6 +41,13 @@ fun ModpackDetailsView(
         ) { selection ->
             projectLocationDialog = false
             selection?.let { locationChange!!(it.pathString) }
+        }
+    }
+
+    if (minecraftVersionDialog) {
+        MinecraftVersionDialog("Select a Minecraft version...", minecraftVersion) { selection ->
+            minecraftVersionDialog = false
+            selection?.let { minecraftVersionChange(it.toString()) }
         }
     }
 
@@ -83,10 +92,9 @@ fun ModpackDetailsView(
         SmallTextField(
             minecraftVersion, minecraftVersionChange, modifier = Modifier.formField(), isError = minecraftVersionError
         )
-        SmallButton(onClick = {}, modifier = Modifier.formConfigure()) {
+        SmallButton(onClick = { minecraftVersionDialog = true }, modifier = Modifier.formConfigure()) {
             Text("...")
         }
-        // TODO: Minecraft version selector
 
         Text("Loader Version:", modifier = Modifier.formLabel())
         SmallTextField(
