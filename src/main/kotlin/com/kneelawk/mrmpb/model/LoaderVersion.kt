@@ -142,29 +142,29 @@ sealed class LoaderVersion {
 sealed class InvalidLoaderVersionError {
     data class Fabric(val loaderVersion: String) : InvalidLoaderVersionError() {
         override fun toString(): String {
-            return "'$loaderVersion' is not a real Fabric version"
+            return "'$loaderVersion' is not a real Fabric version."
         }
     }
 
     data class Forge(val loaderVersion: String, val minecraftVersion: String?) : InvalidLoaderVersionError() {
         override fun toString(): String {
             return if (minecraftVersion == null) {
-                "'$loaderVersion' is not a real Forge version"
+                "'$loaderVersion' is not a real Forge version."
             } else {
-                "'$loaderVersion' is not a real Forge version for Minecraft '$minecraftVersion'"
+                "'$loaderVersion' is not a real Forge version for Minecraft '$minecraftVersion'."
             }
         }
     }
 
     data class Quilt(val loaderVersion: String) : InvalidLoaderVersionError() {
         override fun toString(): String {
-            return "'$loaderVersion' is not a real Quilt version"
+            return "'$loaderVersion' is not a real Quilt version."
         }
     }
 
     object UnknownLoader : InvalidLoaderVersionError() {
         override fun toString(): String {
-            return "Loader strings must start with either 'Fabric' or 'Forge'"
+            return "Loader strings must start with either 'Fabric', 'Forge', or 'Quilt'."
         }
     }
 }

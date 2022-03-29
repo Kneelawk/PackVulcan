@@ -55,6 +55,6 @@ class MinecraftVersion private constructor(val version: String, val type: Type) 
 
 data class InvalidMinecraftVersionError(val givenVersion: String) {
     override fun toString(): String {
-        return "'$givenVersion' is not a real Minecraft version"
+        return "'$givenVersion' is not a real Minecraft version."
     }
 }

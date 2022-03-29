@@ -4,6 +4,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import com.arkivanov.decompose.ComponentContext
 import com.kneelawk.mrmpb.GlobalConstants.INITIAL_LOADER_VERSION
 import com.kneelawk.mrmpb.GlobalConstants.INITIAL_MINECRAFT_VERSION
@@ -27,28 +33,29 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
 
     var editMinecraftVersion by mutableStateOf(INITIAL_MINECRAFT_VERSION)
         private set
-    private var minecraftVersionState by mutableStateOf(MinecraftVersionState(INITIAL_MINECRAFT_VERSION, false))
-    private val minecraftVersionConflator = Conflator<String>(scope) {
-        val version = it
+    private var minecraftVersionState by mutableStateOf(MinecraftVersionState(INITIAL_MINECRAFT_VERSION, false, ""))
+    private val minecraftVersionConflator = Conflator<String>(scope) { version ->
         minecraftVersionState = MinecraftVersion.forVersion(version).switch(
-            { MinecraftVersionState(version, false) },
-            { MinecraftVersionState(version, true) }
+            { MinecraftVersionState(version, true, "") },
+            { MinecraftVersionState(version, false, it.toString()) }
         )
     }
     val minecraftVersion by derivedStateOf { minecraftVersionState.version }
+    val minecraftVersionValid by derivedStateOf { minecraftVersionState.valid }
     val minecraftVersionError by derivedStateOf { minecraftVersionState.error }
 
     var editLoaderVersion by mutableStateOf(INITIAL_LOADER_VERSION)
         private set
-    private var loaderVersionState by mutableStateOf(LoaderVersionState(INITIAL_LOADER_VERSION, false))
-    private val loaderVersionConflator = Conflator<LoaderVersionInput>(scope) {
-        val version = it.loaderVersion
-        loaderVersionState = LoaderVersion.forVersion(version, it.minecraftVersion).switch(
-            { LoaderVersionState(version, false) },
-            { LoaderVersionState(version, true) }
+    private var loaderVersionState by mutableStateOf(LoaderVersionState(INITIAL_LOADER_VERSION, false, ""))
+    private val loaderVersionConflator = Conflator<LoaderVersionInput>(scope) { input ->
+        val version = input.loaderVersion
+        loaderVersionState = LoaderVersion.forVersion(version, input.minecraftVersion).switch(
+            { LoaderVersionState(version, true, "") },
+            { LoaderVersionState(version, false, it.toString()) }
         )
     }
     val loaderVersion by derivedStateOf { loaderVersionState.version }
+    val loaderVersionValid by derivedStateOf { loaderVersionState.valid }
     val loaderVersionError by derivedStateOf { loaderVersionState.error }
 
     val createEnabled by derivedStateOf {
@@ -56,8 +63,8 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
                 && name.isNotBlank()
                 && author.isNotBlank()
                 && VersionUtils.isSemVer(version)
-                && !minecraftVersionError
-                && !loaderVersionError
+                && minecraftVersionValid
+                && loaderVersionValid
     }
 
     fun setMinecraftVersion(version: String) {
@@ -78,9 +85,9 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
     fun create() {
     }
 
-    private data class MinecraftVersionState(val version: String, val error: Boolean)
+    private data class MinecraftVersionState(val version: String, val valid: Boolean, val error: String)
     private data class LoaderVersionInput(val loaderVersion: String, val minecraftVersion: String)
-    private data class LoaderVersionState(val version: String, val error: Boolean)
+    private data class LoaderVersionState(val version: String, val valid: Boolean, val error: String)
 
     private data class VersionState(val minecraftVersion: String, val loaderVersion: String)
 }

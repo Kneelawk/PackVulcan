@@ -22,7 +22,8 @@ private val DarkColorPalette = darkColors(
 )
 
 private val DarkColorPaletteExtended = darkMrMpBColors(
-    headingColor = Cyan50
+    headingColor = Cyan50,
+    linkColor = Blue300,
 )
 
 private val LightColorPalette = lightColors(
@@ -33,7 +34,9 @@ private val LightColorPalette = lightColors(
     surface = Color.White
 )
 
-private val LightColorPaletteExtended = lightMrMpBColors()
+private val LightColorPaletteExtended = lightMrMpBColors(
+    linkColor = Blue600,
+)
 
 @Composable
 fun MrMpBTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
