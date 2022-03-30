@@ -9,19 +9,17 @@ data class IndexToml(val hashFormat: HashFormat, val files: List<FileToml>) : To
         override fun fromToml(toml: Toml): IndexToml {
             return IndexToml(
                 HashFormat.fromString(toml.mustGetString("hash-format")),
-                toml.mustGetTables("files").map { FileToml.fromToml(it) }
+                // sometimes I've encountered index.toml files without a 'files' element
+                toml.getTables("files")?.map { FileToml.fromToml(it) } ?: listOf()
             )
         }
     }
 
     override fun toToml(): Map<String, Any> {
-        val map = mutableMapOf<String, Any>()
-        map["hash-format"] = hashFormat.toString()
-
-        if (files.isNotEmpty()) {
-            map["files"] = files.map { it.toToml() }
-        }
-
-        return map
+        // however, the 'files' element is listed as being required in the documentation, even if it's empty
+        return mapOf(
+            "hash-format" to hashFormat.toString(),
+            "files" to files.map { it.toToml() }
+        )
     }
 }
