@@ -5,6 +5,7 @@ import com.kneelawk.mrmpb.model.manifest.fabric.FabricLoaderJson
 import com.kneelawk.mrmpb.model.manifest.quilt.QuiltLoaderJson
 import com.kneelawk.mrmpb.net.manifest.ManifestCaches
 import com.kneelawk.mrmpb.util.Either
+import com.kneelawk.mrmpb.util.leftOr
 import com.kneelawk.mrmpb.util.suspendGet
 import com.kneelawk.mrmpb.model.manifest.forge.LoaderJson as ForgeLoaderJson
 
@@ -103,36 +104,65 @@ sealed class LoaderVersion {
             return when {
                 lowerCase.startsWith("fabric") -> {
                     val version = loaderVersion.substring("fabric".length).trim()
-                    Either.leftOr(fabricLoaderMap()[version], InvalidLoaderVersionError.Fabric(version))
+                    leftOr(fabricLoaderMap()[version], InvalidLoaderVersionError.Fabric(version))
                 }
                 lowerCase.startsWith("quilt") -> {
                     val version = loaderVersion.substring("quilt".length).trim()
-                    Either.leftOr(quiltLoaderMap()[version], InvalidLoaderVersionError.Quilt(version))
+                    leftOr(quiltLoaderMap()[version], InvalidLoaderVersionError.Quilt(version))
                 }
                 lowerCase.startsWith("forge") -> {
                     val version = loaderVersion.substring("forge".length).trim()
-                    Either.leftOr(
+                    leftOr(
                         forgeMap(minecraftVersion)[version], InvalidLoaderVersionError.Forge(version, minecraftVersion)
                     )
                 }
                 else -> Either.right(InvalidLoaderVersionError.UnknownLoader)
             }
         }
+
+        suspend fun forVersion(
+            loaderType: LoaderVersionType, loaderVersion: String, minecraftVersion: String?
+        ): Either<LoaderVersion, InvalidLoaderVersionError> {
+            return when (loaderType) {
+                LoaderVersionType.FABRIC -> {
+                    leftOr(fabricLoaderMap()[loaderVersion], InvalidLoaderVersionError.Fabric(loaderVersion))
+                }
+                LoaderVersionType.FORGE -> {
+                    leftOr(
+                        forgeMap(minecraftVersion)[loaderVersion],
+                        InvalidLoaderVersionError.Forge(loaderVersion, minecraftVersion)
+                    )
+                }
+                LoaderVersionType.QUILT -> {
+                    leftOr(quiltLoaderMap()[loaderVersion], InvalidLoaderVersionError.Quilt(loaderVersion))
+                }
+            }
+        }
     }
 
-    class Fabric internal constructor(val version: String) : LoaderVersion() {
+    abstract val type: LoaderVersionType
+
+    abstract val version: String
+
+    class Fabric internal constructor(override val version: String) : LoaderVersion() {
+        override val type = LoaderVersionType.FABRIC
+
         override fun toString(): String {
             return "Fabric $version"
         }
     }
 
-    class Forge internal constructor(val version: String) : LoaderVersion() {
+    class Forge internal constructor(override val version: String) : LoaderVersion() {
+        override val type = LoaderVersionType.FORGE
+
         override fun toString(): String {
             return "Forge $version"
         }
     }
 
-    class Quilt internal constructor(val version: String) : LoaderVersion() {
+    class Quilt internal constructor(override val version: String) : LoaderVersion() {
+        override val type = LoaderVersionType.QUILT
+
         override fun toString(): String {
             return "Quilt $version"
         }
@@ -166,5 +196,21 @@ sealed class InvalidLoaderVersionError {
         override fun toString(): String {
             return "Loader strings must start with either 'Fabric', 'Forge', or 'Quilt'."
         }
+    }
+}
+
+enum class LoaderVersionType(val prettyName: String, val packwizName: String) {
+    FABRIC("Fabric", "fabric"),
+    FORGE("Forge", "forge"),
+    QUILT("Quilt", "quilt");
+
+    companion object {
+        fun fromPackwizName(name: String): LoaderVersionType? {
+            return values().firstOrNull { it.packwizName == name }
+        }
+    }
+
+    override fun toString(): String {
+        return prettyName
     }
 }

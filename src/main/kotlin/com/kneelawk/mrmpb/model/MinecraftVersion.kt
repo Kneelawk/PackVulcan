@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.mrmpb.model.manifest.minecraft.TypeJson
 import com.kneelawk.mrmpb.net.manifest.ManifestCaches
 import com.kneelawk.mrmpb.util.Either
+import com.kneelawk.mrmpb.util.leftOr
 import com.kneelawk.mrmpb.util.suspendGet
 import com.kneelawk.mrmpb.model.manifest.minecraft.VersionJson as MinecraftVersionJson
 
@@ -26,7 +27,7 @@ class MinecraftVersion private constructor(val version: String, val type: Type) 
             }
 
         suspend fun forVersion(version: String): Either<MinecraftVersion, InvalidMinecraftVersionError> {
-            return Either.leftOr(minecraftVersionMap()[version], InvalidMinecraftVersionError(version))
+            return leftOr(minecraftVersionMap()[version], InvalidMinecraftVersionError(version))
         }
     }
 

@@ -25,7 +25,7 @@ fun ModpackDetailsView(
     location: String, locationChange: ((String) -> Unit)?, name: String, nameChange: (String) -> Unit, author: String,
     authorChange: (String) -> Unit, version: String, versionChange: (String) -> Unit, versionError: Boolean,
     minecraftVersion: String, minecraftVersionChange: (String) -> Unit, minecraftVersionError: Boolean,
-    loaderVersion: String, loaderVersionChange: (String) -> Unit, loaderVersionError: Boolean
+    loaderVersion: String, loaderVersionChange: (String) -> Unit, loaderVersionError: Boolean, enabled: Boolean = true,
 ) {
     val projectLocationEditable = locationChange != null
     var projectLocationDialog by remember { mutableStateOf(false) }
@@ -69,9 +69,11 @@ fun ModpackDetailsView(
         )
 
         Text("Project Location:", modifier = Modifier.formLabel())
-        SmallTextField(location, locationChange ?: {}, modifier = Modifier.formField())
+        SmallTextField(location, locationChange ?: {}, modifier = Modifier.formField(), enabled = enabled)
         if (projectLocationEditable) {
-            SmallButton(onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure()) {
+            SmallButton(
+                onClick = { projectLocationDialog = true }, modifier = Modifier.formConfigure(), enabled = enabled
+            ) {
                 Text("...")
             }
         }
@@ -82,14 +84,14 @@ fun ModpackDetailsView(
         )
 
         Text("Modpack Name:", modifier = Modifier.formLabel())
-        SmallTextField(name, nameChange, modifier = Modifier.formField())
+        SmallTextField(name, nameChange, modifier = Modifier.formField(), enabled = enabled)
 
         Text("Modpack Author:", modifier = Modifier.formLabel())
-        SmallTextField(author, authorChange, modifier = Modifier.formField())
+        SmallTextField(author, authorChange, modifier = Modifier.formField(), enabled = enabled)
 
         Text("Modpack Version:", modifier = Modifier.formLabel())
         SmallTextField(
-            version, versionChange, modifier = Modifier.formField(), isError = versionError
+            version, versionChange, modifier = Modifier.formField(), isError = versionError, enabled = enabled
         )
 
         Text(
@@ -99,17 +101,21 @@ fun ModpackDetailsView(
 
         Text("Minecraft Version:", modifier = Modifier.formLabel())
         SmallTextField(
-            minecraftVersion, minecraftVersionChange, modifier = Modifier.formField(), isError = minecraftVersionError
+            minecraftVersion, minecraftVersionChange, modifier = Modifier.formField(), isError = minecraftVersionError,
+            enabled = enabled
         )
-        SmallButton(onClick = { minecraftVersionDialog = true }, modifier = Modifier.formConfigure()) {
+        SmallButton(
+            onClick = { minecraftVersionDialog = true }, modifier = Modifier.formConfigure(), enabled = enabled
+        ) {
             Text("...")
         }
 
         Text("Loader Version:", modifier = Modifier.formLabel())
         SmallTextField(
-            loaderVersion, loaderVersionChange, modifier = Modifier.formField(), isError = loaderVersionError
+            loaderVersion, loaderVersionChange, modifier = Modifier.formField(), isError = loaderVersionError,
+            enabled = enabled
         )
-        SmallButton(onClick = { loaderVersionDialog = true }, modifier = Modifier.formConfigure()) {
+        SmallButton(onClick = { loaderVersionDialog = true }, modifier = Modifier.formConfigure(), enabled = enabled) {
             Text("...")
         }
     }

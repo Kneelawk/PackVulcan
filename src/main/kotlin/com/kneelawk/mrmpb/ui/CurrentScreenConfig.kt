@@ -12,4 +12,7 @@ sealed class CurrentScreenConfig : Parcelable {
 
     @Parcelize
     object CreateNew : CurrentScreenConfig()
+
+    @Parcelize
+    object Modpack : CurrentScreenConfig()
 }

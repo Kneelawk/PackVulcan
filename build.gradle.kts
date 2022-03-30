@@ -46,6 +46,9 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
 
+    val okioVersion: String by project
+    implementation("com.squareup.okio:okio:$okioVersion")
+
     // Caffine
     val caffeineVersion: String by project
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
@@ -53,6 +56,10 @@ dependencies {
     // Logging
     val kotlinLoggingVersion: String by project
     implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")
+
+    // Commons Codec
+    val commonsCodecVersion: String by project
+    implementation("commons-codec:commons-codec:$commonsCodecVersion")
 
     // TOML4J
     val toml4jVersion: String by project
