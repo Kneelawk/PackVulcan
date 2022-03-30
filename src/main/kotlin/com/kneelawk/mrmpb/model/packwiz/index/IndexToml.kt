@@ -15,9 +15,13 @@ data class IndexToml(val hashFormat: HashFormat, val files: List<FileToml>) : To
     }
 
     override fun toToml(): Map<String, Any> {
-        return mapOf(
-            "hash-format" to hashFormat.toString(),
-            "files" to files.map { it.toToml() }
-        )
+        val map = mutableMapOf<String, Any>()
+        map["hash-format"] = hashFormat.toString()
+
+        if (files.isNotEmpty()) {
+            map["files"] = files.map { it.toToml() }
+        }
+
+        return map
     }
 }
