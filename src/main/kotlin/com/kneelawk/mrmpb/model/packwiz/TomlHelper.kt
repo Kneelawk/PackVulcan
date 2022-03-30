@@ -39,7 +39,7 @@ object TomlHelper {
 
     suspend fun hash(encodable: ToToml, hashFormat: HashFormat): String = withContext(Dispatchers.IO) {
         val hasher = hashFormat.makeSink(blackholeSink())
-        hasher.buffer().use { writer.write(encodable, it.outputStream()) }
+        hasher.buffer().use { writer.write(encodable.toToml(), it.outputStream()) }
         hasher.hashString()
     }
 }
