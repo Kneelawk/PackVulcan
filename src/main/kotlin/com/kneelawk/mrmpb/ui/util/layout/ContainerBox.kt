@@ -85,7 +85,6 @@ fun AppContainerBox(
     Scaffold(
         scaffoldState = scaffoldState, topBar = topBar, backgroundColor = backgroundColor,
         drawerContent = drawerContent, drawerBackgroundColor = drawerBackgroundColor,
-        drawerShape = FixedWidthRectangleShape(400f)
     ) {
         val contentColor by animateColorAsState(MaterialTheme.colors.onBackground)
         CompositionLocalProvider(LocalContentColor provides contentColor) {
