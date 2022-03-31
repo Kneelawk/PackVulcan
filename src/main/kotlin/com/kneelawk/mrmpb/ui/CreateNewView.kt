@@ -12,18 +12,17 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.AppContainerBox
 import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
 
 @Composable
 fun CreateNewView(component: CreateNewComponent) {
     val uriHandler = LocalUriHandler.current
 
-    ContainerBox {
+    AppContainerBox("Create New Modpack") {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ModpackDetailsView(
                 component.location, { component.location = it },

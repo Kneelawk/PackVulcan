@@ -8,9 +8,6 @@ sealed class CurrentScreenConfig : Parcelable {
     object Start : CurrentScreenConfig()
 
     @Parcelize
-    object Settings : CurrentScreenConfig()
-
-    @Parcelize
     object CreateNew : CurrentScreenConfig()
 
     @Parcelize

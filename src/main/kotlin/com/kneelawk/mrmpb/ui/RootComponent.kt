@@ -22,7 +22,6 @@ class RootComponent(context: ComponentContext) : ComponentContext by context {
     private fun componentFactory(config: CurrentScreenConfig, context: ComponentContext): CurrentScreen {
         return when (config) {
             CurrentScreenConfig.Start -> CurrentScreen.Start
-            CurrentScreenConfig.Settings -> CurrentScreen.Settings
             CurrentScreenConfig.CreateNew -> CurrentScreen.CreateNew(CreateNewComponent(context) { result ->
                 when (result) {
                     CreateNewResult.Cancel -> goBack()
@@ -40,10 +39,6 @@ class RootComponent(context: ComponentContext) : ComponentContext by context {
 
     fun openCreateNew() {
         router.push(CurrentScreenConfig.CreateNew)
-    }
-
-    fun openSettings() {
-        router.push(CurrentScreenConfig.Settings)
     }
 
     fun goBack() {

@@ -22,7 +22,7 @@ import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.model.LoaderVersion
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.ui.util.widgets.DialogButtonBar
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
@@ -38,7 +38,7 @@ fun LoaderVersionDialog(
 
     Dialog(title = title, state = state, onCloseRequest = { finished(null) }) {
         MrMpBTheme(GlobalSettings.darkMode) {
-            ContainerBox {
+            DialogContainerBox {
                 LoaderVersionView(title, previousVersion, minecraftVersion, finished)
             }
         }

@@ -20,7 +20,7 @@ import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.model.MinecraftVersion
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.ui.util.widgets.DialogButtonBar
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
@@ -33,7 +33,7 @@ fun MinecraftVersionDialog(title: String, previousVersion: String, finished: (Mi
 
     Dialog(title = title, state = state, onCloseRequest = { finished(null) }) {
         MrMpBTheme(GlobalSettings.darkMode) {
-            ContainerBox {
+            DialogContainerBox {
                 MinecraftVersionView(title, previousVersion, finished)
             }
         }

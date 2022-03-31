@@ -1,19 +1,34 @@
 package com.kneelawk.mrmpb.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 
 @Composable
-fun SettingsView(finish: () -> Unit) {
-    ContainerBox {
+fun SettingsWindow(windowState: WindowState, onCloseRequest: () -> Unit) {
+    Window(
+        onCloseRequest = onCloseRequest, title = "Modrinth Modpack Builder",
+        state = windowState
+    ) {
+        MrMpBTheme(GlobalSettings.darkMode) {
+            SettingsView()
+        }
+    }
+}
+
+@Composable
+fun SettingsView() {
+    DialogContainerBox {
         Column(
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(IntrinsicSize.Max).align(Alignment.Center)
@@ -33,10 +48,6 @@ fun SettingsView(finish: () -> Unit) {
                     )
                 )
             }
-        }
-
-        IconButton(onClick = finish, modifier = Modifier.align(Alignment.TopStart)) {
-            Icon(Icons.Default.ArrowBack, "Go Back")
         }
     }
 }

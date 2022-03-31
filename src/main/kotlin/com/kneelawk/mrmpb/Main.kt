@@ -1,9 +1,8 @@
 package com.kneelawk.mrmpb
 
 import androidx.compose.ui.window.application
-import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.kneelawk.mrmpb.net.shutdownHttpClient
-import com.kneelawk.mrmpb.ui.ApplicationInstanceManager
+import com.kneelawk.mrmpb.ui.instance.InstanceManager
 import com.kneelawk.mrmpb.ui.util.initSwing
 
 fun main() {
@@ -13,10 +12,10 @@ fun main() {
     // Load the global settings
     GlobalSettings.load()
 
-    ApplicationInstanceManager.openInstance()
+    InstanceManager.newRoot()
 
     application(exitProcessOnExit = false) {
-        ApplicationInstanceManager.compose(::exitApplication)
+        InstanceManager.compose(::exitApplication)
     }
 
     // Shutdown http client

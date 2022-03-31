@@ -34,7 +34,7 @@ import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.ContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.ui.util.widgets.*
 import kotlinx.coroutines.launch
@@ -420,7 +420,7 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
         state = rememberDialogState(size = DpSize(500.dp, 350.dp))
     ) {
         MrMpBTheme(darkTheme = GlobalSettings.darkMode) {
-            ContainerBox {
+            DialogContainerBox {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -429,7 +429,7 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                     val folderNameError = controller.folderNameError
 
                     Text("New Folder Name:", style = MaterialTheme.typography.h5)
-                    TextField(
+                    SmallTextField(
                         value = controller.folderName, onValueChange = { controller.folderNameUpdate(it) },
                         modifier = Modifier.fillMaxWidth().focusRequester(requester),
                         isError = folderNameError != null,
