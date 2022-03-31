@@ -6,8 +6,7 @@ import mu.KotlinLogging
 
 data class PackToml(
     val name: String, val author: String?, val version: String?, val description: String?, val packFormat: String?,
-    val index: IndexObjectToml,
-    val versions: VersionsToml
+    val index: IndexObjectToml, val versions: VersionsToml, val options: OptionsToml?
 ) : ToToml {
     companion object : FromToml<PackToml> {
         const val DEFAULT_PACK_FORMAT = "packwiz:1.0.0"
@@ -29,7 +28,8 @@ data class PackToml(
                 toml.getString("description"),
                 packFormat,
                 IndexObjectToml.fromToml(toml.mustGetTable("index")),
-                VersionsToml.fromToml(toml.mustGetTable("versions"))
+                VersionsToml.fromToml(toml.mustGetTable("versions")),
+                toml.getTable("options")?.let { OptionsToml.fromToml(it) }
             )
         }
     }
@@ -42,7 +42,8 @@ data class PackToml(
             description?.from("description"),
             packFormat?.from("pack-format"),
             "index" to index.toToml(),
-            "versions" to versions.toToml()
+            "versions" to versions.toToml(),
+            options?.toToml()?.from("options")
         )
     }
 }

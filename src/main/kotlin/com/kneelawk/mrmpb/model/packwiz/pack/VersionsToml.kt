@@ -13,9 +13,9 @@ data class VersionsToml(val minecraft: String, val loaderVersions: Map<String, S
             val minecraft = toml.mustGetString("minecraft")
             val loaderVersions = mutableMapOf<String, String>()
 
-            for (entry in toml.entrySet()) {
-                if (entry.key != "minecraft" && entry.value is String) {
-                    loaderVersions[entry.key] = entry.value as String
+            for ((key, value) in toml.entrySet()) {
+                if (key != "minecraft" && value is String) {
+                    loaderVersions[key] = value
                 }
             }
 

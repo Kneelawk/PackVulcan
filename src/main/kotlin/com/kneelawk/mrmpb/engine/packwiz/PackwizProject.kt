@@ -43,7 +43,7 @@ class PackwizProject(
 
             val pack = PackToml(
                 newModpack.name, newModpack.author, newModpack.version, null, PackToml.DEFAULT_PACK_FORMAT, indexObject,
-                versions
+                versions, null
             )
 
             return PackwizProject(newModpack.location, pack, index)
