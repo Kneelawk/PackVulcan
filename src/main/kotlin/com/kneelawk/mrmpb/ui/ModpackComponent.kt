@@ -116,7 +116,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         scope.launch {
             loading = true
 
-            val packFile = modpackLocation.resolve("pack.toml")
+            val packFile = PackwizProject.getPackFile(modpackLocation)
             log.info("Updating existing packwiz project at '$packFile'...")
 
             val project = PackwizProject.loadExisting(packFile)

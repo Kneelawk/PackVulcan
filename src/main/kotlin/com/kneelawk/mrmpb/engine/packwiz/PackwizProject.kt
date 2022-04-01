@@ -16,6 +16,7 @@ import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.name
 
 /**
  * This class is designed to be loaded, read/edited, and then written back to the filesystem, much like packwiz itself
@@ -30,6 +31,14 @@ class PackwizProject(
         private const val PACK_FILENAME = "pack.toml"
 
         private val log = KotlinLogging.logger { }
+
+        fun getPackFile(projectDir: Path): Path {
+            return projectDir.resolve(PACK_FILENAME)
+        }
+
+        fun isPackFile(packFile: Path): Boolean {
+            return packFile.name == PACK_FILENAME
+        }
 
         suspend fun createNew(newModpack: NewModpack): PackwizProject {
             val index = IndexToml(HashFormat.SHA256, listOf())
