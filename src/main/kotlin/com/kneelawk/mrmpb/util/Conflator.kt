@@ -1,10 +1,13 @@
 package com.kneelawk.mrmpb.util
 
+import io.ktor.utils.io.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -18,14 +21,23 @@ class Conflator<T>(
     start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend CoroutineScope.(T) -> Unit
 ) {
+    companion object {
+        private val log = KotlinLogging.logger { }
+    }
+
     private val channel = Channel<T>(Channel.CONFLATED)
 
     init {
         scope.launch(context, start) {
             while (isActive) {
-                val cur = channel.receive()
-                // update detected, applying
-                block(cur)
+                try {
+                    val cur = channel.receive()
+                    // update detected, applying
+                    block(cur)
+                } catch (_: CancellationException) {
+                } catch (e: Exception) {
+                    log.error("Error encountered in Conflator.", e)
+                }
             }
         }
     }
