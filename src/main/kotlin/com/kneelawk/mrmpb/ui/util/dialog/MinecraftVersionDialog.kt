@@ -123,10 +123,9 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
                                             finished(version)
                                         }
                                     }, colors = ButtonDefaults.textButtonColors(backgroundColor = background),
-                                    enabled = !loading
-                                ) {
-                                    Text(version.toString())
-                                }
+                                    enabled = !loading,
+                                    text = version.toString()
+                                )
                             }
                         }
                     }

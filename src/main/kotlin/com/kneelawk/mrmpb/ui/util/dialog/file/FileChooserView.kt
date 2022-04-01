@@ -72,13 +72,14 @@ fun FileChooserView(controller: FileChooserInterface) {
                             .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium)
                     ) {
                         items(controller.homeFolderList) { type ->
-                            ListButton(onClick = {
-                                controller.homeFolderSelect(type)
-                            }, modifier = Modifier.fillMaxWidth()) {
-                                HomeFolderIcon(type)
-
-                                Text(type.displayName, modifier = Modifier.padding(start = 10.dp))
-                            }
+                            ListButton(
+                                onClick = {
+                                    controller.homeFolderSelect(type)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                icon = { HomeFolderIcon(type) },
+                                text = type.displayName
+                            )
                         }
 
                         item {
@@ -88,13 +89,12 @@ fun FileChooserView(controller: FileChooserInterface) {
                         item {
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 ListButton(
-                                    onClick = { controller.addFavorite() }, modifier = Modifier.weight(1f),
-                                    enabled = controller.favoritesAddEnabled
-                                ) {
-                                    Icon(Icons.Default.Add, "add")
-
-                                    Text("Add Favorite", modifier = Modifier.padding(start = 10.dp))
-                                }
+                                    onClick = { controller.addFavorite() },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = controller.favoritesAddEnabled,
+                                    icon = { Icon(Icons.Default.Add, "add") },
+                                    text = "Add Favorite"
+                                )
 
                                 TooltipArea(tooltip = {
                                     Surface(
@@ -128,12 +128,10 @@ fun FileChooserView(controller: FileChooserInterface) {
                                 ) {
                                     ListButton(
                                         onClick = { controller.favoriteSelect(favorite) },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Icon(MrMpBIcons.folder, "favorite")
-
-                                        Text(favorite.name, modifier = Modifier.padding(start = 10.dp))
-                                    }
+                                        modifier = Modifier.fillMaxWidth(),
+                                        icon = { Icon(MrMpBIcons.folder, "favorite") },
+                                        text = favorite.name
+                                    )
                                 }
 
                                 AnimatedVisibility(visible = controller.favoritesEditEnabled) {
@@ -189,13 +187,14 @@ fun FileChooserView(controller: FileChooserInterface) {
                         }
 
                         items(controller.driveList, { it.path }) { drive ->
-                            ListButton(onClick = {
-                                controller.driveSelect(drive.path)
-                            }, modifier = Modifier.fillMaxWidth()) {
-                                Icon(MrMpBIcons.storage, "drive")
-
-                                Text(drive.displayName, modifier = Modifier.padding(start = 10.dp))
-                            }
+                            ListButton(
+                                onClick = {
+                                    controller.driveSelect(drive.path)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                icon = { Icon(MrMpBIcons.storage, "drive") },
+                                text = drive.displayName
+                            )
                         }
                     }
                 }
@@ -247,22 +246,26 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     Color.Transparent
                                 }
 
-                                ListButton(onClick = {
-                                    controller.selectedUpdate(path)
-                                }, modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
-                                    if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
-                                        controller.doubleClick(path)
-                                    }
-                                }, colors = ButtonDefaults.textButtonColors(backgroundColor = background)
-                                ) {
-                                    Icon(
-                                        when (element.type) {
-                                            FileListItemType.FILE -> MrMpBIcons.file
-                                            FileListItemType.FOLDER -> MrMpBIcons.folder
-                                        }, "file"
-                                    )
-                                    Text(path.name, modifier = Modifier.padding(start = 10.dp))
-                                }
+                                ListButton(
+                                    onClick = {
+                                        controller.selectedUpdate(path)
+                                    },
+                                    modifier = Modifier.fillMaxWidth().onPointerEvent(PointerEventType.Release) {
+                                        if (it.awtEventOrNull?.button == MouseEvent.BUTTON1 && it.awtEventOrNull?.clickCount == 2) {
+                                            controller.doubleClick(path)
+                                        }
+                                    },
+                                    colors = ButtonDefaults.textButtonColors(backgroundColor = background),
+                                    icon = {
+                                        Icon(
+                                            when (element.type) {
+                                                FileListItemType.FILE -> MrMpBIcons.file
+                                                FileListItemType.FOLDER -> MrMpBIcons.folder
+                                            }, "file"
+                                        )
+                                    },
+                                    text = path.name
+                                )
                             }
                         }
                     }

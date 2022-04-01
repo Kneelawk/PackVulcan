@@ -13,15 +13,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.kneelawk.mrmpb.ui.instance.InstanceManager
-import com.kneelawk.mrmpb.ui.util.FixedWidthRectangleShape
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppContainerBox(
-    title: String, extraDrawerContent: @Composable ColumnScope.() -> Unit = {}, content: @Composable () -> Unit
+    title: String, extraDrawerContent: (@Composable ColumnScope.() -> Unit)? = null, content: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -60,16 +58,20 @@ fun AppContainerBox(
                 }
             )
 
-            ListButton(onClick = {
-                InstanceManager.openSettings()
-            }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Settings, "settings")
-                Text("Settings", Modifier.padding(start = 5.dp))
+            ListButton(
+                onClick = {
+                    InstanceManager.openSettings()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                icon = { Icon(Icons.Default.Settings, "settings") },
+                text = "Settings"
+            )
+
+            if (extraDrawerContent != null) {
+                Divider()
+
+                extraDrawerContent()
             }
-
-            Divider()
-
-            extraDrawerContent()
         },
         content = content
     )

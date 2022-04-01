@@ -30,29 +30,33 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
 
     var editMinecraftVersion by mutableStateOf(INITIAL_MINECRAFT_VERSION)
         private set
-    private var minecraftVersionState by mutableStateOf(MinecraftVersionState(INITIAL_MINECRAFT_VERSION, null, ""))
+    private var minecraftVersionState by mutableStateOf(MinecraftVersionState(null, ""))
+    private var minecraftVersionLoading by mutableStateOf(false)
     private val minecraftVersionConflator = Conflator<String>(scope) { version ->
+        minecraftVersionLoading = true
         minecraftVersionState = MinecraftVersion.forVersion(version).switch(
-            { MinecraftVersionState(version, it, "") },
-            { MinecraftVersionState(version, null, it.toString()) }
+            { MinecraftVersionState(it, "") },
+            { MinecraftVersionState(null, it.toString()) }
         )
+        minecraftVersionLoading = false
     }
     private val minecraftVersion by derivedStateOf { minecraftVersionState.version }
-    private val minecraftVersionValid by derivedStateOf { minecraftVersionState.valid }
     val minecraftVersionError by derivedStateOf { minecraftVersionState.error }
 
     var editLoaderVersion by mutableStateOf(INITIAL_LOADER_VERSION)
         private set
-    private var loaderVersionState by mutableStateOf(LoaderVersionState(INITIAL_LOADER_VERSION, null, ""))
+    private var loaderVersionState by mutableStateOf(LoaderVersionState(null, ""))
+    private var loaderVersionLoading by mutableStateOf(false)
     private val loaderVersionConflator = Conflator<LoaderVersionInput>(scope) { input ->
+        loaderVersionLoading = true
         val version = input.loaderVersion
         loaderVersionState = LoaderVersion.forVersion(version, input.minecraftVersion).switch(
-            { LoaderVersionState(version, it, "") },
-            { LoaderVersionState(version, null, it.toString()) }
+            { LoaderVersionState(it, "") },
+            { LoaderVersionState(null, it.toString()) }
         )
+        loaderVersionLoading = false
     }
     private val loaderVersion by derivedStateOf { loaderVersionState.version }
-    private val loaderVersionValid by derivedStateOf { loaderVersionState.valid }
     val loaderVersionError by derivedStateOf { loaderVersionState.error }
 
     val createEnabled by derivedStateOf {
@@ -60,19 +64,26 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
                 && name.isNotBlank()
                 && author.isNotBlank()
                 && VersionUtils.isSemVer(version)
-                && minecraftVersionValid != null
-                && loaderVersionValid != null
+                && minecraftVersion != null
+                && loaderVersion != null
+    }
+
+    val showLoadingIcon by derivedStateOf { minecraftVersionLoading || loaderVersionLoading }
+
+    init {
+        minecraftVersionConflator.send(INITIAL_MINECRAFT_VERSION)
+        loaderVersionConflator.send(LoaderVersionInput(INITIAL_LOADER_VERSION, INITIAL_MINECRAFT_VERSION))
     }
 
     fun setMinecraftVersion(version: String) {
         editMinecraftVersion = version
         minecraftVersionConflator.send(version)
-        loaderVersionConflator.send(LoaderVersionInput(loaderVersion, version))
+        loaderVersionConflator.send(LoaderVersionInput(editLoaderVersion, version))
     }
 
     fun setLoaderVersion(version: String) {
         editLoaderVersion = version
-        loaderVersionConflator.send(LoaderVersionInput(version, minecraftVersion))
+        loaderVersionConflator.send(LoaderVersionInput(version, editMinecraftVersion))
     }
 
     fun cancel() {
@@ -84,8 +95,8 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
         val name = name
         val author = author
         val version = version
-        val minecraftVersion = minecraftVersionValid
-        val loaderVersion = loaderVersionValid
+        val minecraftVersion = minecraftVersion
+        val loaderVersion = loaderVersion
 
         if (PathUtils.isPathValid(location)
             && name.isNotBlank()
@@ -102,9 +113,9 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
         }
     }
 
-    private data class MinecraftVersionState(val version: String, val valid: MinecraftVersion?, val error: String)
+    private data class MinecraftVersionState(val version: MinecraftVersion?, val error: String)
     private data class LoaderVersionInput(val loaderVersion: String, val minecraftVersion: String)
-    private data class LoaderVersionState(val version: String, val valid: LoaderVersion?, val error: String)
+    private data class LoaderVersionState(val version: LoaderVersion?, val error: String)
 }
 
 sealed class CreateNewResult {

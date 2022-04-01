@@ -12,6 +12,8 @@ import com.kneelawk.mrmpb.model.manifest.forge.LoaderJson as ForgeLoaderJson
 
 sealed class LoaderVersion {
     companion object {
+        val DEFAULT_VERSION: LoaderVersion = Fabric("0.13.3")
+
         private fun fromFabricJson(json: FabricLoaderJson): Fabric {
             return Fabric(json.version)
         }
@@ -121,31 +123,31 @@ sealed class LoaderVersion {
         }
 
         suspend fun forVersion(
-            loaderType: LoaderVersionType, loaderVersion: String, minecraftVersion: String?
+            loaderType: Type, loaderVersion: String, minecraftVersion: String?
         ): Either<LoaderVersion, InvalidLoaderVersionError> {
             return when (loaderType) {
-                LoaderVersionType.FABRIC -> {
+                Type.FABRIC -> {
                     leftOr(fabricLoaderMap()[loaderVersion], InvalidLoaderVersionError.Fabric(loaderVersion))
                 }
-                LoaderVersionType.FORGE -> {
+                Type.FORGE -> {
                     leftOr(
                         forgeMap(minecraftVersion)[loaderVersion],
                         InvalidLoaderVersionError.Forge(loaderVersion, minecraftVersion)
                     )
                 }
-                LoaderVersionType.QUILT -> {
+                Type.QUILT -> {
                     leftOr(quiltLoaderMap()[loaderVersion], InvalidLoaderVersionError.Quilt(loaderVersion))
                 }
             }
         }
     }
 
-    abstract val type: LoaderVersionType
+    abstract val type: Type
 
     abstract val version: String
 
     class Fabric internal constructor(override val version: String) : LoaderVersion() {
-        override val type = LoaderVersionType.FABRIC
+        override val type = Type.FABRIC
 
         override fun toString(): String {
             return "Fabric $version"
@@ -153,7 +155,7 @@ sealed class LoaderVersion {
     }
 
     class Forge internal constructor(override val version: String) : LoaderVersion() {
-        override val type = LoaderVersionType.FORGE
+        override val type = Type.FORGE
 
         override fun toString(): String {
             return "Forge $version"
@@ -161,10 +163,26 @@ sealed class LoaderVersion {
     }
 
     class Quilt internal constructor(override val version: String) : LoaderVersion() {
-        override val type = LoaderVersionType.QUILT
+        override val type = Type.QUILT
 
         override fun toString(): String {
             return "Quilt $version"
+        }
+    }
+
+    enum class Type(val prettyName: String, val packwizName: String) {
+        FABRIC("Fabric", "fabric"),
+        FORGE("Forge", "forge"),
+        QUILT("Quilt", "quilt");
+
+        companion object {
+            fun fromPackwizName(name: String): Type? {
+                return values().firstOrNull { it.packwizName == name }
+            }
+        }
+
+        override fun toString(): String {
+            return prettyName
         }
     }
 }
@@ -196,21 +214,5 @@ sealed class InvalidLoaderVersionError {
         override fun toString(): String {
             return "Loader strings must start with either 'Fabric', 'Forge', or 'Quilt'."
         }
-    }
-}
-
-enum class LoaderVersionType(val prettyName: String, val packwizName: String) {
-    FABRIC("Fabric", "fabric"),
-    FORGE("Forge", "forge"),
-    QUILT("Quilt", "quilt");
-
-    companion object {
-        fun fromPackwizName(name: String): LoaderVersionType? {
-            return values().firstOrNull { it.packwizName == name }
-        }
-    }
-
-    override fun toString(): String {
-        return prettyName
     }
 }

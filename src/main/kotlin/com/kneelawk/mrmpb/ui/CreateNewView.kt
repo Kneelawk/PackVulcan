@@ -3,6 +3,7 @@ package com.kneelawk.mrmpb.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +40,10 @@ fun CreateNewView(component: CreateNewComponent) {
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End), verticalAlignment = Alignment.Top,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                if (component.showLoadingIcon) {
+                    CircularProgressIndicator()
+                }
+
                 SmallButton(
                     onClick = { component.cancel() },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)

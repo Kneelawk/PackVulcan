@@ -210,10 +210,9 @@ private fun IndependentLoaderVersionSelector(
                                 finished(version)
                             }
                         }, colors = ButtonDefaults.textButtonColors(backgroundColor = background),
-                        enabled = !loading
-                    ) {
-                        Text(version.toString())
-                    }
+                        enabled = !loading,
+                        text = version.toString()
+                    )
                 }
             }
         }
@@ -293,10 +292,9 @@ private fun DependentLoaderVersionSelector(
                                     finished(version)
                                 }
                             }, colors = ButtonDefaults.textButtonColors(backgroundColor = background),
-                            enabled = !loading
-                        ) {
-                            Text(version.toString())
-                        }
+                            enabled = !loading,
+                            text = version.toString()
+                        )
                     }
                 }
             }
