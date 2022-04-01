@@ -12,6 +12,8 @@ import com.kneelawk.mrmpb.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.mrmpb.ui.util.layout.AppContainerBox
 import com.kneelawk.mrmpb.ui.util.widgets.SmallButton
 import java.nio.file.Path
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
 
 const val WELCOME_TEXT = "Modpack Builder"
 
@@ -20,7 +22,10 @@ fun StartView(createNew: () -> Unit, openExisting: (Path) -> Unit) {
     var openProjectDialog by remember { mutableStateOf(false) }
 
     if (openProjectDialog) {
-        OpenFileDialog("Open Packwiz 'pack.toml'") { selected ->
+        OpenFileDialog(
+            title = "Open Packwiz 'pack.toml'",
+            chooserFilter = { it.isDirectory() || it.name == "pack.toml" }
+        ) { selected ->
             openProjectDialog = false
             selected?.let { openExisting(it) }
         }

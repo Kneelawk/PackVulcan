@@ -25,7 +25,8 @@ private val homeFolders = mapOf(
 
 @Composable
 fun rememberFileChooserController(
-    mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", finished: (Path?) -> Unit
+    mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
+    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ): FileChooserInterface {
     // Keep input updated with recompositions
     @Suppress("NAME_SHADOWING")
@@ -111,7 +112,9 @@ fun rememberFileChooserController(
                     // doesn't appear to do that for us.
                     Files.list(cViewing).use { stream ->
                         stream.filter {
-                            (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY) && (!it.isHidden() || cShowHiddenFiles)
+                            (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY)
+                                    && (!it.isHidden() || cShowHiddenFiles)
+                                    && chooserFilter.accept(it)
                         }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
                             val type = when {
                                 it.isDirectory() -> FileListItemType.FOLDER
@@ -320,11 +323,16 @@ fun rememberFileChooserController(
         override fun doubleClick(path: Path) {
             composableScope.launch {
                 if (withContext(Dispatchers.IO) { path.isReadable() }) {
-                    // TODO: handle modes where double-clicking a file means selecting it
                     val attributes = withContext(Dispatchers.IO) { path.readAttributes<BasicFileAttributes>() }
                     if (attributes.isDirectory) {
                         viewing = path
                         topBarViewing = path
+                    } else if (
+                        attributes.isRegularFile
+                        && mode == FileChooserMode.OPEN_FILE
+                        && chooserFilter.accept(path)
+                    ) {
+                        finished(path)
                     }
                 }
             }

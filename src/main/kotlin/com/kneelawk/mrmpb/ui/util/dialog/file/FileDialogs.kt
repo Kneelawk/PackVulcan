@@ -7,7 +7,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.mrmpb.GlobalSettings
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
-import com.kneelawk.mrmpb.ui.util.layout.AppContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -16,7 +15,7 @@ val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
 
 @Composable
 fun OpenFileDialog(
-    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", finished: (Path?) -> Unit
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
 //    AwtWindow(
 //        create = {
@@ -36,19 +35,21 @@ fun OpenFileDialog(
         mode = FileChooserMode.OPEN_FILE,
         initialFolder = initialFolder,
         initialSelection = initialSelection,
+        chooserFilter = chooserFilter,
         finished = finished
     )
 }
 
 @Composable
 fun OpenDirectoryDialog(
-    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", finished: (Path?) -> Unit
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
     FileChooserDialog(
         title = title,
         mode = FileChooserMode.OPEN_DIRECTORY,
         initialFolder = initialFolder,
         initialSelection = initialSelection,
+        chooserFilter = chooserFilter,
         finished = finished
     )
 }
@@ -60,7 +61,7 @@ enum class FileChooserMode {
 @Composable
 fun FileChooserDialog(
     title: String, mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
-    finished: (Path?) -> Unit
+    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
     val state = rememberDialogState(size = DpSize(1280.dp, 800.dp))
 
@@ -88,6 +89,7 @@ fun FileChooserDialog(
                         mode = mode,
                         initialFolder = initialFolder,
                         initialSelection = initialSelection,
+                        chooserFilter = chooserFilter,
                         finished = finished
                     )
                 )
