@@ -102,17 +102,16 @@ sealed class LoaderVersion {
         suspend fun forVersion(
             loaderVersion: String, minecraftVersion: String?
         ): Either<LoaderVersion, InvalidLoaderVersionError> {
-            val lowerCase = loaderVersion.lowercase()
-            return when {
-                lowerCase.startsWith("fabric") -> {
+            return when (Type.forVersion(loaderVersion)) {
+                Type.FABRIC -> {
                     val version = loaderVersion.substring("fabric".length).trim()
                     leftOr(fabricLoaderMap()[version], InvalidLoaderVersionError.Fabric(version))
                 }
-                lowerCase.startsWith("quilt") -> {
+                Type.QUILT -> {
                     val version = loaderVersion.substring("quilt".length).trim()
                     leftOr(quiltLoaderMap()[version], InvalidLoaderVersionError.Quilt(version))
                 }
-                lowerCase.startsWith("forge") -> {
+                Type.FORGE -> {
                     val version = loaderVersion.substring("forge".length).trim()
                     leftOr(
                         forgeMap(minecraftVersion)[version], InvalidLoaderVersionError.Forge(version, minecraftVersion)
@@ -178,6 +177,16 @@ sealed class LoaderVersion {
         companion object {
             fun fromPackwizName(name: String): Type? {
                 return values().firstOrNull { it.packwizName == name }
+            }
+
+            fun forVersion(version: String): Type? {
+                val lowercase = version.lowercase()
+                return when {
+                    lowercase.startsWith("fabric") -> FABRIC
+                    lowercase.startsWith("forge") -> FORGE
+                    lowercase.startsWith("quilt") -> QUILT
+                    else -> null
+                }
             }
         }
 

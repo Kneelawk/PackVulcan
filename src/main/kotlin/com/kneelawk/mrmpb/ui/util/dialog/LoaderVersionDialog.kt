@@ -52,12 +52,13 @@ fun LoaderVersionView(
 ) {
     var selectedVersion by remember { mutableStateOf<LoaderVersion?>(null) }
     var selectedVersionSelected by remember { mutableStateOf(false) }
-    var curTab by remember { mutableStateOf(LoaderType.QUILT) }
-
-    LaunchedEffect(Unit) {
-        // We use `null` for the minecraft version here because we want to detect loader type, regardless of minecraft
-        // version compatibility.
-        LoaderVersion.forVersion(previousVersion, null).ifLeft { curTab = LoaderType.fromLoaderVersion(it) }
+    var curTab by remember {
+        mutableStateOf(
+            LoaderType.fromLoaderVersionType(
+                LoaderVersion.Type.forVersion(previousVersion)
+                    ?: LoaderVersion.Type.QUILT
+            )
+        )
     }
 
     Scaffold(topBar = {
@@ -312,11 +313,11 @@ private enum class LoaderType(val text: String, val icon: @Composable () -> Unit
     FORGE("Forge", { Icon(MrMpBIcons.forge, "forge") });
 
     companion object {
-        fun fromLoaderVersion(loaderVersion: LoaderVersion): LoaderType {
-            return when (loaderVersion) {
-                is LoaderVersion.Fabric -> FABRIC
-                is LoaderVersion.Forge -> FORGE
-                is LoaderVersion.Quilt -> QUILT
+        fun fromLoaderVersionType(type: LoaderVersion.Type): LoaderType {
+            return when (type) {
+                LoaderVersion.Type.FABRIC -> FABRIC
+                LoaderVersion.Type.FORGE -> FORGE
+                LoaderVersion.Type.QUILT -> QUILT
             }
         }
     }
