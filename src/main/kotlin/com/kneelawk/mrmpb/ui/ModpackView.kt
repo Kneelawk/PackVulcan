@@ -1,38 +1,50 @@
 package com.kneelawk.mrmpb.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.kneelawk.mrmpb.ui.keyboard.KeyboardTracker
+import com.kneelawk.mrmpb.ui.keyboard.shortcut
+import com.kneelawk.mrmpb.ui.keyboard.shortcuts
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.layout.AppContainerBox
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
 
+@OptIn(ExperimentalComposeUiApi::class)
+private val SAVE_SHORTCUT = shortcut().cmd().key(Key.S).finish()
+
 @Composable
-fun ModpackView(component: ModpackComponent) {
+fun ModpackView(component: ModpackComponent, tracker: KeyboardTracker) {
+    shortcuts(tracker, SAVE_SHORTCUT to {
+        component.save()
+    })
+
     AppContainerBox(
         title = component.modpackName,
         extraDrawerContent = {
             ListButton(
                 onClick = { component.save() },
-                icon = { Icon(MrMpBIcons.save, "save") },
                 modifier = Modifier.fillMaxWidth(),
-                text = "Save"
-            )
+            ) {
+                Icon(MrMpBIcons.save, "save")
+                Text("Save", modifier = Modifier.padding(start = 10.dp))
+                Box(Modifier.weight(1f))
+                Text(SAVE_SHORTCUT.toString())
+            }
         }
     ) {
         OpenModpackDetailsView(component)

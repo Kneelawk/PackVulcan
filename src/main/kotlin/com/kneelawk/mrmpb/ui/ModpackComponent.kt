@@ -113,28 +113,30 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     }
 
     fun save() {
-        scope.launch {
+        if (!loading) {
             loading = true
 
-            val packFile = PackwizProject.getPackFile(modpackLocation)
-            log.info("Updating existing packwiz project at '$packFile'...")
+            scope.launch {
+                val packFile = PackwizProject.getPackFile(modpackLocation)
+                log.info("Updating existing packwiz project at '$packFile'...")
 
-            val project = PackwizProject.loadExisting(packFile)
+                val project = PackwizProject.loadExisting(packFile)
 
-            project.pack = project.pack.copy(
-                name = modpackName,
-                author = modpackAuthor,
-                version = modpackVersion,
-                versions = project.pack.versions.copy(
-                    minecraft = minecraftVersion.version,
-                    loaderVersions = mapOf(loaderVersion.type.packwizName to loaderVersion.version)
+                project.pack = project.pack.copy(
+                    name = modpackName,
+                    author = modpackAuthor,
+                    version = modpackVersion,
+                    versions = project.pack.versions.copy(
+                        minecraft = minecraftVersion.version,
+                        loaderVersions = mapOf(loaderVersion.type.packwizName to loaderVersion.version)
+                    )
                 )
-            )
 
-            log.info("Writing packwiz project at '${project.projectDir}'...")
-            project.write()
+                log.info("Writing packwiz project at '${project.projectDir}'...")
+                project.write()
 
-            loading = false
+                loading = false
+            }
         }
     }
 

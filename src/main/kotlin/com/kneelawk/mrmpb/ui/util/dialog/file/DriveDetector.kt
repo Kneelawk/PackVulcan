@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.ui.util.dialog.file
 
+import com.kneelawk.mrmpb.util.OsUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
@@ -71,8 +72,7 @@ object DriveDetector {
     }
 
     suspend fun detectDrives(): List<DriveItem> {
-        val os = System.getProperty("os.name")
-        return if (os.startsWith("Windows")) {
+        return if (OsUtils.IS_WINDOWS) {
             windowsDetectDrives()
         } else {
             unixDetectDrives()
