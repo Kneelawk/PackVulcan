@@ -24,6 +24,7 @@ import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.layout.DialogContainerBox
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
+import com.kneelawk.mrmpb.ui.util.layout.slidingTransitionSpec
 import com.kneelawk.mrmpb.ui.util.widgets.DialogButtonBar
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
 import com.kneelawk.mrmpb.ui.util.widgets.SmallTextButton
@@ -76,17 +77,10 @@ fun LoaderVersionView(
                 }
             }
 
-            AnimatedContent(curTab, modifier = Modifier.weight(1f).fillMaxWidth(), transitionSpec = {
-                if (targetState > initialState) {
-                    slideInHorizontally { width -> width } + fadeIn() with
-                            slideOutHorizontally { width -> -width } + fadeOut()
-                } else {
-                    slideInHorizontally { width -> -width } + fadeIn() with
-                            slideOutHorizontally { width -> width } + fadeOut()
-                }.using(
-                    SizeTransform(clip = false)
-                )
-            }) { tab ->
+            AnimatedContent(
+                curTab, modifier = Modifier.weight(1f).fillMaxWidth(),
+                transitionSpec = AnimatedContentScope<LoaderType>::slidingTransitionSpec
+            ) { tab ->
                 when (tab) {
                     LoaderType.FABRIC -> {
                         IndependentLoaderVersionSelector(

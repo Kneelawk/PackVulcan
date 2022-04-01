@@ -22,9 +22,21 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         private val log = KotlinLogging.logger { }
     }
 
+    /*
+     * Component Stuff.
+     */
+
     private val scope = ComponentScope(lifecycle)
 
+    /*
+     * View Stuff.
+     */
+
     var loading by mutableStateOf(true)
+
+    /*
+     * Details Stuff.
+     */
 
     var modpackLocation: Path by mutableStateOf(Paths.get(""))
         private set
@@ -74,6 +86,10 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     }
 
     val showLoadingIcon by derivedStateOf { minecraftVersionLoading || loaderVersionLoading }
+
+    /*
+     * Mod List Stuff.
+     */
 
     init {
         scope.launch {
