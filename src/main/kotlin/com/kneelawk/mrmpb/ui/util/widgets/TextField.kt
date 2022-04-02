@@ -41,11 +41,13 @@ fun SmallTextField(
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    val borderThicknessState by derivedStateOf {
-        if (isFocused) {
-            2.dp
-        } else {
-            1.dp
+    val borderThicknessState by remember {
+        derivedStateOf {
+            if (isFocused) {
+                2.dp
+            } else {
+                1.dp
+            }
         }
     }
 

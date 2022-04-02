@@ -45,7 +45,8 @@ fun rememberFileChooserController(
     val viewingState: MutableState<Path> = remember { mutableStateOf(initialFolder) }
     val cViewing by viewingState
 
-    val favoritesAddEnabledState = derivedStateOf { !GlobalSettings.fileChooserFavoritesList.contains(cViewing) }
+    val favoritesAddEnabledState =
+        remember { derivedStateOf { !GlobalSettings.fileChooserFavoritesList.contains(cViewing) } }
     val favoritesEditEnabledState = remember { mutableStateOf(false) }
 
     val topBarViewingState = remember { mutableStateOf(cViewing) }
@@ -89,9 +90,9 @@ fun rememberFileChooserController(
             }
         }
     }
-    val cSelectedPath by derivedStateOf { selectedProduced.selectedPath }
-    val selectedValidState = derivedStateOf { selectedProduced.valid }
-    val selectedErrorState = derivedStateOf { selectedProduced.error }
+    val cSelectedPath by remember { derivedStateOf { selectedProduced.selectedPath } }
+    val selectedValidState = remember { derivedStateOf { selectedProduced.valid } }
+    val selectedErrorState = remember { derivedStateOf { selectedProduced.error } }
 
     val showHiddenFilesState = remember { mutableStateOf(false) }
     val cShowHiddenFiles by showHiddenFilesState
@@ -278,9 +279,9 @@ fun rememberFileChooserController(
                     FolderNameProduced(true, null, newFolder)
                 }
             }
-            val folderNameValidState = derivedStateOf { folderNameProduced.valid }
-            val folderNameErrorState = derivedStateOf { folderNameProduced.error }
-            val newFolder by derivedStateOf { folderNameProduced.newFolder }
+            val folderNameValidState = remember { derivedStateOf { folderNameProduced.valid } }
+            val folderNameErrorState = remember { derivedStateOf { folderNameProduced.error } }
+            val newFolder by remember { derivedStateOf { folderNameProduced.newFolder } }
 
             // No need to remember this as all its state is remembered elsewhere
             return object : CreateFolderInterface {

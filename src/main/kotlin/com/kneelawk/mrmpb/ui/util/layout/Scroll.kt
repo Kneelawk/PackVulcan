@@ -23,7 +23,7 @@ fun VerticalScrollWrapper(modifier: Modifier, adapter: ScrollbarAdapter, content
 
         var containerSize by remember { mutableStateOf(0) }
         val measure = remember { measureHeight { containerSize = it } }
-        val isScrollable = adapter.maxScrollOffset(containerSize) > 0f
+        val isScrollable by remember { derivedStateOf { adapter.maxScrollOffset(containerSize) > 0f } }
 
         Layout({
             AnimatedVisibility(visible = isScrollable) {
