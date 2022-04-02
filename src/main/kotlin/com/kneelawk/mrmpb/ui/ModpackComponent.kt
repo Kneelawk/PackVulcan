@@ -1,10 +1,8 @@
 package com.kneelawk.mrmpb.ui
 
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
+import com.kneelawk.mrmpb.engine.packwiz.PackwizMetaFile
 import com.kneelawk.mrmpb.engine.packwiz.PackwizProject
 import com.kneelawk.mrmpb.model.LoaderVersion
 import com.kneelawk.mrmpb.model.MinecraftVersion
@@ -91,6 +89,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
      * Mod List Stuff.
      */
 
+    val modsList = mutableStateListOf<PackwizMetaFile>()
+
     init {
         scope.launch {
             val project = when (args) {
@@ -99,32 +99,58 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                     PackwizProject.createNew(args.newModpack)
                 }
                 is ModpackComponentArgs.OpenExisting -> {
-                    log.info("Loading existing packwiz project at '${args.packFile}'...")
-                    PackwizProject.loadExisting(args.packFile)
+                    val projectDir = args.packFile.parent
+                    log.info("Loading existing packwiz project at '${projectDir}'...")
+                    PackwizProject.loadFromProjectDir(projectDir)
                 }
             }
 
-            modpackLocation = project.projectDir
-            modpackName = project.pack.name
-            modpackAuthor = project.pack.author ?: ""
-            updateModpackVersion(project.pack.version ?: "")
-
-            val minecraftVersion = project.pack.versions.minecraft
-
-            val loaderVersion = project.pack.versions.loaderVersions.entries.firstNotNullOfOrNull {
-                LoaderVersion.Type.fromPackwizName(
-                    it.key
-                )?.to(it.value)
-            }?.let {
-                "${it.first.prettyName} ${it.second}"
-            } ?: ""
-
-            updateMinecraftAndLoaderVersions(loaderVersion, minecraftVersion)
-
-            log.info("Writing packwiz project to '${project.projectDir}'...")
-            project.write()
+            loadFromProject(project)
 
             loading = false
+        }
+    }
+
+    private suspend fun loadFromProject(project: PackwizProject) {
+        // are these refreshes all over the place a good idea?
+        project.refresh()
+
+        modpackLocation = project.projectDir
+        modpackName = project.pack.name
+        modpackAuthor = project.pack.author ?: ""
+        updateModpackVersion(project.pack.version ?: "")
+
+        val minecraftVersion = project.pack.versions.minecraft
+
+        val loaderVersion = project.pack.versions.loaderVersions.entries.firstNotNullOfOrNull {
+            LoaderVersion.Type.fromPackwizName(
+                it.key
+            )?.to(it.value)
+        }?.let {
+            "${it.first.prettyName} ${it.second}"
+        } ?: ""
+
+        updateMinecraftAndLoaderVersions(loaderVersion, minecraftVersion)
+
+        modsList.clear()
+        modsList.addAll(project.getExternalMods())
+
+        log.info("Writing packwiz project to '${project.projectDir}'...")
+        project.write()
+    }
+
+    fun reload() {
+        if (!loading) {
+            loading = true
+
+            scope.launch {
+                log.info("Loading existing packwiz project at '${modpackLocation}'...")
+                val project = PackwizProject.loadFromProjectDir(modpackLocation)
+
+                loadFromProject(project)
+
+                loading = false
+            }
         }
     }
 
@@ -133,10 +159,11 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
             loading = true
 
             scope.launch {
-                val packFile = PackwizProject.getPackFile(modpackLocation)
-                log.info("Updating existing packwiz project at '$packFile'...")
+                log.info("Updating existing packwiz project at '$modpackLocation'...")
+                val project = PackwizProject.loadFromProjectDir(modpackLocation)
 
-                val project = PackwizProject.loadExisting(packFile)
+                // are these refreshes all over the place a good idea?
+                project.refresh()
 
                 project.pack = project.pack.copy(
                     name = modpackName,
@@ -147,6 +174,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                         loaderVersions = mapOf(loaderVersion.type.packwizName to loaderVersion.version)
                     )
                 )
+
+                project.setExternalMods(modsList)
 
                 log.info("Writing packwiz project at '${project.projectDir}'...")
                 project.write()

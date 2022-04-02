@@ -61,6 +61,10 @@ dependencies {
     val commonsCodecVersion: String by project
     implementation("commons-codec:commons-codec:$commonsCodecVersion")
 
+    // JGit
+    val jgitVersion: String by project
+    implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
+
     // TOML4J
     val toml4jVersion: String by project
     implementation("com.moandjiezana.toml:toml4j:$toml4jVersion")

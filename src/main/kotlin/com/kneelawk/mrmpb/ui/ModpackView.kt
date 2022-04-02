@@ -1,7 +1,11 @@
 package com.kneelawk.mrmpb.ui
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -141,8 +145,28 @@ fun CurrentModpackDetailsView(component: ModpackComponent) {
 
 @Composable
 fun ModpackModsView(component: ModpackComponent) {
-    Box(Modifier.fillMaxSize()) {
-        Text("Under construction...", modifier = Modifier.align(Alignment.Center))
+    Column {
+        Row(modifier = Modifier.background(MaterialTheme.colors.surface).padding(20.dp)) {
+            Button(onClick = {}, modifier = Modifier.weight(1f)) {
+                Text("Add Mods...")
+            }
+        }
+
+        Row {
+            val lazyListState = rememberLazyListState()
+
+            LazyColumn(state = lazyListState, modifier = Modifier.padding(20.dp)) {
+                items(component.modsList) { mod ->
+                    Row(
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium).padding(10.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(mod.toml.name)
+                    }
+                }
+            }
+        }
     }
 }
 
