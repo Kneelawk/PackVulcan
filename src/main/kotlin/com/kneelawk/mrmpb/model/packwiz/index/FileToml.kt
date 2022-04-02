@@ -22,13 +22,17 @@ data class FileToml(
     }
 
     override fun toToml(): Map<String, Any> {
-        return maybeMapOf(
-            "file" to file,
-            "hash" to hash,
-            alias?.from("alias"),
-            hashFormat?.toString()?.from("hash-format"),
-            "metafile" to metafile,
-            "preserve" to preserve
-        )
+        val map = mutableMapOf<String, Any>()
+        map["file"] = file
+        map["hash"] = hash
+        alias?.let { map["alias"] = it }
+        hashFormat?.let { map["hash-format"] = it }
+        if (metafile) {
+            map["metafile"] = true
+        }
+        if (preserve) {
+            map["preserve"] = true
+        }
+        return map
     }
 }
