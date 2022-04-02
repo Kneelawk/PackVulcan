@@ -1,6 +1,7 @@
 package com.kneelawk.mrmpb.ui
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
@@ -28,6 +32,7 @@ import com.kneelawk.mrmpb.ui.keyboard.shortcuts
 import com.kneelawk.mrmpb.ui.theme.MrMpBIcons
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.layout.AppContainerBox
+import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.ui.util.layout.slidingTransitionSpec
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
 
@@ -146,16 +151,24 @@ fun CurrentModpackDetailsView(component: ModpackComponent) {
 @Composable
 fun ModpackModsView(component: ModpackComponent) {
     Column {
-        Row(modifier = Modifier.background(MaterialTheme.colors.surface).padding(20.dp)) {
-            Button(onClick = {}, modifier = Modifier.weight(1f)) {
-                Text("Add Mods...")
+        Box(
+            modifier = Modifier.fillMaxWidth().shadow(5.dp, RectangleShape, false)
+                .background(MaterialTheme.colors.surface)
+        ) {
+            Row(modifier = Modifier.padding(20.dp)) {
+                Button(onClick = {}, modifier = Modifier.weight(1f)) {
+                    Text("Add Mods...")
+                }
             }
         }
 
-        Row {
-            val lazyListState = rememberLazyListState()
+        val lazyListState = rememberLazyListState()
 
-            LazyColumn(state = lazyListState, modifier = Modifier.padding(20.dp)) {
+        VerticalScrollWrapper(
+            modifier = Modifier.weight(1f).fillMaxWidth(), adapter = ScrollbarAdapter(lazyListState),
+            backgroundColor = Color.Transparent, backgroundShape = MaterialTheme.shapes.large, scrollbarPadding = 0.dp
+        ) {
+            LazyColumn(state = lazyListState, modifier = Modifier.padding(20.dp).weight(1f)) {
                 items(component.modsList) { mod ->
                     Row(
                         modifier = Modifier

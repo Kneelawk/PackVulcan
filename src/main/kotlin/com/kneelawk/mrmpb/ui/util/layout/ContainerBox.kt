@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.kneelawk.mrmpb.ui.instance.InstanceManager
+import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.widgets.ListButton
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,7 @@ fun AppContainerBox(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(title)
+                    Text(title, style = MaterialTheme.typography.h5, color = MrMpBTheme.colors.headingColor)
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -45,7 +46,7 @@ fun AppContainerBox(
         drawerContent = {
             TopAppBar(
                 title = {
-                    Text("Menu")
+                    Text("Menu", style = MaterialTheme.typography.h5, color = MrMpBTheme.colors.headingColor)
                 },
                 navigationIcon = {
                     IconButton(onClick = {

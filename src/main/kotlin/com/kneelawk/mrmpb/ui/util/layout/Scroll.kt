@@ -12,13 +12,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun VerticalScrollWrapper(modifier: Modifier, adapter: ScrollbarAdapter, content: @Composable RowScope.() -> Unit) {
-    Row(modifier = modifier.background(MaterialTheme.colors.surface, MaterialTheme.shapes.medium).clip(MaterialTheme.shapes.medium)) {
+fun VerticalScrollWrapper(
+    modifier: Modifier, backgroundColor: Color = MaterialTheme.colors.surface,
+    backgroundShape: Shape = MaterialTheme.shapes.medium, scrollbarPadding: Dp = 15.dp, adapter: ScrollbarAdapter,
+    content: @Composable RowScope.() -> Unit
+) {
+    Row(modifier = modifier.background(backgroundColor, backgroundShape).clip(backgroundShape)) {
         content()
 
         var containerSize by remember { mutableStateOf(0) }
@@ -29,7 +36,7 @@ fun VerticalScrollWrapper(modifier: Modifier, adapter: ScrollbarAdapter, content
             AnimatedVisibility(visible = isScrollable) {
                 VerticalScrollbar(
                     adapter = adapter,
-                    modifier = Modifier.fillMaxHeight().padding(end = 15.dp)
+                    modifier = Modifier.fillMaxHeight().padding(end = scrollbarPadding)
                 )
             }
         }, Modifier.fillMaxHeight(), measure)

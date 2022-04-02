@@ -31,7 +31,7 @@ fun StartView(createNew: () -> Unit, openExisting: (Path) -> Unit) {
         }
     }
 
-    AppContainerBox("Modpack Builder") {
+    AppContainerBox("Welcome") {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
