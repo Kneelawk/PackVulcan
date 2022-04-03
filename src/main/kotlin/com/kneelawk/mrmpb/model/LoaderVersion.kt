@@ -3,7 +3,7 @@ package com.kneelawk.mrmpb.model
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.mrmpb.model.manifest.fabric.FabricLoaderJson
 import com.kneelawk.mrmpb.model.manifest.quilt.QuiltLoaderJson
-import com.kneelawk.mrmpb.net.manifest.ManifestCaches
+import com.kneelawk.mrmpb.net.manifest.ManifestApis
 import com.kneelawk.mrmpb.util.Either
 import com.kneelawk.mrmpb.util.leftOr
 import com.kneelawk.mrmpb.util.suspendGet
@@ -42,7 +42,7 @@ sealed class LoaderVersion {
         private val quiltLoaderMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, Quilt>>()
 
         suspend fun fabricLoaderList(): List<Fabric> = fabricLoaderListCache.suspendGet(Unit) {
-            ManifestCaches.fabricLoaders().map { fromFabricJson(it) }
+            ManifestApis.fabricLoaders().map { fromFabricJson(it) }
         }
 
         private suspend fun fabricLoaderMap(): Map<String, Fabric> = fabricLoaderMapCache.suspendGet(Unit) {
@@ -50,7 +50,7 @@ sealed class LoaderVersion {
         }
 
         suspend fun quiltLoaderList(): List<Quilt> = quiltLoaderListCache.suspendGet(Unit) {
-            ManifestCaches.quiltManifest().map { fromQuiltJson(it) }
+            ManifestApis.quiltManifest().map { fromQuiltJson(it) }
         }
 
         private suspend fun quiltLoaderMap(): Map<String, Quilt> = quiltLoaderMapCache.suspendGet(Unit) {
@@ -58,13 +58,13 @@ sealed class LoaderVersion {
         }
 
         private suspend fun forgeListMap(): Map<String, List<Forge>> = forgeListMapCache.suspendGet(Unit) {
-            ManifestCaches.forgeManifest().gameVersions.associate { gv ->
+            ManifestApis.forgeManifest().gameVersions.associate { gv ->
                 gv.id to gv.loaders.map { fromForgeJson(it) }
             }
         }
 
         private suspend fun forgeFullList(): List<Forge> = forgeFullListCache.suspendGet(Unit) {
-            ManifestCaches.forgeManifest().gameVersions.flatMap { gv -> gv.loaders.map { fromForgeJson(it) } }
+            ManifestApis.forgeManifest().gameVersions.flatMap { gv -> gv.loaders.map { fromForgeJson(it) } }
         }
 
         private suspend fun forgeFullMap(): Map<String, Forge> = forgeFullMapCache.suspendGet(Unit) {

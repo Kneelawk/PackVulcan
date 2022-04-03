@@ -15,11 +15,13 @@ object MrMpBIcons {
         }
     }
 
-    val create_new_folder = loader.getResourceAsStream("create_new_folder_black_24dp.svg").orError("create-new-folder")
+    val createNewFolder = loader.getResourceAsStream("create_new_folder_black_24dp.svg").orError("createNewFolder")
         .use { loadSvgPainter(it, Density(1f)) }
     val desktop = loader.getResourceAsStream("desktop_mac_black_24dp.svg").orError("desktop")
         .use { loadSvgPainter(it, Density(1f)) }
     val download = loader.getResourceAsStream("download_black_24dp.svg").orError("download")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val error = loader.getResourceAsStream("error_black_24dp.svg").orError("error")
         .use { loadSvgPainter(it, Density(1f)) }
     val file = loader.getResourceAsStream("description_black_24dp.svg").orError("file")
         .use { loadSvgPainter(it, Density(1f)) }
@@ -30,6 +32,8 @@ object MrMpBIcons {
     val movie = loader.getResourceAsStream("movie_black_24dp.svg").orError("movie")
         .use { loadSvgPainter(it, Density(1f)) }
     val music = loader.getResourceAsStream("music_note_black_24dp.svg").orError("music")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val noImage = loader.getResourceAsStream("no_photography_black_24dp.svg").orError("noImage")
         .use { loadSvgPainter(it, Density(1f)) }
     val save = loader.getResourceAsStream("save_black_24dp.svg").orError("save")
         .use { loadSvgPainter(it, Density(1f)) }

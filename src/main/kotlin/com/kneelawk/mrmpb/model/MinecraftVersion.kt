@@ -2,7 +2,7 @@ package com.kneelawk.mrmpb.model
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.mrmpb.model.manifest.minecraft.TypeJson
-import com.kneelawk.mrmpb.net.manifest.ManifestCaches
+import com.kneelawk.mrmpb.net.manifest.ManifestApis
 import com.kneelawk.mrmpb.util.Either
 import com.kneelawk.mrmpb.util.leftOr
 import com.kneelawk.mrmpb.util.suspendGet
@@ -20,7 +20,7 @@ class MinecraftVersion private constructor(val version: String, val type: Type) 
         private val minecraftVersionMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, MinecraftVersion>>()
 
         suspend fun minecraftVersionList(): List<MinecraftVersion> = minecraftVersionListCache.suspendGet(Unit) {
-            ManifestCaches.minecraftManifest().versions.map { fromMinecraftJson(it) }
+            ManifestApis.minecraftManifest().versions.map { fromMinecraftJson(it) }
         }
 
         private suspend fun minecraftVersionMap(): Map<String, MinecraftVersion> =

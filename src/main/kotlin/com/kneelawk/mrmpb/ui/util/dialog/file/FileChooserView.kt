@@ -222,7 +222,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                         SmallIconButton(onClick = {
                             controller.openCreateFolderDialog()
                         }) {
-                            Icon(MrMpBIcons.create_new_folder, "create new folder")
+                            Icon(MrMpBIcons.createNewFolder, "create new folder")
                         }
                     }
 
@@ -451,7 +451,7 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                         onConfirm = { controller.createFolder() },
                         confirmEnabled = controller.folderNameValid,
                         confirmContent = {
-                            Icon(MrMpBIcons.create_new_folder, "create")
+                            Icon(MrMpBIcons.createNewFolder, "create")
                             Text("Create", modifier = Modifier.padding(start = 5.dp))
                         }
                     )

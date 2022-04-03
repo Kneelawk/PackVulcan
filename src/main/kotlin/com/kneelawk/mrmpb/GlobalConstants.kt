@@ -9,6 +9,8 @@ object GlobalConstants {
     private const val FOLDER_NAME = ".mrmpb"
     private val FOLDER = Paths.get(System.getProperty("user.home"), FOLDER_NAME)
     val SETTINGS_FILE: Path = FOLDER.resolve("settings.toml")
+    private val CACHE_DIR_PATH: Path = FOLDER.resolve("cache")
+    val MOD_CACHE_DIR_PATH: Path = CACHE_DIR_PATH.resolve("mods")
 
     const val INITIAL_PROJECT_VERSION = "0.1.0"
     const val INITIAL_MINECRAFT_VERSION = "1.18.2"
