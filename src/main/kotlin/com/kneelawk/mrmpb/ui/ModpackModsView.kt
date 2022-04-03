@@ -33,7 +33,7 @@ import com.kneelawk.mrmpb.util.LoadingState
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
-val log = KotlinLogging.logger { }
+private val log = KotlinLogging.logger { }
 
 @Composable
 fun ModpackModsView(component: ModpackComponent) {

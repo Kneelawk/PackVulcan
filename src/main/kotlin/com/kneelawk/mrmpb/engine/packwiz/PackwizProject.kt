@@ -88,20 +88,18 @@ class PackwizProject(
             return loadExisting(projectDir.resolve(PACK_FILENAME), projectDir)
         }
 
-        private suspend fun loadExisting(packFile: Path, projectDir: Path): PackwizProject {
+        private suspend fun loadExisting(packFile: Path, projectDir: Path): PackwizProject = coroutineScope {
             val indexFile = projectDir.resolve(INDEX_FILENAME)
             val packwizIgnoreFile = projectDir.resolve(PACKWIZIGNORE_FILENAME)
 
-            val packwizIgnoreDeferred = coroutineScope {
-                async(Dispatchers.IO) {
-                    val ignore = IgnoreNode(packwizIgnoreRules.toMutableList())
-                    if (packwizIgnoreFile.exists()) {
-                        packwizIgnoreFile.inputStream().use {
-                            ignore.parse(".packwizignore", it)
-                        }
+            val packwizIgnoreDeferred = async(Dispatchers.IO) {
+                val ignore = IgnoreNode(packwizIgnoreRules.toMutableList())
+                if (packwizIgnoreFile.exists()) {
+                    packwizIgnoreFile.inputStream().use {
+                        ignore.parse(".packwizignore", it)
                     }
-                    ignore
                 }
+                ignore
             }
 
             val pack = withContext(Dispatchers.IO) {
@@ -124,37 +122,35 @@ class PackwizProject(
             }
 
             val loadingFiles = index.files.map { indexElement ->
-                coroutineScope {
-                    async(Dispatchers.IO) {
-                        val path = projectDir.resolve(indexElement.file)
-                        val hashFormat = indexElement.hashFormat ?: index.hashFormat
+                async(Dispatchers.IO) {
+                    val path = projectDir.resolve(indexElement.file)
+                    val hashFormat = indexElement.hashFormat ?: index.hashFormat
 
-                        if (path.exists()) {
-                            val (packwizFile, fileHash) = if (indexElement.metafile) {
-                                val fileSource = FileSystem.SYSTEM.source(path.toOkioPath())
-                                val hashSource = hashFormat.makeSource(fileSource)
-                                val toml = hashSource.use { TomlHelper.read(ModToml, it) }
-                                PackwizMetaFile(
-                                    indexElement.file, indexElement.alias, indexElement.preserve, toml
-                                ) to hashSource.hashString()
-                            } else {
-                                val hash = HashHelper.hash(path, hashFormat)
-                                PackwizRealFile(
-                                    indexElement.file, indexElement.alias, indexElement.preserve, path
-                                ) to hash
-                            }
-
-                            if (fileHash != indexElement.hash) {
-                                log.warn(
-                                    "File '${indexElement.file}' has differing hash from known hash. This file was likely edited outside of packwiz."
-                                )
-                            }
-
-                            packwizFile
+                    if (path.exists()) {
+                        val (packwizFile, fileHash) = if (indexElement.metafile) {
+                            val fileSource = FileSystem.SYSTEM.source(path.toOkioPath())
+                            val hashSource = hashFormat.makeSource(fileSource)
+                            val toml = hashSource.use { TomlHelper.read(ModToml, it) }
+                            PackwizMetaFile(
+                                indexElement.file, indexElement.alias, indexElement.preserve, toml
+                            ) to hashSource.hashString()
                         } else {
-                            // don't bother trying to load files that don't exist anymore
-                            null
+                            val hash = HashHelper.hash(path, hashFormat)
+                            PackwizRealFile(
+                                indexElement.file, indexElement.alias, indexElement.preserve, path
+                            ) to hash
                         }
+
+                        if (fileHash != indexElement.hash) {
+                            log.warn(
+                                "File '${indexElement.file}' has differing hash from known hash. This file was likely edited outside of packwiz."
+                            )
+                        }
+
+                        packwizFile
+                    } else {
+                        // don't bother trying to load files that don't exist anymore
+                        null
                     }
                 }
             }
@@ -163,7 +159,7 @@ class PackwizProject(
 
             val packwizIgnore = packwizIgnoreDeferred.await()
 
-            return PackwizProject(projectDir, pack, index, files, packwizIgnore)
+            PackwizProject(projectDir, pack, index, files, packwizIgnore)
         }
     }
 
@@ -186,23 +182,21 @@ class PackwizProject(
         files.addAll(mods)
     }
 
-    private suspend fun updateIndex() {
-        val loadingFiles = this.files.map { file ->
-            coroutineScope {
-                async(Dispatchers.IO) {
-                    when (file) {
-                        is PackwizMetaFile -> {
-                            FileToml(
-                                file.filePath, TomlHelper.hash(file.toml, index.hashFormat), file.alias, null, true,
-                                file.preserve
-                            )
-                        }
-                        is PackwizRealFile -> {
-                            FileToml(
-                                file.filePath, HashHelper.hash(file.file, index.hashFormat), file.alias, null, false,
-                                file.preserve
-                            )
-                        }
+    private suspend fun updateIndex() = coroutineScope {
+        val loadingFiles = files.map { file ->
+            async(Dispatchers.IO) {
+                when (file) {
+                    is PackwizMetaFile -> {
+                        FileToml(
+                            file.filePath, TomlHelper.hash(file.toml, index.hashFormat), file.alias, null, true,
+                            file.preserve
+                        )
+                    }
+                    is PackwizRealFile -> {
+                        FileToml(
+                            file.filePath, HashHelper.hash(file.file, index.hashFormat), file.alias, null, false,
+                            file.preserve
+                        )
                     }
                 }
             }
@@ -238,7 +232,7 @@ class PackwizProject(
         }
     }
 
-    suspend fun refresh() {
+    suspend fun refresh() = coroutineScope {
         val currentMetaFiles = files.asSequence().mapNotNull {
             if (it is PackwizMetaFile) {
                 it.filePath
@@ -265,33 +259,31 @@ class PackwizProject(
             if (awareOf.contains(relative)) {
                 null
             } else {
-                coroutineScope {
-                    async(Dispatchers.IO) {
-                        if ((relative.startsWith(modsDirname) && relative.endsWith(
-                                METAFILE_EXTENSION
-                            )) || currentMetaFiles.contains(relative)
-                        ) {
-                            try {
-                                val toml = FileSystem.SYSTEM.source(path.toOkioPath()).use {
-                                    TomlHelper.read(ModToml, it)
-                                }
-                                PackwizMetaFile(relative, null, false, toml)
-                            } catch (e: IOException) {
-                                log.warn(
-                                    "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
-                                    e
-                                )
-                                PackwizRealFile(relative, null, false, path)
-                            } catch (e: IllegalStateException) {
-                                log.warn(
-                                    "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
-                                    e
-                                )
-                                PackwizRealFile(relative, null, false, path)
+                async(Dispatchers.IO) {
+                    if ((relative.startsWith(modsDirname) && relative.endsWith(
+                            METAFILE_EXTENSION
+                        )) || currentMetaFiles.contains(relative)
+                    ) {
+                        try {
+                            val toml = FileSystem.SYSTEM.source(path.toOkioPath()).use {
+                                TomlHelper.read(ModToml, it)
                             }
-                        } else {
+                            PackwizMetaFile(relative, null, false, toml)
+                        } catch (e: IOException) {
+                            log.warn(
+                                "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
+                                e
+                            )
+                            PackwizRealFile(relative, null, false, path)
+                        } catch (e: IllegalStateException) {
+                            log.warn(
+                                "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
+                                e
+                            )
                             PackwizRealFile(relative, null, false, path)
                         }
+                    } else {
+                        PackwizRealFile(relative, null, false, path)
                     }
                 }
             }
@@ -305,7 +297,7 @@ class PackwizProject(
         updateHashes()
     }
 
-    suspend fun write() {
+    suspend fun write(): Unit = coroutineScope {
         updateHashes()
 
         val indexFile = projectDir.resolve(INDEX_FILENAME).toOkioPath()
@@ -325,37 +317,35 @@ class PackwizProject(
         }
 
         // now we can write out all the files we're aware of
-        val jobs = files.map { packwizFile ->
-            coroutineScope {
-                launch(Dispatchers.IO) {
-                    val path = projectDir.resolve(packwizFile.filePath)
+        files.map { packwizFile ->
+            launch(Dispatchers.IO) {
+                val path = projectDir.resolve(packwizFile.filePath)
 
-                    when (packwizFile) {
-                        is PackwizMetaFile -> {
-                            FileSystem.SYSTEM.sink(path.toOkioPath()).use { TomlHelper.write(packwizFile.toml, it) }
-                        }
-                        is PackwizRealFile -> {
-                            if (path.normalize() != packwizFile.file.normalize()) {
-                                log.warn(
-                                    "File '${packwizFile.filePath}' should be at '$path' but is at '${packwizFile.file}' instead. Copying to the correct location..."
-                                )
-                                // I am not sure this is really necessary, as there should be no circumstance where these two paths are different.
-                                Files.copy(packwizFile.file, path)
-                            }
+                when (packwizFile) {
+                    is PackwizMetaFile -> {
+                        FileSystem.SYSTEM.sink(path.toOkioPath()).use { TomlHelper.write(packwizFile.toml, it) }
+                    }
+                    is PackwizRealFile -> {
+                        if (path.normalize() != packwizFile.file.normalize()) {
+                            log.warn(
+                                "File '${packwizFile.filePath}' should be at '$path' but is at '${packwizFile.file}' instead. Copying to the correct location..."
+                            )
+                            // I am not sure this is really necessary, as there should be no circumstance where these two paths are different.
+                            Files.copy(packwizFile.file, path)
                         }
                     }
                 }
             }
         }
 
-        jobs.joinAll()
-
-        withContext(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             FileSystem.SYSTEM.sink(indexFile).use { TomlHelper.write(index, it) }
         }
 
-        withContext(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             FileSystem.SYSTEM.sink(packFile).use { TomlHelper.write(pack, it) }
         }
+
+        // this `coroutineScope` only completes once all the `launch` statements complete
     }
 }

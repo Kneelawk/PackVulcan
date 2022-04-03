@@ -4,6 +4,7 @@ import androidx.compose.ui.window.application
 import com.kneelawk.mrmpb.net.shutdownHttpClient
 import com.kneelawk.mrmpb.ui.instance.InstanceManager
 import com.kneelawk.mrmpb.ui.util.initSwing
+import com.kneelawk.mrmpb.util.ApplicationScope
 
 fun main() {
     // Must be the very first thing in the application, so that Swing components have not selected a LAF yet.
@@ -23,4 +24,7 @@ fun main() {
 
     // Store global settings
     GlobalSettings.store()
+
+    // Shutdown the application coroutine scope
+    ApplicationScope.shutdown()
 }

@@ -6,10 +6,15 @@ import com.kneelawk.mrmpb.model.modrinth.project.ProjectJson
 import com.kneelawk.mrmpb.model.modrinth.team.TeamMemberJson
 import com.kneelawk.mrmpb.model.modrinth.version.VersionJson
 import com.kneelawk.mrmpb.net.HTTP_CLIENT
+import com.kneelawk.mrmpb.util.ApplicationScope
+import com.kneelawk.mrmpb.util.Batcher
 import com.kneelawk.mrmpb.util.suspendGet
 import io.ktor.client.request.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.time.Duration
 
 object ModrinthApi {
@@ -24,15 +29,35 @@ object ModrinthApi {
      * Retriever methods.
      */
 
-    private suspend fun retrieveProject(idOrSlug: String): ProjectJson = withContext(Dispatchers.IO) {
-        // TODO: lookup batching using https://api.modrinth.com/v2/projects?ids=[%22P7dR8mSH%22,%22Ha28R6CL%22]
-        HTTP_CLIENT.get("https://api.modrinth.com/v2/project/$idOrSlug")
-    }
+    private val projectBatcher =
+        Batcher<String, ProjectJson>(ApplicationScope, Duration.ofSeconds(1), Dispatchers.IO) { requests ->
+            val result: List<ProjectJson> = HTTP_CLIENT.get("https://api.modrinth.com/v2/projects") {
+                parameter("ids", Json.encodeToString(requests.map { it.request }))
+            }
 
-    private suspend fun retrieveVersion(id: String): VersionJson = withContext(Dispatchers.IO) {
-        // TODO: lookup batching using https://api.modrinth.com/v2/versions?ids=[%221bDn0oLI%22,%22pKzU4NF4%22]
-        HTTP_CLIENT.get("https://api.modrinth.com/v2/version/$id")
-    }
+            assert(
+                result.size == requests.size
+            ) { "Received different number of projects than requested. Request count: ${requests.size}, result count: ${result.size}" }
+
+            for (index in result.indices) {
+                requests[index].responseChannel.send(result[index])
+            }
+        }
+
+    private val versionBatcher =
+        Batcher<String, VersionJson>(ApplicationScope, Duration.ofSeconds(1), Dispatchers.IO) { requests ->
+            val result: List<VersionJson> = HTTP_CLIENT.get("https://api.modrinth.com/v2/versions") {
+                parameter("ids", Json.encodeToString(requests.map { it.request }))
+            }
+
+            assert(
+                result.size == requests.size
+            ) { "Received different number of versions than requested. Request count: ${requests.size}, result count: ${result.size}" }
+
+            for (index in result.indices) {
+                requests[index].responseChannel.send(result[index])
+            }
+        }
 
     private suspend fun retrieveTeamMembers(id: String): List<TeamMemberJson> = withContext(Dispatchers.IO) {
         HTTP_CLIENT.get("https://api.modrinth.com/v2/team/$id/members")
@@ -42,9 +67,9 @@ object ModrinthApi {
      * Accessor methods.
      */
 
-    suspend fun project(idOrSlug: String): ProjectJson = projectCache.suspendGet(idOrSlug, ::retrieveProject)
+    suspend fun project(idOrSlug: String): ProjectJson = projectCache.suspendGet(idOrSlug, projectBatcher::request)
 
-    suspend fun version(id: String): VersionJson = versionCache.suspendGet(id, ::retrieveVersion)
+    suspend fun version(id: String): VersionJson = versionCache.suspendGet(id, versionBatcher::request)
 
     suspend fun teamMembers(id: String): List<TeamMemberJson> = teamMemberCache.suspendGet(id, ::retrieveTeamMembers)
 }
