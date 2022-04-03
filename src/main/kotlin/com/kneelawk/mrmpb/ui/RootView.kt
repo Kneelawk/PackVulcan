@@ -6,14 +6,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
 import com.kneelawk.mrmpb.GlobalSettings
-import com.kneelawk.mrmpb.ui.instance.InstanceManager
 import com.kneelawk.mrmpb.ui.keyboard.rememberKeyboardTracker
 import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 

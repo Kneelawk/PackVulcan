@@ -1,15 +1,11 @@
 package com.kneelawk.mrmpb.engine.modinfo
 
-import com.kneelawk.mrmpb.engine.mod.ModFileCache
 import com.kneelawk.mrmpb.engine.packwiz.PackwizMetaFile
 import com.kneelawk.mrmpb.model.FullModInfo
 import com.kneelawk.mrmpb.model.ModIcon
 import com.kneelawk.mrmpb.model.packwiz.mod.ModToml
 import com.kneelawk.mrmpb.model.packwiz.mod.ModrinthToml
 import com.kneelawk.mrmpb.net.modrinth.ModrinthApi
-import okio.FileSystem
-import okio.Path.Companion.toOkioPath
-import okio.openZip
 
 object ModInfo {
     suspend fun getFullInfo(mod: PackwizMetaFile): FullModInfo {

@@ -15,7 +15,8 @@ val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
 
 @Composable
 fun OpenFileDialog(
-    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
+    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
 //    AwtWindow(
 //        create = {
@@ -42,7 +43,8 @@ fun OpenFileDialog(
 
 @Composable
 fun OpenDirectoryDialog(
-    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "", chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
+    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
     FileChooserDialog(
         title = title,

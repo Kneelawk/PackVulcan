@@ -7,10 +7,10 @@ pluginManagement {
 
     plugins {
         val kotlinVersion: String by settings
-        kotlin("jvm") version(kotlinVersion)
-        kotlin("plugin.serialization") version(kotlinVersion)
+        kotlin("jvm") version (kotlinVersion)
+        kotlin("plugin.serialization") version (kotlinVersion)
         val composeVersion: String by settings
-        id("org.jetbrains.compose") version(composeVersion)
+        id("org.jetbrains.compose") version (composeVersion)
     }
 }
 rootProject.name = "ModrinthModpackBuilder"

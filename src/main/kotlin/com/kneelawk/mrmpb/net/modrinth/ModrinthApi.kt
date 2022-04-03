@@ -10,7 +10,6 @@ import com.kneelawk.mrmpb.util.ApplicationScope
 import com.kneelawk.mrmpb.util.Batcher
 import com.kneelawk.mrmpb.util.suspendGet
 import io.ktor.client.request.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
