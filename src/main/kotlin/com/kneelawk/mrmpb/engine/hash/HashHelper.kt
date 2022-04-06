@@ -1,6 +1,6 @@
 package com.kneelawk.mrmpb.engine.hash
 
-import com.kneelawk.mrmpb.model.packwiz.HashFormat
+import com.kneelawk.mrmpb.model.HashFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.FileSystem

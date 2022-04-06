@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.model.packwiz
 
+import com.kneelawk.mrmpb.model.HashFormat
 import com.moandjiezana.toml.Toml
 import com.moandjiezana.toml.TomlWriter
 import kotlinx.coroutines.Dispatchers

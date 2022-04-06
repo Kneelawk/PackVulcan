@@ -1,16 +1,29 @@
-package com.kneelawk.mrmpb.model.packwiz
+package com.kneelawk.mrmpb.model
 
 import com.kneelawk.mrmpb.engine.hash.*
+import com.kneelawk.mrmpb.model.packwiz.LoadError
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import okio.HashingSink
 import okio.HashingSource
 import okio.Sink
 import okio.Source
 
+@Serializable
 enum class HashFormat {
+    @SerialName("md5")
     MD5,
+
+    @SerialName("murmur2")
     MURMUR2,
+
+    @SerialName("sha1")
     SHA1,
+
+    @SerialName("sha256")
     SHA256,
+
+    @SerialName("sha512")
     SHA512;
 
     companion object {

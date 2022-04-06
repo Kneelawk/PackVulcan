@@ -30,7 +30,9 @@ import com.kneelawk.mrmpb.ui.theme.MrMpBTheme
 import com.kneelawk.mrmpb.ui.util.ImageWrapper
 import com.kneelawk.mrmpb.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.mrmpb.util.LoadingState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
 
 private val log = KotlinLogging.logger { }
@@ -74,11 +76,16 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMetaFile) {
     var modInfo by remember { mutableStateOf<LoadingState<FullModInfo>>(LoadingState.Loading) }
 
     suspend fun loadModInfo() {
-        modInfo = try {
-            LoadingState.Loaded(ModInfo.getFullInfo(mod))
-        } catch (e: Exception) {
-            log.warn("Error getting mod info.", e)
-            LoadingState.Error
+        modInfo = supervisorScope {
+            try {
+                // getting null here means mod data couldn't be loaded
+                ModInfo.getFullInfo(mod)?.let { LoadingState.Loaded(it) } ?: LoadingState.Error
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                log.warn("Error getting mod info.", e)
+                LoadingState.Error
+            }
         }
     }
 

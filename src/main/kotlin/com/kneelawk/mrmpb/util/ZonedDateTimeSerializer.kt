@@ -8,10 +8,8 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
-    companion object {
-        private val formatter = DateTimeFormatter.ISO_DATE_TIME
-    }
+object ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
+    private val formatter = DateTimeFormatter.ISO_DATE_TIME
 
     override val descriptor = PrimitiveSerialDescriptor("ZonedDateTime", PrimitiveKind.STRING)
 

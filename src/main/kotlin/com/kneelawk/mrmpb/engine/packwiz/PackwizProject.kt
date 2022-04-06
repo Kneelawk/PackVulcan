@@ -2,7 +2,7 @@ package com.kneelawk.mrmpb.engine.packwiz
 
 import com.kneelawk.mrmpb.engine.hash.HashHelper
 import com.kneelawk.mrmpb.model.NewModpack
-import com.kneelawk.mrmpb.model.packwiz.HashFormat
+import com.kneelawk.mrmpb.model.HashFormat
 import com.kneelawk.mrmpb.model.packwiz.TomlHelper
 import com.kneelawk.mrmpb.model.packwiz.index.FileToml
 import com.kneelawk.mrmpb.model.packwiz.index.IndexToml

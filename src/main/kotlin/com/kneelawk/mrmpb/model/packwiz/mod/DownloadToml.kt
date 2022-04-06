@@ -1,5 +1,6 @@
 package com.kneelawk.mrmpb.model.packwiz.mod
 
+import com.kneelawk.mrmpb.model.HashFormat
 import com.kneelawk.mrmpb.model.packwiz.*
 import com.moandjiezana.toml.Toml
 
