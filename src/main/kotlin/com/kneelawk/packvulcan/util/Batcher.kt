@@ -1,7 +1,10 @@
 package com.kneelawk.packvulcan.util
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
@@ -10,7 +13,6 @@ import kotlin.time.Duration
 import kotlin.time.toKotlinDuration
 import java.time.Duration as JDuration
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class Batcher<T, R>(
     scope: CoroutineScope, cycleDuration: Duration, context: CoroutineContext = EmptyCoroutineContext,
     handler: suspend (List<Message<T, R>>) -> Unit
@@ -30,10 +32,6 @@ class Batcher<T, R>(
 
                 var result = messageChannel.tryReceive()
 
-                if (result.isClosed) {
-                    break
-                }
-
                 if (result.isSuccess) {
                     val messages = mutableListOf<Message<T, R>>()
                     do {
@@ -48,7 +46,7 @@ class Batcher<T, R>(
     }
 
     suspend fun request(request: T): R {
-        val responseChannel = Channel<R>()
+        val responseChannel = Channel<R>(1)
         messageChannel.send(Message(request, responseChannel))
 
         return responseChannel.receive()
