@@ -84,10 +84,10 @@ tasks.withType<KotlinCompile> {
 
 compose.desktop {
     application {
-        mainClass = "com.kneelawk.mrmpb.MainKt"
+        mainClass = "com.kneelawk.packvulcan.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "ModrinthModpackBuilder"
+            packageName = "PackVulcan"
             packageVersion = "1.0.0"
         }
     }

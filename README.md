@@ -1,4 +1,4 @@
-# ModrinthModpackBuilder
+# PackVulcan
 
 GUI Modrinth &amp; Packwiz Modpack Builder
 

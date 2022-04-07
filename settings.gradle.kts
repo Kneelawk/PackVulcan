@@ -13,5 +13,5 @@ pluginManagement {
         id("org.jetbrains.compose") version (composeVersion)
     }
 }
-rootProject.name = "ModrinthModpackBuilder"
+rootProject.name = "PackVulcan"
 
