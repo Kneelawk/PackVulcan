@@ -3,6 +3,7 @@ package com.kneelawk.packvulcan.ui
 import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
+import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.engine.packwiz.PackwizProject
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
@@ -89,7 +90,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
      * Mod List Stuff.
      */
 
-    val modsList = mutableStateListOf<PackwizMetaFile>()
+    val modsList = mutableStateListOf<PackwizMod>()
 
     init {
         scope.launch {

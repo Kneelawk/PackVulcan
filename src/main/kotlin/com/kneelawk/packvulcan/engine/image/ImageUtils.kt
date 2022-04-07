@@ -1,5 +1,7 @@
 package com.kneelawk.packvulcan.engine.image
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import kotlin.math.min
@@ -8,7 +10,7 @@ import kotlin.math.roundToInt
 object ImageUtils {
     const val MOD_ICON_SIZE = 64
 
-    fun scaleImage(input: BufferedImage, maxSideLength: Int): BufferedImage {
+    suspend fun scaleImage(input: BufferedImage, maxSideLength: Int): BufferedImage = withContext(Dispatchers.IO) {
         val maxSideLengthF = maxSideLength.toFloat()
         val widthF = input.width.toFloat()
         val heightF = input.height.toFloat()
@@ -28,6 +30,6 @@ object ImageUtils {
         g.drawImage(input, 0, 0, width, height, null)
         g.dispose()
 
-        return new
+        new
     }
 }

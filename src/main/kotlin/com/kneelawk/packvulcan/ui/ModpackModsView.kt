@@ -20,10 +20,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.engine.image.ImageUtils
-import com.kneelawk.packvulcan.engine.modinfo.ModInfo
-import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
-import com.kneelawk.packvulcan.model.FullModInfo
+import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
@@ -70,16 +69,16 @@ fun ModpackModsView(component: ModpackComponent) {
 }
 
 @Composable
-fun ModpackModView(component: ModpackComponent, mod: PackwizMetaFile) {
+fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
     val scope = rememberCoroutineScope()
 
-    var modInfo by remember { mutableStateOf<LoadingState<FullModInfo>>(LoadingState.Loading) }
+    var modInfo by remember { mutableStateOf<LoadingState<SimpleModInfo>>(LoadingState.Loading) }
 
     suspend fun loadModInfo() {
         modInfo = supervisorScope {
             try {
                 // getting null here means mod data couldn't be loaded
-                ModInfo.getFullInfo(mod)?.let { LoadingState.Loaded(it) } ?: LoadingState.Error
+                mod.getSimpleInfo()?.let { LoadingState.Loaded(it) } ?: LoadingState.Error
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -95,7 +94,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMetaFile) {
 
     var modImage by remember { mutableStateOf<LoadingState<ImageWrapper>>(LoadingState.Loading) }
 
-    suspend fun loadModIcon(modInfo: LoadingState<FullModInfo>) {
+    suspend fun loadModIcon(modInfo: LoadingState<SimpleModInfo>) {
         modImage = when (modInfo) {
             is LoadingState.Loaded -> LoadingState.Loaded(
                 when (val icon = modInfo.data.icon) {
@@ -148,7 +147,10 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMetaFile) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(mod.toml.name, style = MaterialTheme.typography.h6, color = PackVulcanTheme.colors.headingColor)
+                    Text(
+                        mod.displayName, style = MaterialTheme.typography.h6,
+                        color = PackVulcanTheme.colors.headingColor
+                    )
 
                     when (val modInfo = modInfo) {
                         LoadingState.Loading -> {

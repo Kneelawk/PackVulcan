@@ -1,8 +1,9 @@
 package com.kneelawk.packvulcan.engine.packwiz
 
 import com.kneelawk.packvulcan.engine.hash.HashHelper
-import com.kneelawk.packvulcan.model.NewModpack
+import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.model.HashFormat
+import com.kneelawk.packvulcan.model.NewModpack
 import com.kneelawk.packvulcan.model.packwiz.TomlHelper
 import com.kneelawk.packvulcan.model.packwiz.index.FileToml
 import com.kneelawk.packvulcan.model.packwiz.index.IndexToml
@@ -136,7 +137,7 @@ class PackwizProject(
                             ) to hashSource.hashString()
                         } else {
                             val hash = HashHelper.hash(path, hashFormat)
-                            PackwizRealFile(
+                            packwizRealFile(
                                 indexElement.file, indexElement.alias, indexElement.preserve, path
                             ) to hash
                         }
@@ -161,13 +162,29 @@ class PackwizProject(
 
             PackwizProject(projectDir, pack, index, files, packwizIgnore)
         }
+
+        private suspend fun packwizRealFile(
+            filePath: String, alias: String?, preserve: Boolean, path: Path
+        ): PackwizRealFile = withContext(Dispatchers.IO) {
+            val pathName = path.name
+            if (pathName.endsWith(".jar")) {
+                val info = ModFileInfo.getFileInfo(path)
+                if (info != null) {
+                    PackwizModFile(filePath, alias, preserve, path, info)
+                } else {
+                    PackwizResourceFile(filePath, alias, preserve, path)
+                }
+            } else {
+                PackwizResourceFile(filePath, alias, preserve, path)
+            }
+        }
     }
 
     private val modsDirname = pack.options?.modsFolder ?: MODS_DIRNAME
 
-    fun getExternalMods(): List<PackwizMetaFile> {
+    fun getExternalMods(): List<PackwizMod> {
         return files.mapNotNull { packwizFile ->
-            if (packwizFile is PackwizMetaFile && packwizFile.filePath.startsWith(modsDirname)) {
+            if (packwizFile is PackwizMod && packwizFile.filePath.startsWith(modsDirname)) {
                 packwizFile
             } else {
                 null
@@ -175,9 +192,9 @@ class PackwizProject(
         }
     }
 
-    fun setExternalMods(mods: List<PackwizMetaFile>) {
+    fun setExternalMods(mods: List<PackwizMod>) {
         files.removeAll {
-            it is PackwizMetaFile && it.filePath.startsWith(modsDirname)
+            it is PackwizMod && it.filePath.startsWith(modsDirname)
         }
         files.addAll(mods)
     }
@@ -274,16 +291,16 @@ class PackwizProject(
                                 "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
                                 e
                             )
-                            PackwizRealFile(relative, null, false, path)
+                            packwizRealFile(relative, null, false, path)
                         } catch (e: IllegalStateException) {
                             log.warn(
                                 "Encountered exception when parsing what appeared to be a packwiz meta-file but actually wasn't.",
                                 e
                             )
-                            PackwizRealFile(relative, null, false, path)
+                            packwizRealFile(relative, null, false, path)
                         }
                     } else {
-                        PackwizRealFile(relative, null, false, path)
+                        packwizRealFile(relative, null, false, path)
                     }
                 }
             }
