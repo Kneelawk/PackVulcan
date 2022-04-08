@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AppContainerBox(
-    title: String, extraDrawerContent: (@Composable ColumnScope.() -> Unit)? = null, content: @Composable () -> Unit
+    title: String, extraDrawerContent: (@Composable ColumnScope.() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {}, content: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -39,7 +40,8 @@ fun AppContainerBox(
                     }) {
                         Icon(Icons.Default.Menu, "menu")
                     }
-                }
+                },
+                actions = actions
             )
         },
         drawerContent = {

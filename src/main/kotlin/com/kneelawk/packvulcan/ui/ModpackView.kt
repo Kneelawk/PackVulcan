@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -42,6 +43,13 @@ fun ModpackView(component: ModpackComponent, tracker: KeyboardTracker) {
                 Text("Save", modifier = Modifier.padding(start = 10.dp))
                 Box(Modifier.weight(1f))
                 Text(SAVE_SHORTCUT.toString())
+            }
+        },
+        actions = {
+            IconButton(onClick = {
+                component.reload()
+            }) {
+                Icon(Icons.Default.Refresh, "refresh")
             }
         }
     ) {
