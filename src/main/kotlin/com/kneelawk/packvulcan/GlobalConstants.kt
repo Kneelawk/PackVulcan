@@ -12,6 +12,8 @@ object GlobalConstants {
     private val CACHE_DIR_PATH: Path = FOLDER.resolve("cache")
     val MOD_CACHE_DIR_PATH: Path = CACHE_DIR_PATH.resolve("mods")
 
+    val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
+
     const val INITIAL_PROJECT_VERSION = "0.1.0"
     const val INITIAL_MINECRAFT_VERSION = "1.18.2"
     const val INITIAL_LOADER_VERSION = "Fabric 0.13.3"

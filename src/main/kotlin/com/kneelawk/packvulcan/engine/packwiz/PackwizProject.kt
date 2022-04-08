@@ -156,7 +156,7 @@ class PackwizProject(
                 }
             }
 
-            val files = loadingFiles.awaitAll().asSequence().filterNotNull().toMutableList()
+            val files = loadingFiles.awaitAll().asSequence().filterNotNull().sortedBy { it.filePath }.toMutableList()
 
             val packwizIgnore = packwizIgnoreDeferred.await()
 
@@ -166,8 +166,7 @@ class PackwizProject(
         private suspend fun packwizRealFile(
             filePath: String, alias: String?, preserve: Boolean, path: Path
         ): PackwizRealFile = withContext(Dispatchers.IO) {
-            val pathName = path.name
-            if (pathName.endsWith(".jar")) {
+            if (path.name.endsWith(".jar")) {
                 val info = ModFileInfo.getFileInfo(path)
                 if (info != null) {
                     PackwizModFile(filePath, alias, preserve, path, info)
@@ -182,7 +181,10 @@ class PackwizProject(
 
     private val modsDirname = pack.options?.modsFolder ?: MODS_DIRNAME
 
-    fun getExternalMods(): List<PackwizMod> {
+    val modsDir: Path
+        get() = projectDir.resolve(modsDirname)
+
+    fun getMods(): List<PackwizMod> {
         return files.mapNotNull { packwizFile ->
             if (packwizFile is PackwizMod && packwizFile.filePath.startsWith(modsDirname)) {
                 packwizFile
@@ -192,11 +194,12 @@ class PackwizProject(
         }
     }
 
-    fun setExternalMods(mods: List<PackwizMod>) {
+    fun setMods(mods: List<PackwizMod>) {
         files.removeAll {
             it is PackwizMod && it.filePath.startsWith(modsDirname)
         }
-        files.addAll(mods)
+        files.addAll(mods.distinctBy { it.filePath })
+        files.sortBy { it.filePath }
     }
 
     private suspend fun updateIndex() = coroutineScope {

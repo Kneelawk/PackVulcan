@@ -2,6 +2,7 @@ package com.kneelawk.packvulcan.ui.util.dialog.file
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import com.kneelawk.packvulcan.GlobalConstants.HOME_FOLDER
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.util.Conflator
 import kotlinx.coroutines.*
@@ -26,7 +27,8 @@ private val homeFolders = mapOf(
 @Composable
 fun rememberFileChooserController(
     mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
-    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    visibilityFilter: FileVisibilityFilter = FileVisibilityFilter.ACCEPT_ALL,
+    selectionFilter: FileSelectionFilter = FileSelectionFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ): FileChooserInterface {
     // Keep input updated with recompositions
     @Suppress("NAME_SHADOWING")
@@ -60,6 +62,7 @@ fun rememberFileChooserController(
         // we do this checking in a produceState, so that we can handle cases when filesystem checks like
         // `isRegularFile()` or `isDirectory()` take a significant amount of time.
         val selectedPath = Paths.get(cSelected)
+        val selectionFilterError = selectionFilter.getError(selectedPath)
         value = if (cSelected.isEmpty()) {
             SelectedProduced(false, null, selectedPath)
         } else if (!isValidFilename(cSelected)) {
@@ -68,6 +71,8 @@ fun rememberFileChooserController(
                 "Paths must not be blank or longer than 255 characters and must not contain '\"', '*', '<', '>', '?', '|', newline, or tab characters.",
                 selectedPath
             )
+        } else if (selectionFilterError != null) {
+            SelectedProduced(false, selectionFilterError, selectedPath)
         } else {
             when (mode) {
                 FileChooserMode.SAVE -> {
@@ -115,7 +120,7 @@ fun rememberFileChooserController(
                         stream.filter {
                             (it.isDirectory() || mode != FileChooserMode.OPEN_DIRECTORY)
                                     && (!it.isHidden() || cShowHiddenFiles)
-                                    && chooserFilter.accept(it)
+                                    && visibilityFilter.accept(it)
                         }.sorted { o1, o2 -> o1.name.compareTo(o2.name, ignoreCase = true) }.map {
                             val type = when {
                                 it.isDirectory() -> FileListItemType.FOLDER
@@ -331,7 +336,7 @@ fun rememberFileChooserController(
                     } else if (
                         attributes.isRegularFile
                         && mode == FileChooserMode.OPEN_FILE
-                        && chooserFilter.accept(path)
+                        && visibilityFilter.accept(path)
                     ) {
                         finished(path)
                     }

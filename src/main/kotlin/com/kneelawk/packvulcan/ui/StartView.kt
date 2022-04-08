@@ -24,7 +24,7 @@ fun StartView(createNew: () -> Unit, openExisting: (Path) -> Unit) {
     if (openProjectDialog) {
         OpenFileDialog(
             title = "Open Packwiz 'pack.toml'",
-            chooserFilter = { it.isDirectory() || PackwizProject.isPackFile(it) }
+            visibilityFilter = { it.isDirectory() || PackwizProject.isPackFile(it) }
         ) { selected ->
             openProjectDialog = false
             selected?.let { openExisting(it) }

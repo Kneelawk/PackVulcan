@@ -5,18 +5,17 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
+import com.kneelawk.packvulcan.GlobalConstants.HOME_FOLDER
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import java.nio.file.Path
-import java.nio.file.Paths
-
-val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
 
 @Composable
 fun OpenFileDialog(
     title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
-    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    visibilityFilter: FileVisibilityFilter = FileVisibilityFilter.ACCEPT_ALL,
+    selectionFilter: FileSelectionFilter = FileSelectionFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
 //    AwtWindow(
 //        create = {
@@ -36,7 +35,8 @@ fun OpenFileDialog(
         mode = FileChooserMode.OPEN_FILE,
         initialFolder = initialFolder,
         initialSelection = initialSelection,
-        chooserFilter = chooserFilter,
+        visibilityFilter = visibilityFilter,
+        selectionFilter = selectionFilter,
         finished = finished
     )
 }
@@ -44,14 +44,16 @@ fun OpenFileDialog(
 @Composable
 fun OpenDirectoryDialog(
     title: String, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
-    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    visibilityFilter: FileVisibilityFilter = FileVisibilityFilter.ACCEPT_ALL,
+    selectionFilter: FileSelectionFilter = FileSelectionFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
     FileChooserDialog(
         title = title,
         mode = FileChooserMode.OPEN_DIRECTORY,
         initialFolder = initialFolder,
         initialSelection = initialSelection,
-        chooserFilter = chooserFilter,
+        visibilityFilter = visibilityFilter,
+        selectionFilter = selectionFilter,
         finished = finished
     )
 }
@@ -63,7 +65,8 @@ enum class FileChooserMode {
 @Composable
 fun FileChooserDialog(
     title: String, mode: FileChooserMode, initialFolder: Path = HOME_FOLDER, initialSelection: String = "",
-    chooserFilter: FileChooserFilter = FileChooserFilter.ACCEPT_ALL, finished: (Path?) -> Unit
+    visibilityFilter: FileVisibilityFilter = FileVisibilityFilter.ACCEPT_ALL,
+    selectionFilter: FileSelectionFilter = FileSelectionFilter.ACCEPT_ALL, finished: (Path?) -> Unit
 ) {
     val state = rememberDialogState(size = DpSize(1280.dp, 800.dp))
 
@@ -91,7 +94,8 @@ fun FileChooserDialog(
                         mode = mode,
                         initialFolder = initialFolder,
                         initialSelection = initialSelection,
-                        chooserFilter = chooserFilter,
+                        visibilityFilter = visibilityFilter,
+                        selectionFilter = selectionFilter,
                         finished = finished
                     )
                 )

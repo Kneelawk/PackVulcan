@@ -18,7 +18,7 @@ sealed class PersonJson {
     data class Simple(override val name: String) : PersonJson()
 
     @Serializable
-    data class Contact(override val name: String, val contact: String) : PersonJson()
+    data class Contact(override val name: String, val contact: Map<String, String>? = null) : PersonJson()
 }
 
 private class PersonSerializer : JsonContentPolymorphicSerializer<PersonJson>(PersonJson::class) {

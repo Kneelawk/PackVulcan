@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.engine.image.ImageUtils
+import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.model.ModIcon
 import com.kneelawk.packvulcan.model.SimpleModInfo
@@ -27,25 +29,69 @@ import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
+import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.util.LoadingState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import mu.KotlinLogging
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
 
 private val log = KotlinLogging.logger { }
 
 @Composable
 fun ModpackModsView(component: ModpackComponent) {
+    var addModJarDialogOpen by remember { mutableStateOf(false) }
+
+    if (addModJarDialogOpen) {
+        OpenFileDialog(
+            title = "Select a mod .jar to add",
+            initialFolder = component.previousSelectionDir,
+            visibilityFilter = {
+                it.isDirectory() || it.name.endsWith(".jar")
+            },
+            selectionFilter = {
+                if (!it.name.endsWith(".jar")) {
+                    return@OpenFileDialog "The selected file is not a .jar file."
+                }
+
+                ModFileInfo.getFileInfo(it) ?: return@OpenFileDialog "Unable to recognize this .jar as a mod file."
+
+                null
+            }
+        ) { selected ->
+            addModJarDialogOpen = false
+            selected?.let {
+                component.addModJar(it)
+            }
+        }
+    }
+
     Column {
         Box(
             modifier = Modifier.fillMaxWidth().shadow(5.dp, RectangleShape, true)
                 .background(MaterialTheme.colors.surface)
         ) {
-            Row(modifier = Modifier.padding(20.dp)) {
-                Button(onClick = {}, modifier = Modifier.weight(1f)) {
-                    Text("Add Mods...")
+            Row(modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                val buttonShape = MaterialTheme.shapes.small
+                val startShape = buttonShape.copy(topEnd = CornerSize(0), bottomEnd = CornerSize(0))
+                val endShape = buttonShape.copy(topStart = CornerSize(0), bottomStart = CornerSize(0))
+
+                Button(onClick = {}, modifier = Modifier.weight(1f), shape = startShape, enabled = !component.loading) {
+                    Icon(PackVulcanIcons.modrinth, "modrinth")
+
+                    Text("Add from Modrinth...", modifier = Modifier.padding(start = 10.dp))
+                }
+
+                Button(
+                    onClick = { addModJarDialogOpen = true }, modifier = Modifier.weight(1f), shape = endShape,
+                    enabled = !component.loading
+                ) {
+                    Icon(PackVulcanIcons.file, "file")
+
+                    Text("Add Mod Jar...", modifier = Modifier.padding(start = 10.dp))
                 }
             }
         }
@@ -60,7 +106,7 @@ fun ModpackModsView(component: ModpackComponent) {
                 state = lazyListState, modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(15.dp), contentPadding = PaddingValues(20.dp)
             ) {
-                items(component.modsList) { mod ->
+                items(component.modsList, key = { it.filePath }) { mod ->
                     ModpackModView(component, mod)
                 }
             }
@@ -182,6 +228,14 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                         Text("${modInfo.data.versionName} - ${modInfo.data.filename}")
                     }
                 }
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Button(onClick = {
+                component.removeMod(mod.filePath)
+            }, enabled = !component.loading) {
+                Text("Remove")
             }
         }
     }

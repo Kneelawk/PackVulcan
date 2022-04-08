@@ -29,6 +29,8 @@ object PackVulcanIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val image = loader.getResourceAsStream("image_black_24dp.svg").orError("image")
         .use { loadSvgPainter(it, Density(1f)) }
+    val modrinth = loader.getResourceAsStream("modrinth_icon_24dp.svg").orError("modrinth")
+        .use { loadSvgPainter(it, Density(1f)) }
     val movie = loader.getResourceAsStream("movie_black_24dp.svg").orError("movie")
         .use { loadSvgPainter(it, Density(1f)) }
     val music = loader.getResourceAsStream("music_note_black_24dp.svg").orError("music")

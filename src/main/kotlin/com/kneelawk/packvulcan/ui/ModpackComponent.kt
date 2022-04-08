@@ -2,8 +2,10 @@ package com.kneelawk.packvulcan.ui
 
 import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
-import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
+import com.kneelawk.packvulcan.GlobalConstants.HOME_FOLDER
+import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
+import com.kneelawk.packvulcan.engine.packwiz.PackwizModFile
 import com.kneelawk.packvulcan.engine.packwiz.PackwizProject
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
@@ -11,10 +13,16 @@ import com.kneelawk.packvulcan.model.NewModpack
 import com.kneelawk.packvulcan.util.ComponentScope
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.VersionUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.copyTo
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.name
+import kotlin.io.path.relativeTo
 
 class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : ComponentContext by context {
     companion object {
@@ -91,6 +99,10 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
      */
 
     val modsList = mutableStateListOf<PackwizMod>()
+    private val modsMap = mutableMapOf<String, PackwizMod>()
+
+    private var modsDir = Paths.get("")
+    var previousSelectionDir = HOME_FOLDER
 
     init {
         scope.launch {
@@ -133,8 +145,9 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
 
         updateMinecraftAndLoaderVersions(loaderVersion, minecraftVersion)
 
-        modsList.clear()
-        modsList.addAll(project.getExternalMods())
+        modsDir = project.modsDir
+
+        setModsList(project.getMods())
 
         log.info("Writing packwiz project to '${project.projectDir}'...")
         project.write()
@@ -149,6 +162,64 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                 val project = PackwizProject.loadFromProjectDir(modpackLocation)
 
                 loadFromProject(project)
+
+                loading = false
+            }
+        }
+    }
+
+    private fun setModsList(mods: List<PackwizMod>) {
+        modsList.clear()
+        modsList.addAll(mods.sortedBy { it.filePath })
+        modsMap.clear()
+        modsMap.putAll(mods.associateBy { it.filePath })
+    }
+
+    private fun addOrReplaceModInList(mod: PackwizMod) {
+        if (modsMap.containsKey(mod.filePath)) {
+            val index = modsList.indexOfFirst { it.filePath == mod.filePath }
+            modsList[index] = mod
+        } else {
+            val index = modsList.indexOfFirst { it.filePath > mod.filePath }
+            modsList.add(index, mod)
+        }
+
+        modsMap[mod.filePath] = mod
+    }
+
+    fun removeMod(filePath: String) {
+        modsList.removeAll { it.filePath == filePath }
+        modsMap.remove(filePath)
+    }
+
+    fun modFilenameConflicts(path: Path): Boolean {
+        val newModFile = modsDir.resolve(path.name)
+        val relative = newModFile.relativeTo(modpackLocation).invariantSeparatorsPathString
+        return modsMap.containsKey(relative)
+    }
+
+    fun addModJar(path: Path) {
+        previousSelectionDir = path.parent
+
+        if (!loading) {
+            loading = true
+
+            scope.launch {
+                // copy file to mods dir
+                val newModFile = modsDir.resolve(path.name)
+
+                withContext(Dispatchers.IO) {
+                    path.copyTo(newModFile, overwrite = true)
+                }
+
+                if (path.name.endsWith(".jar")) {
+                    val info = ModFileInfo.getFileInfo(newModFile)
+                    if (info != null) {
+                        val relative = newModFile.relativeTo(modpackLocation).invariantSeparatorsPathString
+
+                        addOrReplaceModInList(PackwizModFile(relative, null, false, newModFile, info))
+                    }
+                }
 
                 loading = false
             }
@@ -176,7 +247,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                     )
                 )
 
-                project.setExternalMods(modsList)
+                project.setMods(modsList)
 
                 log.info("Writing packwiz project at '${project.projectDir}'...")
                 project.write()
