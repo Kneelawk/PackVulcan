@@ -2,12 +2,21 @@ package com.kneelawk.packvulcan.engine.modinfo
 
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.packwiz.mod.ModToml
 import com.kneelawk.packvulcan.model.packwiz.mod.ModrinthToml
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 
 object ModInfo {
+    fun getModProvider(mod: PackwizMetaFile): ModProvider {
+        return when {
+            mod.toml.update?.modrinth != null -> ModProvider.MODRINTH
+            // TODO: Add curseforge check when curseforge api is supported
+            else -> ModProvider.URL
+        }
+    }
+
     suspend fun getSimpleInfo(mod: PackwizMetaFile): SimpleModInfo? {
         val modToml = mod.toml
         return modToml.update?.modrinth?.let { modrinth ->
@@ -24,8 +33,8 @@ object ModInfo {
         val projectUrl = "https://modrinth.com/mod/${project.slug}"
 
         return SimpleModInfo.Modrinth(
-            mod.name, authors, mod.filename, version.name, project.iconUrl?.let { ModIcon.Url(it) }, projectUrl,
-            modrinth.modId, modrinth.version
+            mod.name, authors, mod.filename, version.versionNumber, project.description,
+            project.iconUrl?.let { ModIcon.Url(it) }, projectUrl, modrinth.modId, modrinth.version
         )
     }
 

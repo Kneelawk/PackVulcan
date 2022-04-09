@@ -19,11 +19,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
@@ -162,7 +166,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             Box(modifier = Modifier.size(ImageUtils.MOD_ICON_SIZE.dp)) {
                 when (val modImage = modImage) {
@@ -189,7 +193,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                 }
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -211,6 +215,15 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                     }
                 }
 
+                val providerStr = buildAnnotatedString {
+                    append("Provided by: ")
+                    pushStyle(SpanStyle(color = providerColor(mod.provider), fontWeight = FontWeight.Bold))
+                    append(mod.provider.prettyName)
+                    pop()
+                }
+
+                Text(providerStr)
+
                 when (val modInfo = modInfo) {
                     LoadingState.Loading -> {
                         Text("Loading mod info...")
@@ -225,12 +238,20 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                         }
                     }
                     is LoadingState.Loaded -> {
-                        Text("${modInfo.data.versionName} - ${modInfo.data.filename}")
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            val description = when (val modInfo = modInfo) {
+                                LoadingState.Loading -> "Loading description..."
+                                LoadingState.Error -> "Error loading description."
+                                is LoadingState.Loaded -> modInfo.data.description ?: "No description."
+                            }
+
+                            Text(description)
+
+                            Text("Version: ${modInfo.data.version}")
+                        }
                     }
                 }
             }
-
-            Spacer(Modifier.weight(1f))
 
             Button(onClick = {
                 component.removeMod(mod.filePath)
@@ -238,5 +259,16 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                 Text("Remove")
             }
         }
+    }
+}
+
+@Composable
+fun providerColor(provider: ModProvider): Color {
+    return when (provider) {
+        ModProvider.MODRINTH -> Color(0xFF30B27B)
+        ModProvider.CURSEFORGE -> Color(0xFFF16436)
+        ModProvider.GITHUB -> Color(0xFF4078C0)
+        ModProvider.URL -> PackVulcanTheme.colors.linkColor
+        ModProvider.FILESYSTEM -> MaterialTheme.colors.onSurface
     }
 }

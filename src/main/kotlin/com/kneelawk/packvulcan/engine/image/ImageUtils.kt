@@ -8,7 +8,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 object ImageUtils {
-    const val MOD_ICON_SIZE = 64
+    const val MOD_ICON_SIZE = 96
 
     suspend fun scaleImage(input: BufferedImage, maxSideLength: Int): BufferedImage = withContext(Dispatchers.IO) {
         val maxSideLengthF = maxSideLength.toFloat()

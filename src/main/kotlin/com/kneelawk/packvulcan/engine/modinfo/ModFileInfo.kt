@@ -87,7 +87,7 @@ object ModFileInfo {
                 val authors = ModInfo.authorString(meta.data.authors?.map { it.name })
 
                 SimpleModInfo.File(
-                    meta.data.name ?: name, authors, filename, meta.data.version, icon,
+                    meta.data.name ?: name, authors, filename, meta.data.version, meta.data.description, icon,
                     meta.data.contact?.get("homepage"), meta.data.id
                 )
             }
@@ -96,17 +96,19 @@ object ModFileInfo {
 
                 SimpleModInfo.File(
                     modToml?.displayName ?: name, modToml?.authors ?: "Unknown", filename,
-                    modToml?.version ?: "unknown", icon, modToml?.displayURL, modToml?.modId ?: "unknown"
+                    modToml?.version ?: "unknown", modToml?.description, icon, modToml?.displayURL,
+                    modToml?.modId ?: "unknown"
                 )
             }
             is Metadata.Quilt -> {
                 val quiltLoader = meta.data.quiltLoader
+                val metadata = quiltLoader.metadata
 
-                val authors = ModInfo.authorString(quiltLoader.metadata?.contributors?.keys?.toList())
+                val authors = ModInfo.authorString(metadata?.contributors?.keys?.toList())
 
                 SimpleModInfo.File(
-                    quiltLoader.metadata?.name ?: name, authors, filename, quiltLoader.version, icon,
-                    quiltLoader.metadata?.contact?.get("homepage"), quiltLoader.id
+                    metadata?.name ?: name, authors, filename, quiltLoader.version, metadata?.description,
+                    icon, quiltLoader.metadata?.contact?.get("homepage"), quiltLoader.id
                 )
             }
         }

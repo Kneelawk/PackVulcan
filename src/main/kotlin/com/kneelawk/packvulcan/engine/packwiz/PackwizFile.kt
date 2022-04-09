@@ -1,6 +1,7 @@
 package com.kneelawk.packvulcan.engine.packwiz
 
 import com.kneelawk.packvulcan.engine.modinfo.ModInfo
+import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.packwiz.mod.ModToml
 import java.nio.file.Path
@@ -13,6 +14,7 @@ sealed interface PackwizFile {
 
 sealed interface PackwizMod : PackwizFile {
     val displayName: String
+    val provider: ModProvider
 
     suspend fun getSimpleInfo(): SimpleModInfo?
 }
@@ -22,6 +24,7 @@ data class PackwizMetaFile(
 ) : PackwizFile, PackwizMod {
     override val displayName: String
         get() = toml.name
+    override val provider by lazy { ModInfo.getModProvider(this) }
 
     override suspend fun getSimpleInfo(): SimpleModInfo? {
         return ModInfo.getSimpleInfo(this)
@@ -38,6 +41,8 @@ data class PackwizModFile(
 ) : PackwizRealFile, PackwizMod {
     override val displayName: String
         get() = info.name
+    override val provider: ModProvider
+        get() = ModProvider.FILESYSTEM
 
     override suspend fun getSimpleInfo(): SimpleModInfo {
         return info
