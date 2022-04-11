@@ -32,6 +32,8 @@ fun ModpackView(component: ModpackComponent, tracker: KeyboardTracker) {
         component.save()
     })
 
+    ModpackModsDialogs(component)
+
     AppContainerBox(
         title = component.modpackName,
         extraDrawerContent = {

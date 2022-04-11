@@ -30,6 +30,7 @@ import com.kneelawk.packvulcan.model.ModIcon
 import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
+import com.kneelawk.packvulcan.ui.modrinth.ModrinthSearchWindow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
@@ -44,6 +45,19 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 
 private val log = KotlinLogging.logger { }
+
+@Composable
+fun ModpackModsDialogs(component: ModpackComponent) {
+    if (component.modrinthSearchDialogOpen) {
+        ModrinthSearchWindow(
+            onCloseRequest = {
+                component.modrinthSearchDialogOpen = false
+            },
+            selectedMinecraftVersions = component.selectedMinecraftVersions,
+            selectedKnownLoaders = component.selectedModLoaders,
+        )
+    }
+}
 
 @Composable
 fun ModpackModsView(component: ModpackComponent) {
@@ -83,7 +97,11 @@ fun ModpackModsView(component: ModpackComponent) {
                 val startShape = buttonShape.copy(topEnd = CornerSize(0), bottomEnd = CornerSize(0))
                 val endShape = buttonShape.copy(topStart = CornerSize(0), bottomStart = CornerSize(0))
 
-                Button(onClick = {}, modifier = Modifier.weight(1f), shape = startShape, enabled = !component.loading) {
+                Button(
+                    onClick = { component.modrinthSearchDialogOpen = true }, modifier = Modifier.weight(1f),
+                    shape = startShape,
+                    enabled = !component.loading
+                ) {
                     Icon(PackVulcanIcons.modrinth, "modrinth")
 
                     Text("Add from Modrinth...", modifier = Modifier.padding(start = 10.dp))
@@ -104,13 +122,14 @@ fun ModpackModsView(component: ModpackComponent) {
 
         VerticalScrollWrapper(
             modifier = Modifier.weight(1f).fillMaxWidth(), adapter = ScrollbarAdapter(lazyListState),
-            backgroundColor = Color.Transparent, backgroundShape = MaterialTheme.shapes.large, scrollbarPadding = 0.dp
+            backgroundColor = Color.Transparent, backgroundShape = MaterialTheme.shapes.large,
+            scrollbarPadding = PaddingValues(0.dp)
         ) {
             LazyColumn(
                 state = lazyListState, modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(15.dp), contentPadding = PaddingValues(20.dp)
             ) {
-                items(component.modsList, key = { it.filePath }) { mod ->
+                items(component.modsList, key = PackwizMod::filePath) { mod ->
                     ModpackModView(component, mod)
                 }
             }

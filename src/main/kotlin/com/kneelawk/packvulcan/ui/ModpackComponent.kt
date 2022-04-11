@@ -104,6 +104,14 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     private var modsDir = Paths.get("")
     var previousSelectionDir = HOME_FOLDER
 
+    /*
+     * Mod Adding Stuff.
+     */
+
+    var modrinthSearchDialogOpen by mutableStateOf(false)
+    val selectedMinecraftVersions = mutableStateMapOf<String, Unit>()
+    val selectedModLoaders = mutableStateMapOf<LoaderVersion.Type, Unit>()
+
     init {
         scope.launch {
             val project = when (args) {

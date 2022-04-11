@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,13 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun VerticalScrollWrapper(
-    modifier: Modifier, backgroundColor: Color = MaterialTheme.colors.surface,
-    backgroundShape: Shape = MaterialTheme.shapes.medium, scrollbarPadding: Dp = 15.dp, adapter: ScrollbarAdapter,
+    adapter: ScrollbarAdapter, modifier: Modifier = Modifier, backgroundColor: Color = MaterialTheme.colors.surface,
+    backgroundShape: Shape = MaterialTheme.shapes.medium, scrollbarPadding: PaddingValues = PaddingValues(end = 15.dp),
     content: @Composable RowScope.() -> Unit
 ) {
     Row(modifier = modifier.background(backgroundColor, backgroundShape).clip(backgroundShape)) {
@@ -36,7 +32,7 @@ fun VerticalScrollWrapper(
             AnimatedVisibility(visible = isScrollable) {
                 VerticalScrollbar(
                     adapter = adapter,
-                    modifier = Modifier.fillMaxHeight().padding(end = scrollbarPadding)
+                    modifier = Modifier.fillMaxHeight().padding(scrollbarPadding)
                 )
             }
         }, Modifier.fillMaxHeight(), measure)

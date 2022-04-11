@@ -3,6 +3,8 @@ package com.kneelawk.packvulcan.net.modrinth
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.model.modrinth.project.ProjectJson
+import com.kneelawk.packvulcan.model.modrinth.tag.CategoryJson
+import com.kneelawk.packvulcan.model.modrinth.tag.LoaderJson
 import com.kneelawk.packvulcan.model.modrinth.team.TeamMemberJson
 import com.kneelawk.packvulcan.model.modrinth.version.VersionJson
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
@@ -26,6 +28,10 @@ object ModrinthApi {
         Caffeine.newBuilder().expireAfterWrite(Duration.ofHours(1)).buildAsync()
     private val teamMemberCache: AsyncCache<String, List<TeamMemberJson>> =
         Caffeine.newBuilder().expireAfterWrite(Duration.ofHours(2)).buildAsync()
+    private val categoryCache: AsyncCache<Unit, List<CategoryJson>> =
+        Caffeine.newBuilder().buildAsync()
+    private val loaderCache: AsyncCache<Unit, List<LoaderJson>> =
+        Caffeine.newBuilder().buildAsync()
 
     /*
      * Retriever methods.
@@ -71,6 +77,14 @@ object ModrinthApi {
         HTTP_CLIENT.get("https://api.modrinth.com/v2/team/$id/members")
     }
 
+    private suspend fun retrieveCategories(): List<CategoryJson> = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.get("https://api.modrinth.com/v2/tag/category")
+    }
+
+    private suspend fun retrieveLoaders(): List<LoaderJson> = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.get("https://api.modrinth.com/v2/tag/loader")
+    }
+
     /*
      * Accessor methods.
      */
@@ -80,4 +94,8 @@ object ModrinthApi {
     suspend fun version(id: String): VersionJson = versionCache.suspendGet(id, versionBatcher::request)
 
     suspend fun teamMembers(id: String): List<TeamMemberJson> = teamMemberCache.suspendGet(id, ::retrieveTeamMembers)
+
+    suspend fun categories(): List<CategoryJson> = categoryCache.suspendGet(Unit) { retrieveCategories() }
+
+    suspend fun loaders(): List<LoaderJson> = loaderCache.suspendGet(Unit) { retrieveLoaders() }
 }

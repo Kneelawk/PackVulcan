@@ -108,6 +108,39 @@ fun ListButton(
 }
 
 @Composable
+fun CheckboxButton(
+    checked: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    elevation: ButtonElevation? = null,
+    shape: Shape = MaterialTheme.shapes.small,
+    border: BorderStroke? = null,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    checkboxColors: CheckboxColors = CheckboxDefaults.colors(MaterialTheme.colors.primary),
+    icon: (@Composable () -> Unit)? = null,
+    text: String,
+) {
+    ListButton(onClick, modifier, enabled, interactionSource, elevation, shape, border, colors) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = null,
+            modifier = Modifier.padding(end = 10.dp),
+            enabled = enabled,
+            interactionSource = interactionSource,
+            colors = checkboxColors
+        )
+        if (icon != null) {
+            icon()
+            Text(text, modifier = Modifier.padding(start = 10.dp))
+        } else {
+            Text(text)
+        }
+    }
+}
+
+@Composable
 fun SmallButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

@@ -24,9 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -41,7 +39,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
-import java.awt.Cursor
 import java.awt.event.MouseEvent
 import java.nio.file.Path
 import kotlin.io.path.name
@@ -272,27 +269,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                 }
             }
 
-            splitter {
-                visiblePart {
-                    Column(verticalArrangement = Arrangement.Center) {
-                        Box(
-                            Modifier
-                                .width(3.dp)
-                                .height(30.dp)
-                                .background(MaterialTheme.colors.surface, shape = MaterialTheme.shapes.small)
-                        )
-                    }
-                }
-                handle {
-                    Box(
-                        Modifier
-                            .markAsHandle()
-                            .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
-                            .width(10.dp)
-                            .fillMaxHeight()
-                    )
-                }
-            }
+            styledSplitter()
         }
 
         val selectedError = controller.selectedError
