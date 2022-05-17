@@ -73,7 +73,7 @@ fun rememberModrinthSearchController(
 
     LaunchedEffect(Unit) {
         categoriesLoading = true
-        categoryList.addAll(CategoryDisplay.categoryList())
+        categoryList.addAll(CategoryDisplay.categoryList().filter { it.projectType == "mod" })
         categoriesLoading = false
     }
 

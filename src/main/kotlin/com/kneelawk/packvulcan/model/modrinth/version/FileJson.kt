@@ -8,4 +8,5 @@ data class FileJson(
     val url: String,
     val filename: String,
     val primary: Boolean,
+    val size: Int,
 )

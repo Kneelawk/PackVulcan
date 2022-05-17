@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class CategoryDisplay(override val prettyName: String, val apiName: String, override val icon: @Composable () -> Unit) :
+class CategoryDisplay(override val prettyName: String, val apiName: String, val projectType: String, override val icon: @Composable () -> Unit) :
     DisplayElement {
     companion object {
         private fun getPainterFor(json: CategoryJson): Painter {
@@ -43,7 +43,7 @@ class CategoryDisplay(override val prettyName: String, val apiName: String, over
                 if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString()
             }
             val icon = getPainterFor(json)
-            CategoryDisplay(prettyName, json.name) { Icon(icon, json.name, modifier = Modifier.size(24.dp)) }
+            CategoryDisplay(prettyName, json.name, json.projectType) { Icon(icon, json.name, modifier = Modifier.size(24.dp)) }
         }
 
         private val categoryCache: AsyncCache<Unit, List<CategoryDisplay>> =
