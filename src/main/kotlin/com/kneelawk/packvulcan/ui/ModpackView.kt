@@ -12,6 +12,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.unit.dp
+import com.kneelawk.packvulcan.ui.attributor.AttributorView
 import com.kneelawk.packvulcan.ui.keyboard.KeyboardTracker
 import com.kneelawk.packvulcan.ui.keyboard.shortcut
 import com.kneelawk.packvulcan.ui.keyboard.shortcuts
@@ -32,6 +33,7 @@ fun ModpackView(component: ModpackComponent, tracker: KeyboardTracker) {
         component.save()
     })
 
+    ModpackDialogs(component)
     ModpackModsDialogs(component)
 
     AppContainerBox(
@@ -46,6 +48,15 @@ fun ModpackView(component: ModpackComponent, tracker: KeyboardTracker) {
                 Box(Modifier.weight(1f))
                 Text(SAVE_SHORTCUT.toString())
             }
+
+            Divider()
+
+            ListButton(
+                onClick = { component.attributorDialogOpen = true },
+                enabled = !component.attributorDialogOpen,
+                modifier = Modifier.fillMaxWidth(),
+                text = "Attributor"
+            )
         },
         actions = {
             IconButton(onClick = {
@@ -91,4 +102,14 @@ enum class ModpackTab(val text: String, val icon: @Composable () -> Unit) {
     DETAILS("Details", { Icon(Icons.Default.Info, "details") }),
     MODS("Mods", { Icon(Icons.Default.List, "mods") }),
     FILES("Files", { Icon(PackVulcanIcons.file, "files") });
+}
+
+@Composable
+private fun ModpackDialogs(component: ModpackComponent) {
+    if (component.attributorDialogOpen) {
+        AttributorView(
+            onCloseRequest = { component.attributorDialogOpen = false },
+            modsList = component.modsList
+        )
+    }
 }

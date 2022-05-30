@@ -10,7 +10,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfade
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.childAnimation
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.fade
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.ui.keyboard.rememberKeyboardTracker
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
@@ -27,7 +28,8 @@ fun RootView(windowState: WindowState, component: RootComponent, onCloseRequest:
         PackVulcanTheme(GlobalSettings.darkMode) {
             val backgroundColor by animateColorAsState(MaterialTheme.colors.background)
             Children(
-                component.routerState, animation = crossfade(), modifier = Modifier.background(backgroundColor)
+                component.routerState, animation = childAnimation(fade()),
+                modifier = Modifier.background(backgroundColor)
             ) { child ->
                 when (val instance = child.instance) {
                     CurrentScreen.Start -> StartView(

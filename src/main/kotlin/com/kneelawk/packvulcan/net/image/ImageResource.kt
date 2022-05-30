@@ -25,7 +25,7 @@ object ImageResource {
         // TODO: filesystem image caching
         val response: HttpResponse = HTTP_CLIENT.get(url)
         // looks like an input stream is the only way to do this atm
-        val inputStream = response.content.toInputStream()
+        val inputStream = response.bodyAsChannel().toInputStream()
         ImageIO.read(inputStream)
     }
 

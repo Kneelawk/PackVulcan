@@ -35,6 +35,7 @@ dependencies {
     val coroutinesVersion: String by project
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
 
     // Serialization
     val serializationVersion: String by project
@@ -43,8 +44,9 @@ dependencies {
     // Ktor Client
     val ktorVersion: String by project
     implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     val okioVersion: String by project
     implementation("com.squareup.okio:okio:$okioVersion")

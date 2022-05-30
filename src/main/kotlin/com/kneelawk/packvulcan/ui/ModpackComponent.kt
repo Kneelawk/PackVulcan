@@ -112,6 +112,12 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     val selectedMinecraftVersions = mutableStateMapOf<String, Unit>()
     val selectedModLoaders = mutableStateMapOf<LoaderVersion.Type, Unit>()
 
+    /*
+     * Attribution Stuff.
+     */
+
+    var attributorDialogOpen by mutableStateOf(false)
+
     init {
         scope.launch {
             val project = when (args) {

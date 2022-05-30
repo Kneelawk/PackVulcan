@@ -85,10 +85,11 @@ object ModFileInfo {
         return when (val meta = info.metadata) {
             is Metadata.Fabric -> {
                 val authors = ModInfo.authorString(meta.data.authors?.map { it.name })
+                val contact = meta.data.contact
 
                 SimpleModInfo.File(
                     meta.data.name ?: name, authors, filename, meta.data.version, meta.data.description, icon,
-                    meta.data.contact?.get("homepage"), meta.data.id
+                    contact?.get("homepage") ?: contact?.get("sources"), meta.data.id
                 )
             }
             is Metadata.Forge -> {
@@ -105,10 +106,11 @@ object ModFileInfo {
                 val metadata = quiltLoader.metadata
 
                 val authors = ModInfo.authorString(metadata?.contributors?.keys?.toList())
+                val contact = metadata?.contact
 
                 SimpleModInfo.File(
                     metadata?.name ?: name, authors, filename, quiltLoader.version, metadata?.description,
-                    icon, quiltLoader.metadata?.contact?.get("homepage"), quiltLoader.id
+                    icon, contact?.get("homepage") ?: contact?.get("sources"), quiltLoader.id
                 )
             }
         }

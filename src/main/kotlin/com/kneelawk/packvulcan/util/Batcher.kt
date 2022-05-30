@@ -56,5 +56,5 @@ class Batcher<T, R>(
         running.set(false)
     }
 
-    class Message<T, R>(val request: T, val responseChannel: Channel<R>)
+    data class Message<T, R>(val request: T, val responseChannel: Channel<R>)
 }

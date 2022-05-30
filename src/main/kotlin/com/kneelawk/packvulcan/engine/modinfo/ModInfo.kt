@@ -24,12 +24,12 @@ object ModInfo {
         } ?: ModFileInfo.getFileInfo(modToml)
     }
 
-    private suspend fun getModrinthInfo(mod: ModToml, modrinth: ModrinthToml): SimpleModInfo {
-        val project = ModrinthApi.project(modrinth.modId)
-        val version = ModrinthApi.version(modrinth.version)
+    private suspend fun getModrinthInfo(mod: ModToml, modrinth: ModrinthToml): SimpleModInfo? {
+        val project = ModrinthApi.project(modrinth.modId).escapeIfRight { return null }
+        val version = ModrinthApi.version(modrinth.version).escapeIfRight { return null }
         val teamMembers = ModrinthApi.teamMembers(project.team)
 
-        val authors = authorString(teamMembers.map { it.user.name ?: it.user.username })
+        val authors = authorString(teamMembers.map { it.user.username })
         val projectUrl = "https://modrinth.com/mod/${project.slug}"
 
         return SimpleModInfo.Modrinth(

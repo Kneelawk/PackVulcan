@@ -137,7 +137,7 @@ object ModFileCache {
 
                     val fileSink = FileSystem.SYSTEM.sink(to.toOkioPath())
                     val hashSink = hashFormat.makeSink(fileSink)
-                    hashSink.buffer().use { response.content.copyTo(it.outputStream()) }
+                    hashSink.buffer().use { response.bodyAsChannel().copyTo(it.outputStream()) }
 
                     calculatedHash = hashSink.hashString()
                 } catch (e: CancellationException) {

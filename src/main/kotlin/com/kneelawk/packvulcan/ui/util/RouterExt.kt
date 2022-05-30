@@ -1,6 +1,7 @@
 package com.kneelawk.packvulcan.ui.util
 
 import com.arkivanov.decompose.router.Router
+import com.arkivanov.decompose.router.navigate
 
 fun <C : Any> Router<C, *>.popSafe() {
     navigate {
