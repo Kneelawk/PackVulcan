@@ -53,7 +53,8 @@ object ModFileInfo {
     }
 
     suspend fun getFileInfo(mod: ModToml): SimpleModInfo? {
-        val modFileInfo = modFileInfoCache.suspendGet(mod.download.url) {
+        val url = mod.download.url ?: return null
+        val modFileInfo = modFileInfoCache.suspendGet(url) {
             loadFileInfo(mod)
         } ?: return null
 
@@ -117,7 +118,8 @@ object ModFileInfo {
     }
 
     private suspend fun loadFileInfo(mod: ModToml): Info? {
-        val file = ModFileCache.getModFile(mod.download.url, mod.download.hash, mod.download.hashFormat)
+        val url = mod.download.url ?: return null
+        val file = ModFileCache.getModFile(url, mod.download.hash, mod.download.hashFormat)
         return loadFileInfo(file)
     }
 

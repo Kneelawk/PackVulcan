@@ -4,6 +4,7 @@ import com.kneelawk.packvulcan.engine.hash.HashHelper
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.model.HashFormat
 import com.kneelawk.packvulcan.model.NewModpack
+import com.kneelawk.packvulcan.model.packwiz.FormatVersion
 import com.kneelawk.packvulcan.model.packwiz.TomlHelper
 import com.kneelawk.packvulcan.model.packwiz.index.FileToml
 import com.kneelawk.packvulcan.model.packwiz.index.IndexToml
@@ -28,15 +29,14 @@ import kotlin.io.path.*
  * does when running a command. This structure itself should not be a permanent means of data storage.
  */
 class PackwizProject(
-    val projectDir: Path, var pack: PackToml, var index: IndexToml,
-    val files: MutableList<PackwizFile>, val packwizIgnore: IgnoreNode
+    val projectDir: Path, var pack: PackToml, var index: IndexToml, val files: MutableList<PackwizFile>,
+    val packwizIgnore: IgnoreNode
 ) {
     companion object {
         private const val INDEX_FILENAME = "index.toml"
         private const val PACK_FILENAME = "pack.toml"
         private const val PACKWIZIGNORE_FILENAME = ".packwizignore"
         private const val MODS_DIRNAME = "mods"
-        private const val METAFILE_EXTENSION = ".toml"
 
         private val log = KotlinLogging.logger { }
 
@@ -76,8 +76,8 @@ class PackwizProject(
             val versions = VersionsToml(newModpack.minecraftVersion.version, loaderVersions)
 
             val pack = PackToml(
-                newModpack.name, newModpack.author, newModpack.version, null, PackToml.DEFAULT_PACK_FORMAT, indexObject,
-                versions, null
+                newModpack.name, newModpack.author, newModpack.version, null, FormatVersion.NEW_PACK_FORMAT,
+                indexObject, versions, null
             )
 
             return PackwizProject(
@@ -180,6 +180,7 @@ class PackwizProject(
     }
 
     private val modsDirname = pack.options?.modsFolder ?: MODS_DIRNAME
+    private val packFormat = pack.packFormat
 
     val modsDir: Path
         get() = projectDir.resolve(modsDirname)
@@ -280,8 +281,8 @@ class PackwizProject(
                 null
             } else {
                 async(Dispatchers.IO) {
-                    if ((relative.startsWith(modsDirname) && relative.endsWith(
-                            METAFILE_EXTENSION
+                    if (((relative.startsWith(modsDirname) || packFormat.metafilesOutsideModsDir) && relative.endsWith(
+                            packFormat.metafileExtension
                         )) || currentMetaFiles.contains(relative)
                     ) {
                         try {

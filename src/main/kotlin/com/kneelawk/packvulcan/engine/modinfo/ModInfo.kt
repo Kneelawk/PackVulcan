@@ -12,7 +12,7 @@ object ModInfo {
     fun getModProvider(mod: PackwizMetaFile): ModProvider {
         return when {
             mod.toml.update?.modrinth != null -> ModProvider.MODRINTH
-            // TODO: Add curseforge check when curseforge api is supported
+            mod.toml.download.mode == "metadata:curseforge" -> ModProvider.CURSEFORGE
             else -> ModProvider.URL
         }
     }

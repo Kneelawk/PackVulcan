@@ -5,19 +5,17 @@ import com.moandjiezana.toml.Toml
 import mu.KotlinLogging
 
 data class PackToml(
-    val name: String, val author: String?, val version: String?, val description: String?, val packFormat: String?,
+    val name: String, val author: String?, val version: String?, val description: String?, val packFormat: FormatVersion,
     val index: IndexObjectToml, val versions: VersionsToml, val options: OptionsToml?
 ) : ToToml {
     companion object : FromToml<PackToml> {
-        const val DEFAULT_PACK_FORMAT = "packwiz:1.0.0"
-
         private val log = KotlinLogging.logger { }
 
         @Throws(LoadError::class)
         override fun fromToml(toml: Toml): PackToml {
-            val packFormat: String? = toml.getString("pack-format")
+            val packFormat = FormatVersion.fromString(toml.getString("pack-format"))
 
-            if (packFormat != null && packFormat != DEFAULT_PACK_FORMAT) {
+            if (packFormat.isUnknown) {
                 log.warn("Unknown pack format '$packFormat'")
             }
 
@@ -40,7 +38,7 @@ data class PackToml(
             author?.from("author"),
             version?.from("version"),
             description?.from("description"),
-            packFormat?.from("pack-format"),
+            "pack-format" to packFormat.toString(),
             "index" to index.toToml(),
             "versions" to versions.toToml(),
             options?.toToml()?.from("options")
