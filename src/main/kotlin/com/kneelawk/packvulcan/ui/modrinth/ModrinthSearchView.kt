@@ -253,8 +253,10 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
 
                             Divider()
 
-                            Column {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Text("Licenses", fontWeight = FontWeight.Bold)
+
+                                Text("Todo")
                             }
                         }
 
