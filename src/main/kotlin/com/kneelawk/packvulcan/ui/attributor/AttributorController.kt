@@ -5,7 +5,6 @@ import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -22,9 +21,9 @@ fun rememberAttributorController(modsList: List<PackwizMod>): AttributorInterfac
             override val loading by loadingState
 
             override fun generateAttributions() {
-                scope.launch {
-                    supervisorScope {
-                        loadingState.value = true
+                if (!loading) {
+                    loadingState.value = true
+                    scope.launch {
                         textState.value = ""
 
                         val str = StringWriter()

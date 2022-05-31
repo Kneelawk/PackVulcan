@@ -33,7 +33,11 @@ fun AttributorView(onCloseRequest: () -> Unit, modsList: List<PackwizMod>) {
 @Composable
 fun AttributorView(controller: AttributorInterface) {
     Column(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Button(onClick = controller::generateAttributions, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = controller::generateAttributions,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !controller.loading
+        ) {
             Text("Generate Attributions")
         }
 
