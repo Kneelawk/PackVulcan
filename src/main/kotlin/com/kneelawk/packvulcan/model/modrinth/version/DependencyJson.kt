@@ -8,6 +8,8 @@ data class DependencyJson(
     val versionId: String?,
     @SerialName("project_id")
     val projectId: String?,
+    @SerialName("file_name")
+    val filename: String?,
     @SerialName("dependency_type")
     val dependencyType: DependencyTypeJson
 )
