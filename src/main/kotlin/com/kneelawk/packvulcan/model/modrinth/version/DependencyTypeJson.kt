@@ -11,6 +11,9 @@ enum class DependencyTypeJson {
     @SerialName("optional")
     OPTIONAL,
 
+    @SerialName("embedded")
+    EMBEDDED,
+
     @SerialName("incompatible")
     INCOMPATIBLE;
 }
