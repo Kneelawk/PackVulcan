@@ -2,9 +2,7 @@ package com.kneelawk.packvulcan.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Gold500 = Color(0xFFDBC90F)
-val Gold700 = Color(0xFFB9A304)
-
+val BlueGreen500 = Color(0xFF00BFD3)
 val BlueGreen700 = Color(0xFF009AA6)
 val BlueGreen900 = Color(0xFF026364)
 
