@@ -37,7 +37,7 @@ fun rememberAttributorController(modsList: List<PackwizMod>): AttributorInterfac
 
                         writer.println("${modsList.size} Mods:")
 
-                        val simpleModList = simpleModPromises.awaitAll()
+                        val simpleModList = simpleModPromises.awaitAll().sortedBy { it.first.displayName.lowercase() }
                         for ((mod, simpleMod) in simpleModList) {
                             if (simpleMod == null) {
                                 writer.println("* ${mod.displayName}")
