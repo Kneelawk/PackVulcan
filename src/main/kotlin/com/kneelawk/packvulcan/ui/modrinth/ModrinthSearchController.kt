@@ -61,7 +61,7 @@ fun rememberModrinthSearchController(
 
     LaunchedEffect(Unit) {
         loadersLoading = true
-        loaderList.addAll(LoaderDisplay.loaderList())
+        loaderList.addAll(LoaderDisplay.loaderList().filter { MOD_LOADERS.contains(it.apiName) })
 
         val map = mutableMapOf<LoaderDisplay, Unit>()
         for (type in selectedKnownLoaders.keys) {

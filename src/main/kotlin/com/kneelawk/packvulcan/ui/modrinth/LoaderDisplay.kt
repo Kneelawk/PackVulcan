@@ -20,6 +20,9 @@ import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import java.util.*
 
+// FIXME: Hardcoded list of 'mod' loaders
+val MOD_LOADERS = setOf("fabric", "forge", "quilt", "liteloader", "modloader", "rift")
+
 class LoaderDisplay(
     override val prettyName: String, val apiName: String, val loaderType: LoaderVersion.Type?,
     override val icon: @Composable () -> Unit
