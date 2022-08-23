@@ -57,6 +57,8 @@ object PackVulcanIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val noImage = loader.getResourceAsStream("no_photography_black_24dp.svg").orError("noImage")
         .use { loadSvgPainter(it, Density(1f)) }
+    val public = loader.getResourceAsStream("public_black_24dp.svg").orError("public")
+        .use { loadSvgPainter(it, Density(1f)) }
     val restaurant = loader.getResourceAsStream("restaurant_black_24dp.svg").orError("restaurant")
         .use { loadSvgPainter(it, Density(1f)) }
     val save = loader.getResourceAsStream("save_black_24dp.svg").orError("save")

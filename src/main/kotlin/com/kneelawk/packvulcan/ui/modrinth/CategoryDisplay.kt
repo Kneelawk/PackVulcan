@@ -41,6 +41,7 @@ class CategoryDisplay(
                 "storage" -> PackVulcanIcons.inventory
                 "technology" -> PackVulcanIcons.microscope
                 "utility" -> PackVulcanIcons.fancySuitcase
+                "worldgen" -> PackVulcanIcons.public
                 else -> if (json.icon.isNotBlank()) {
                     try {
                         loadSvgPainter(json.icon, Density(1f))
