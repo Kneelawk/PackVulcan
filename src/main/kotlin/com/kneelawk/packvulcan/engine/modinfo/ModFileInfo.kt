@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.mod.ModFileCache
-import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.modfile.IconJson
 import com.kneelawk.packvulcan.model.modfile.fabric.FabricModJson
@@ -80,7 +80,7 @@ object ModFileInfo {
                 original
             }
 
-            ModIcon.Buffered(bi)
+            ModIconSource.Buffered(bi)
         }
 
         return when (val meta = info.metadata) {
@@ -93,6 +93,7 @@ object ModFileInfo {
                     contact?.get("homepage") ?: contact?.get("sources"), meta.data.id
                 )
             }
+
             is Metadata.Forge -> {
                 val modToml = meta.data.mods.firstOrNull()
 
@@ -102,6 +103,7 @@ object ModFileInfo {
                     modToml?.modId ?: "unknown"
                 )
             }
+
             is Metadata.Quilt -> {
                 val quiltLoader = meta.data.quiltLoader
                 val metadata = quiltLoader.metadata
@@ -144,6 +146,7 @@ object ModFileInfo {
 
                 Info(Metadata.Fabric(data), icon)
             }
+
             modFileSystem.exists(QUILT_METADATA_PATH) -> {
                 val data = withContext(Dispatchers.IO) {
                     modFileSystem.read(QUILT_METADATA_PATH) {
@@ -155,6 +158,7 @@ object ModFileInfo {
 
                 Info(Metadata.Quilt(data), icon)
             }
+
             modFileSystem.exists(FORGE_METADATA_PATH) -> {
                 val data = withContext(Dispatchers.IO) {
                     modFileSystem.source(FORGE_METADATA_PATH).use {
@@ -172,6 +176,7 @@ object ModFileInfo {
 
                 Info(Metadata.Forge(data), icon)
             }
+
             else -> null
         }
     }
@@ -184,6 +189,7 @@ object ModFileInfo {
                     key.toIntOrNull()?.let { abs(it - ImageUtils.MOD_ICON_SIZE) } ?: 4096
                 }?.let { iconJson.paths[it] }
             }
+
             is IconJson.Single -> iconJson.path
             null -> null
         }

@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.engine.image.ImageUtils
-import com.kneelawk.packvulcan.ui.util.ImageWrapper
+import com.kneelawk.packvulcan.ui.util.ModIconWrapper
 import com.kneelawk.packvulcan.util.LoadingState
 
 @Composable
-fun ModIcon(modImage: LoadingState<ImageWrapper>, reload: () -> Unit) {
+fun ModIcon(modImage: LoadingState<ModIconWrapper>, reload: () -> Unit) {
     Box(modifier = Modifier.size(ImageUtils.MOD_ICON_SIZE.dp)) {
         when (val modImage = modImage) {
             LoadingState.Loading -> {
@@ -32,7 +32,7 @@ fun ModIcon(modImage: LoadingState<ImageWrapper>, reload: () -> Unit) {
             }
 
             is LoadingState.Loaded -> {
-                modImage.data.iconOrBitmap(
+                modImage.data.draw(
                     "mod icon",
                     modifier = Modifier.align(Alignment.Center)
                         .size(ImageUtils.MOD_ICON_SIZE.dp)

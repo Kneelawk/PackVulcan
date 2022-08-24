@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
-import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
@@ -29,6 +29,7 @@ import com.kneelawk.packvulcan.ui.modrinth.ModrinthSearchWindow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
+import com.kneelawk.packvulcan.ui.util.ModIconWrapper
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
@@ -157,21 +158,21 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
         loadModInfo()
     }
 
-    var modImage by remember { mutableStateOf<LoadingState<ImageWrapper>>(LoadingState.Loading) }
+    var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
 
     suspend fun loadModIcon(modInfo: LoadingState<SimpleModInfo>) {
         modImage = when (modInfo) {
             is LoadingState.Loaded -> LoadingState.Loaded(
                 when (val icon = modInfo.data.icon) {
-                    is ModIcon.Buffered -> ImageWrapper.ImageBitmap(icon.image.toComposeImageBitmap())
-                    is ModIcon.Url -> ImageResource.getModIcon(icon.url)?.let { ImageWrapper.ImageBitmap(it) }
-                        ?: ImageWrapper.Painter(PackVulcanIcons.noImage)
+                    is ModIconSource.Buffered -> ModIconWrapper.image(icon.image.toComposeImageBitmap())
+                    is ModIconSource.Url -> ImageResource.getModIcon(icon.url)?.let { ModIconWrapper.image(it) }
+                        ?: ModIconWrapper.icon(ImageWrapper.Painter(PackVulcanIcons.noImage))
 
-                    null -> ImageWrapper.Painter(PackVulcanIcons.noImage)
+                    null -> ModIconWrapper.icon(ImageWrapper.Painter(PackVulcanIcons.noImage))
                 }
             )
 
-            LoadingState.Error -> LoadingState.Loaded(ImageWrapper.Painter(PackVulcanIcons.error))
+            LoadingState.Error -> LoadingState.Loaded(ModIconWrapper.icon(PackVulcanIcons.error))
             LoadingState.Loading -> LoadingState.Loading
         }
     }

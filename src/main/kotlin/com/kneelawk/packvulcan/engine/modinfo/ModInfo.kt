@@ -1,7 +1,7 @@
 package com.kneelawk.packvulcan.engine.modinfo
 
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
-import com.kneelawk.packvulcan.model.ModIcon
+import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.packwiz.mod.ModToml
@@ -34,7 +34,7 @@ object ModInfo {
 
         return SimpleModInfo.Modrinth(
             mod.name, authors, mod.filename, version.versionNumber, project.description,
-            project.iconUrl?.let { ModIcon.Url(it) }, projectUrl, modrinth.modId, modrinth.version
+            project.iconUrl?.let { ModIconSource.Url(it) }, projectUrl, modrinth.modId, modrinth.version
         )
     }
 

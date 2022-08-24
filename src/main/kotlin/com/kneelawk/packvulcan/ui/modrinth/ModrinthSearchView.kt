@@ -28,7 +28,7 @@ import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
-import com.kneelawk.packvulcan.ui.util.ImageWrapper
+import com.kneelawk.packvulcan.ui.util.ModIconWrapper
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.widgets.*
@@ -490,13 +490,13 @@ private fun <T : DisplayElement> StaticLoadableList(
 private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitJson) {
     val scope = rememberCoroutineScope()
 
-    var modImage by remember { mutableStateOf<LoadingState<ImageWrapper>>(LoadingState.Loading) }
+    var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
 
     suspend fun loadModImage() {
         modImage = if (searchHit.iconUrl.isNullOrBlank()) {
-            LoadingState.Loaded(ImageWrapper.Painter(PackVulcanIcons.noImage))
+            LoadingState.Loaded(ModIconWrapper.icon(PackVulcanIcons.noImage))
         } else {
-            ImageResource.getModIcon(searchHit.iconUrl)?.let { LoadingState.Loaded(ImageWrapper.ImageBitmap(it)) }
+            ImageResource.getModIcon(searchHit.iconUrl)?.let { LoadingState.Loaded(ModIconWrapper.image(it)) }
                 ?: LoadingState.Error
         }
     }
