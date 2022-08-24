@@ -1,5 +1,6 @@
 package com.kneelawk.packvulcan.ui.modrinth
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
@@ -9,7 +10,6 @@ import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.add
-import kotlinx.coroutines.CoroutineScope
 import mu.KotlinLogging
 
 @Composable
@@ -19,6 +19,8 @@ fun rememberModrinthSearchController(
     val log = remember { KotlinLogging.logger { } }
     val scope = rememberCoroutineScope()
 
+    val searchResults = remember { mutableStateListOf<SearchHitJson>() }
+
     val loadingState = remember { mutableStateOf(true) }
     var loading by loadingState
     val minecraftLoadingState = remember { mutableStateOf(true) }
@@ -27,6 +29,9 @@ fun rememberModrinthSearchController(
     var loadersLoading by loadersLoadingState
     val categoriesLoadingState = remember { mutableStateOf(true) }
     var categoriesLoading by categoriesLoadingState
+
+    val searchStringState = remember { mutableStateOf("") }
+    var searchStringC by searchStringState
 
     val minecraftVersions = remember { mutableStateListOf<MinecraftVersion>() }
 
@@ -56,10 +61,12 @@ fun rememberModrinthSearchController(
     val showMinecraftAlphasState = remember { mutableStateOf(false) }
     val showMinecraftAlphasC by showMinecraftAlphasState
 
-    val searchStringState = remember { mutableStateOf("") }
-    var searchStringC by searchStringState
+    val currentPageState = remember { mutableStateOf(1) }
+    var currentPageC by currentPageState
+    val finalPageState = remember { mutableStateOf(1) }
+    var finalPageC by finalPageState
 
-    val searchResults = remember { mutableStateListOf<SearchHitJson>() }
+    val searchScrollState = rememberLazyListState()
 
     LaunchedEffect(showMinecraftReleasesC, showMinecraftSnapshotsC, showMinecraftBetasC, showMinecraftAlphasC) {
         minecraftLoading = true
@@ -93,21 +100,24 @@ fun rememberModrinthSearchController(
         categoriesLoading = false
     }
 
-    suspend fun CoroutineScope.doSearch(data: SearchData) {
-        loading = true
-        val res = ModrinthApi.search(data.toQuery())
-        searchResults.clear()
-        searchResults.addAll(res.hits)
-        loading = false
-    }
+    val searchConflator = remember {
+        Conflator(scope) { data: SearchData ->
+            loading = true
+            val res = ModrinthApi.search(data.toQuery())
+            finalPageC = (res.totalHits + SEARCH_RESULT_LIMIT - 1) / SEARCH_RESULT_LIMIT
+            searchResults.clear()
+            searchResults.addAll(res.hits)
+            loading = false
 
-    val searchConflator = remember { Conflator(scope, block = CoroutineScope::doSearch) }
+            searchScrollState.scrollToItem(0)
+        }
+    }
 
     fun startSearch() {
         searchConflator.send(
             SearchData(
                 searchStringC, selectedMinecraftVersions.keys.toSet(), selectedLoaders.keys.toSet(),
-                selectedCategories.keys.toSet(), filterClientC, filterServerC
+                selectedCategories.keys.toSet(), filterClientC, filterServerC, currentPageC
             )
         )
     }
@@ -140,6 +150,9 @@ fun rememberModrinthSearchController(
             override val selectedCategories = selectedCategories
             override val searchString by searchStringState
             override val searchResults = searchResults
+            override val currentPage by currentPageState
+            override val finalPage by finalPageState
+            override val searchScrollState = searchScrollState
 
             override fun clearFilters() {
                 selectedMinecraftVersions.clear()
@@ -149,53 +162,78 @@ fun rememberModrinthSearchController(
                 filterServerC = false
                 selectedCategories.clear()
 
+                currentPageC = 1
                 startSearch()
             }
 
             override fun selectMinecraftVersion(version: String) {
                 selectedMinecraftVersions.add(version)
+                currentPageC = 1
                 startSearch()
             }
 
             override fun unselectMinecraftVersion(version: String) {
                 selectedMinecraftVersions.remove(version)
+                currentPageC = 1
                 startSearch()
             }
 
             override fun selectLoader(loader: LoaderDisplay) {
                 selectedLoaders.add(loader)
                 loader.loaderType?.let { selectedKnownLoaders.add(it) }
+                currentPageC = 1
                 startSearch()
             }
 
             override fun unselectLoader(loader: LoaderDisplay) {
                 selectedLoaders.remove(loader)
                 loader.loaderType?.let { selectedKnownLoaders.remove(it) }
+                currentPageC = 1
                 startSearch()
             }
 
             override fun selectCategory(category: CategoryDisplay) {
                 selectedCategories.add(category)
+                currentPageC = 1
                 startSearch()
             }
 
             override fun unselectCategory(category: CategoryDisplay) {
                 selectedCategories.remove(category)
+                currentPageC = 1
                 startSearch()
             }
 
             override fun setFilterClient(filter: Boolean) {
                 filterClientC = filter
+                currentPageC = 1
                 startSearch()
             }
 
             override fun setFilterServer(filter: Boolean) {
                 filterServerC = filter
+                currentPageC = 1
                 startSearch()
             }
 
             override fun setSearchString(string: String) {
                 searchStringC = string
+                currentPageC = 1
+                startSearch()
+            }
+
+            override fun goToPage(page: Int) {
+                currentPageC = page
+                startSearch()
+            }
+
+            override fun pageForward() {
+                if (currentPageC < finalPageC) currentPageC++
+                startSearch()
+            }
+
+            override fun pageBackward() {
+                if (currentPageC > 1) currentPageC--
                 startSearch()
             }
         }
@@ -206,7 +244,7 @@ val SEARCH_RESULT_LIMIT = 20
 
 data class SearchData(
     val searchString: String, val minecraftVersions: Set<String>, val loaders: Set<LoaderDisplay>,
-    val categories: Set<CategoryDisplay>, val filterClient: Boolean, val filterServer: Boolean
+    val categories: Set<CategoryDisplay>, val filterClient: Boolean, val filterServer: Boolean, val currentPage: Int
 ) {
     fun toQuery(): SearchQuery {
         val query = searchString.ifBlank { null }
@@ -238,6 +276,8 @@ data class SearchData(
             facets.add(listOf("server_side:optional", "server_side:required"))
         }
 
-        return SearchQuery(query, facets, SearchIndex.RELEVANCE, 0, SEARCH_RESULT_LIMIT)
+        val offset = (currentPage - 1) * SEARCH_RESULT_LIMIT
+
+        return SearchQuery(query, facets, SearchIndex.RELEVANCE, offset, SEARCH_RESULT_LIMIT)
     }
 }

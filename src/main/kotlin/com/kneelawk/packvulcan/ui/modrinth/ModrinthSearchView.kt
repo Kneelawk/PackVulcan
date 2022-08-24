@@ -292,14 +292,12 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                     }
                 }
 
-                val searchScrollState = rememberLazyListState()
-
                 Row(modifier = Modifier.weight(1f)) {
                     Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                         Divider()
 
                         LazyColumn(
-                            state = searchScrollState, modifier = Modifier.weight(1f),
+                            state = controller.searchScrollState, modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                             contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
                         ) {
@@ -312,9 +310,138 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                     }
 
                     VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(searchScrollState),
+                        adapter = rememberScrollbarAdapter(controller.searchScrollState),
                         modifier = Modifier.fillMaxHeight()
                     )
+                }
+
+                Row(
+                    Modifier.padding(top = 10.dp, end = 20.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SmallButton(
+                        onClick = { controller.pageBackward() },
+                        minWidth = ButtonDefaults.MinHeight,
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
+                        enabled = controller.currentPage > 1
+                    ) {
+                        Text("<")
+                    }
+
+                    if (controller.finalPage <= 7) {
+                        for (i in 1..controller.finalPage) {
+                            val background =
+                                if (i == controller.currentPage) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
+
+                            SmallButton(
+                                onClick = { controller.goToPage(i) },
+                                minWidth = ButtonDefaults.MinHeight,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = background)
+                            ) {
+                                Text("$i")
+                            }
+                        }
+                    } else if (controller.currentPage < 5) {
+                        for (i in 1..5) {
+                            val background =
+                                if (i == controller.currentPage) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
+
+                            SmallButton(
+                                onClick = { controller.goToPage(i) },
+                                minWidth = ButtonDefaults.MinHeight,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = background)
+                            ) {
+                                Text("$i")
+                            }
+                        }
+
+                        Text("\u2014", modifier = Modifier.padding(horizontal = 10.dp))
+
+                        SmallButton(
+                            onClick = { controller.goToPage(controller.finalPage) },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("${controller.finalPage}")
+                        }
+                    } else if (controller.currentPage > controller.finalPage - 4) {
+                        SmallButton(
+                            onClick = { controller.goToPage(1) },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("1")
+                        }
+
+                        Text("\u2014", modifier = Modifier.padding(horizontal = 10.dp))
+
+                        for (i in 1..5) {
+                            val page = controller.finalPage - 5 + i
+                            val background =
+                                if (page == controller.currentPage) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
+
+                            SmallButton(
+                                onClick = { controller.goToPage(page) },
+                                minWidth = ButtonDefaults.MinHeight,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = background)
+                            ) {
+                                Text("$page")
+                            }
+                        }
+                    } else {
+                        SmallButton(
+                            onClick = { controller.goToPage(1) },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("1")
+                        }
+
+                        Text("\u2014", modifier = Modifier.padding(horizontal = 10.dp))
+
+                        SmallButton(
+                            onClick = { controller.pageBackward() },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("${controller.currentPage - 1}")
+                        }
+
+                        SmallButton(
+                            onClick = { },
+                            minWidth = ButtonDefaults.MinHeight
+                        ) {
+                            Text("${controller.currentPage}")
+                        }
+
+                        SmallButton(
+                            onClick = { controller.pageForward() },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("${controller.currentPage + 1}")
+                        }
+
+                        Text("\u2014", modifier = Modifier.padding(horizontal = 10.dp))
+
+                        SmallButton(
+                            onClick = { controller.goToPage(controller.finalPage) },
+                            minWidth = ButtonDefaults.MinHeight,
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+                        ) {
+                            Text("${controller.finalPage}")
+                        }
+                    }
+
+                    SmallButton(
+                        onClick = { controller.pageForward() },
+                        minWidth = ButtonDefaults.MinHeight,
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
+                        enabled = controller.currentPage < controller.finalPage
+                    ) {
+                        Text(">")
+                    }
                 }
             }
         }

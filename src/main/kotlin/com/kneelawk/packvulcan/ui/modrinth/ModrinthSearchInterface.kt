@@ -1,5 +1,6 @@
 package com.kneelawk.packvulcan.ui.modrinth
 
+import androidx.compose.foundation.lazy.LazyListState
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 
@@ -26,6 +27,9 @@ interface ModrinthSearchInterface {
     val selectedCategories: Map<CategoryDisplay, Unit>
     val searchString: String
     val searchResults: List<SearchHitJson>
+    val currentPage: Int
+    val finalPage: Int
+    val searchScrollState: LazyListState
 
     fun clearFilters()
 
@@ -46,4 +50,10 @@ interface ModrinthSearchInterface {
     fun setFilterServer(filter: Boolean)
 
     fun setSearchString(string: String)
+
+    fun goToPage(page: Int)
+
+    fun pageForward()
+
+    fun pageBackward()
 }
