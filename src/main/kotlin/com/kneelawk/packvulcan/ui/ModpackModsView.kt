@@ -7,14 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -23,7 +19,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.model.ModIcon
@@ -36,6 +31,7 @@ import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
+import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
 import com.kneelawk.packvulcan.util.LoadingState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -170,9 +166,11 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                     is ModIcon.Buffered -> ImageWrapper.ImageBitmap(icon.image.toComposeImageBitmap())
                     is ModIcon.Url -> ImageResource.getModIcon(icon.url)?.let { ImageWrapper.ImageBitmap(it) }
                         ?: ImageWrapper.Painter(PackVulcanIcons.noImage)
+
                     null -> ImageWrapper.Painter(PackVulcanIcons.noImage)
                 }
             )
+
             LoadingState.Error -> LoadingState.Loaded(ImageWrapper.Painter(PackVulcanIcons.error))
             LoadingState.Loading -> LoadingState.Loading
         }
@@ -187,30 +185,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
             modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.Top
         ) {
-            Box(modifier = Modifier.size(ImageUtils.MOD_ICON_SIZE.dp)) {
-                when (val modImage = modImage) {
-                    LoadingState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                    LoadingState.Error -> {
-                        IconButton(onClick = {
-                            scope.launch {
-                                loadModIcon(modInfo)
-                            }
-                        }, modifier = Modifier.align(Alignment.Center)) {
-                            Icon(Icons.Default.Refresh, "reload image")
-                        }
-                    }
-                    is LoadingState.Loaded -> {
-                        modImage.data.iconOrBitmap(
-                            "mod icon",
-                            modifier = Modifier.align(Alignment.Center)
-                                .size(ImageUtils.MOD_ICON_SIZE.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                        )
-                    }
-                }
-            }
+            ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 Row(
@@ -225,9 +200,11 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                         LoadingState.Loading -> {
                             Text("Loading mod author...")
                         }
+
                         LoadingState.Error -> {
                             Text("Error loading mod author.")
                         }
+
                         is LoadingState.Loaded -> {
                             Text("by ${modInfo.data.author}")
                         }
@@ -247,6 +224,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                     LoadingState.Loading -> {
                         Text("Loading mod info...")
                     }
+
                     LoadingState.Error -> {
                         Button(onClick = {
                             scope.launch {
@@ -256,6 +234,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                             Text("Retry")
                         }
                     }
+
                     is LoadingState.Loaded -> {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             val description = when (val modInfo = modInfo) {

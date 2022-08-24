@@ -3,6 +3,8 @@ package com.kneelawk.packvulcan.net.modrinth
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.model.modrinth.project.ProjectJson
+import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
+import com.kneelawk.packvulcan.model.modrinth.search.result.SearchResultJson
 import com.kneelawk.packvulcan.model.modrinth.tag.CategoryJson
 import com.kneelawk.packvulcan.model.modrinth.tag.LoaderJson
 import com.kneelawk.packvulcan.model.modrinth.team.TeamMemberJson
@@ -37,7 +39,9 @@ object ModrinthApi {
      */
 
     private val projectBatcher =
-        Batcher<String, Either<ProjectJson, MissingProject>>(ApplicationScope, Duration.ofMillis(500), Dispatchers.IO) { requests ->
+        Batcher<String, Either<ProjectJson, MissingProject>>(
+            ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
+        ) { requests ->
             val ids = requests.map { it.request }
             log.debug("Project batch request, ids: $ids")
 
@@ -53,7 +57,9 @@ object ModrinthApi {
         }
 
     private val versionBatcher =
-        Batcher<String, Either<VersionJson, MissingVersion>>(ApplicationScope, Duration.ofMillis(500), Dispatchers.IO) { requests ->
+        Batcher<String, Either<VersionJson, MissingVersion>>(
+            ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
+        ) { requests ->
             val ids = requests.map { it.request }
             log.debug("Version batch request, ids: $ids")
 
@@ -84,13 +90,31 @@ object ModrinthApi {
      * Accessor methods.
      */
 
-    suspend fun project(idOrSlug: String): Either<ProjectJson, MissingProject> = projectCache.suspendGet(idOrSlug, projectBatcher::request)
+    suspend fun project(idOrSlug: String): Either<ProjectJson, MissingProject> =
+        projectCache.suspendGet(idOrSlug, projectBatcher::request)
 
-    suspend fun version(id: String): Either<VersionJson, MissingVersion> = versionCache.suspendGet(id, versionBatcher::request)
+    suspend fun version(id: String): Either<VersionJson, MissingVersion> =
+        versionCache.suspendGet(id, versionBatcher::request)
 
     suspend fun teamMembers(id: String): List<TeamMemberJson> = teamMemberCache.suspendGet(id, ::retrieveTeamMembers)
 
     suspend fun categories(): List<CategoryJson> = categoryCache.suspendGet(Unit) { retrieveCategories() }
 
     suspend fun loaders(): List<LoaderJson> = loaderCache.suspendGet(Unit) { retrieveLoaders() }
+
+    suspend fun search(query: SearchQuery): SearchResultJson = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.get("https://api.modrinth.com/v2/search") {
+            with(url.parameters) {
+                query.query?.let { append("query", it) }
+                query.facets?.let { andList ->
+                    append("facets", andList.joinToString(",", "[", "]") { orList ->
+                        orList.joinToString(",", "[", "]") { "\"$it\"" }
+                    })
+                }
+                query.index?.let { append("index", it.apiName) }
+                query.offset?.let { append("offset", it.toString()) }
+                query.limit?.let { append("limit", it.toString()) }
+            }
+        }.body()
+    }
 }

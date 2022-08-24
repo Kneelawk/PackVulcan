@@ -11,9 +11,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -25,14 +24,16 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.model.LoaderVersion
+import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
+import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
+import com.kneelawk.packvulcan.ui.util.ImageWrapper
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
-import com.kneelawk.packvulcan.ui.util.widgets.CheckboxButton
-import com.kneelawk.packvulcan.ui.util.widgets.SmallIconButton
-import com.kneelawk.packvulcan.ui.util.widgets.styledSplitter
-import com.kneelawk.packvulcan.util.add
+import com.kneelawk.packvulcan.ui.util.widgets.*
+import com.kneelawk.packvulcan.util.LoadingState
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -176,9 +177,9 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                                         onClick = {
                                                             val selected = controller.selectedMinecraftVersions
                                                             if (selected.contains(version.version)) {
-                                                                selected.remove(version.version)
+                                                                controller.unselectMinecraftVersion(version.version)
                                                             } else {
-                                                                selected.add(version.version)
+                                                                controller.selectMinecraftVersion(version.version)
                                                             }
                                                         },
                                                         modifier = Modifier.fillMaxWidth(),
@@ -221,14 +222,14 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                 Row {
                                     CheckboxButton(
                                         checked = controller.filterClient,
-                                        onClick = { controller.filterClient = !controller.filterClient },
+                                        onClick = { controller.setFilterClient(!controller.filterClient) },
                                         modifier = Modifier.weight(1f),
                                         icon = { Icon(PackVulcanIcons.laptop, "client") },
                                         text = "Client"
                                     )
                                     CheckboxButton(
                                         checked = controller.filterServer,
-                                        onClick = { controller.filterServer = !controller.filterServer },
+                                        onClick = { controller.setFilterServer(!controller.filterServer) },
                                         modifier = Modifier.weight(1f),
                                         icon = { Icon(PackVulcanIcons.storage, "server") },
                                         text = "Server"
@@ -244,8 +245,8 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                 StaticLoadableList(
                                     controller.categoryList,
                                     controller.selectedCategories,
-                                    controller.selectedCategories::add,
-                                    controller.selectedCategories::remove,
+                                    controller::selectCategory,
+                                    controller::unselectCategory,
                                     controller.categorySelectorEnabled,
                                     controller.categorySelectorLoading
                                 )
@@ -276,8 +277,45 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
         }
 
         second(400.dp) {
-            Column {
+            Column(
+                Modifier.padding(top = 20.dp, start = (5 - 1.5).dp, bottom = 20.dp, end = 0.dp)
+            ) {
+                Column(Modifier.padding(end = 20.dp)) {
+                    SmallTextField(
+                        value = controller.searchString,
+                        onValueChange = { controller.setSearchString(it) },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                    )
 
+                    AnimatedVisibility(controller.searchLoading) {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                    }
+                }
+
+                val searchScrollState = rememberLazyListState()
+
+                Row(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                        Divider()
+
+                        LazyColumn(
+                            state = searchScrollState, modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
+                        ) {
+                            items(controller.searchResults, { it.slug }) {
+                                SearchHitView(controller, it)
+                            }
+                        }
+
+                        Divider()
+                    }
+
+                    VerticalScrollbar(
+                        adapter = rememberScrollbarAdapter(searchScrollState),
+                        modifier = Modifier.fillMaxHeight()
+                    )
+                }
             }
         }
 
@@ -317,6 +355,50 @@ private fun <T : DisplayElement> StaticLoadableList(
 
         if (loading) {
             CircularProgressIndicator()
+        }
+    }
+}
+
+@Composable
+private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitJson) {
+    val scope = rememberCoroutineScope()
+
+    var modImage by remember { mutableStateOf<LoadingState<ImageWrapper>>(LoadingState.Loading) }
+
+    suspend fun loadModImage() {
+        modImage = if (searchHit.iconUrl.isNullOrBlank()) {
+            LoadingState.Loaded(ImageWrapper.Painter(PackVulcanIcons.noImage))
+        } else {
+            ImageResource.getModIcon(searchHit.iconUrl)?.let { LoadingState.Loaded(ImageWrapper.ImageBitmap(it)) }
+                ?: LoadingState.Error
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        loadModImage()
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            ModIcon(modImage) { scope.launch { loadModImage() } }
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        searchHit.title, style = MaterialTheme.typography.h6,
+                        color = PackVulcanTheme.colors.headingColor
+                    )
+
+                    Text("by ${searchHit.author}")
+                }
+
+                Text(searchHit.description)
+            }
         }
     }
 }

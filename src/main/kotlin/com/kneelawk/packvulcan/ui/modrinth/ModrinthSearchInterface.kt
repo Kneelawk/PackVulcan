@@ -1,6 +1,7 @@
 package com.kneelawk.packvulcan.ui.modrinth
 
 import com.kneelawk.packvulcan.model.MinecraftVersion
+import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 
 interface ModrinthSearchInterface {
     val searchLoading: Boolean
@@ -16,17 +17,33 @@ interface ModrinthSearchInterface {
     var showMinecraftBetas: Boolean
     var showMinecraftAlphas: Boolean
     val minecraftVersionList: List<MinecraftVersion>
-    val selectedMinecraftVersions: MutableMap<String, Unit>
+    val selectedMinecraftVersions: Map<String, Unit>
     val loaderList: List<LoaderDisplay>
     val selectedLoaders: Map<LoaderDisplay, Unit>
-    var filterClient: Boolean
-    var filterServer: Boolean
+    val filterClient: Boolean
+    val filterServer: Boolean
     val categoryList: List<CategoryDisplay>
-    val selectedCategories: MutableMap<CategoryDisplay, Unit>
+    val selectedCategories: Map<CategoryDisplay, Unit>
+    val searchString: String
+    val searchResults: List<SearchHitJson>
 
     fun clearFilters()
+
+    fun selectMinecraftVersion(version: String)
+
+    fun unselectMinecraftVersion(version: String)
 
     fun selectLoader(loader: LoaderDisplay)
 
     fun unselectLoader(loader: LoaderDisplay)
+
+    fun selectCategory(category: CategoryDisplay)
+
+    fun unselectCategory(category: CategoryDisplay)
+
+    fun setFilterClient(filter: Boolean)
+
+    fun setFilterServer(filter: Boolean)
+
+    fun setSearchString(string: String)
 }

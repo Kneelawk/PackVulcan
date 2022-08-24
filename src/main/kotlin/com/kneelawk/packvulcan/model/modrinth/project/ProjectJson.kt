@@ -1,5 +1,7 @@
 package com.kneelawk.packvulcan.model.modrinth.project
 
+import com.kneelawk.packvulcan.model.modrinth.ProjectTypeJson
+import com.kneelawk.packvulcan.model.modrinth.SideCompatJson
 import com.kneelawk.packvulcan.util.ZonedDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
