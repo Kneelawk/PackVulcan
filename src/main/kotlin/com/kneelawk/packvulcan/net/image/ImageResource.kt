@@ -33,23 +33,46 @@ object ImageResource {
             val response: HttpResponse = HTTP_CLIENT.get(url)
 
             // looks like an input stream is the only way to do this atm
-            val inputStream = response.bodyAsChannel().toInputStream()
+            response.bodyAsChannel().toInputStream().use { inputStream ->
+                if (response.contentType()?.match(ContentType.Image.SVG) == true) {
+                    try {
+                        ImageWrapper.Painter(loadSvgPainter(inputStream, Density(1f)))
+                    } catch (e: Exception) {
+                        log.warn("Error loading SVG {}", url, e)
+                        null
+                    }
+                } else {
+                    ImageIO.createImageInputStream(inputStream).use { imageStream ->
+                        val readers = ImageIO.getImageReaders(imageStream)
 
-            if (response.contentType()?.match(ContentType.Image.SVG) == true) {
-                try {
-                    ImageWrapper.Painter(loadSvgPainter(inputStream, Density(1f)))
-                } catch (e: Exception) {
-                    log.warn("Error loading SVG", e)
-                    null
+                        if (!readers.hasNext()) {
+                            log.warn("No image readers for {}", url)
+                        }
+
+                        while (readers.hasNext()) {
+                            try {
+                                val reader = readers.next()
+
+                                reader.input = imageStream
+
+                                reader.addIIOReadWarningListener { _, warning ->
+                                    log.warn("Image reader warning {}: {}", url, warning)
+                                }
+
+                                return@withContext ImageWrapper.ImageBitmap(reader.read(0).toComposeImageBitmap())
+                            } catch (e: Exception) {
+                                log.warn("Error reading image {}", url, e)
+                            }
+                        }
+
+                        null
+                    }
                 }
-            } else {
-                ImageIO.read(inputStream)
-                    ?.let { ImageWrapper.ImageBitmap(ImageUtils.scaleImage(it, size).toComposeImageBitmap()) }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            log.warn("Error loading image", e)
+            log.warn("Error loading image {}", url, e)
             null
         }
     }

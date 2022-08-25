@@ -75,6 +75,10 @@ dependencies {
     val javaSemverVersion: String by project
     implementation("com.github.zafarkhaja:java-semver:$javaSemverVersion")
 
+    // load WEBP images in ImageIO
+    val sejdaWebpVersion: String by project
+    implementation("org.sejda.imageio:webp-imageio:$sejdaWebpVersion")
+
     // Use logback logger because nothing seems to have updated their log4j yet
     val logbackVersion: String by project
     runtimeOnly("ch.qos.logback:logback-classic:$logbackVersion")
