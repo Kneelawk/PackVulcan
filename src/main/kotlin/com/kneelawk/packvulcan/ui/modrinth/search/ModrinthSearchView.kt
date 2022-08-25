@@ -2,6 +2,8 @@ package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -286,55 +288,53 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
             Column(
                 Modifier.padding(top = 20.dp, start = (5 - 1.5).dp, bottom = 20.dp, end = 0.dp)
             ) {
-                Column(Modifier.padding(end = 20.dp)) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp, end = 20.dp)
+                ) {
+                    SmallTextField(
+                        value = controller.searchString,
+                        onValueChange = { controller.setSearchString(it) },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text("Sort by", modifier = Modifier.padding(start = 5.dp))
+
+                    OptionsDropDown(
+                        options = SearchIndexDisplay.values(),
+                        buttonText = controller.sortBy.prettyName,
+                        selectOption = controller::setSortBy
                     ) {
-                        SmallTextField(
-                            value = controller.searchString,
-                            onValueChange = { controller.setSearchString(it) },
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Text("Sort by", modifier = Modifier.padding(start = 5.dp))
-
-                        OptionsDropDown(
-                            options = SearchIndexDisplay.values(),
-                            buttonText = controller.sortBy.prettyName,
-                            selectOption = controller::setSortBy
-                        ) {
-                            Text(it.prettyName)
-                        }
-
-                        Text("Show per page", modifier = Modifier.padding(start = 5.dp))
-
-                        OptionsDropDown(
-                            options = PerPageDisplay.values(),
-                            buttonText = controller.perPage.limit.toString(),
-                            selectOption = controller::setPerPage
-                        ) {
-                            Text(it.limit.toString())
-                        }
+                        Text(it.prettyName)
                     }
 
-                    AnimatedVisibility(controller.searchLoading) {
-                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Text("Show per page", modifier = Modifier.padding(start = 5.dp))
+
+                    OptionsDropDown(
+                        options = PerPageDisplay.values(),
+                        buttonText = controller.perPage.limit.toString(),
+                        selectOption = controller::setPerPage
+                    ) {
+                        Text(it.limit.toString())
                     }
                 }
 
-                Row(modifier = Modifier.weight(1f)) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.fillMaxSize().padding(end = 20.dp)) {
                         Divider()
 
-                        LazyColumn(
-                            state = controller.searchScrollState, modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
-                        ) {
-                            items(controller.searchResults, { it.slug }) {
-                                SearchHitView(controller, it)
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                            TopSideLoadingIndicator(controller.searchLoading)
+
+                            LazyColumn(
+                                state = controller.searchScrollState, modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                                contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
+                            ) {
+                                items(controller.searchResults, { it.slug }) {
+                                    SearchHitView(controller, it)
+                                }
                             }
                         }
 
@@ -343,7 +343,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
 
                     VerticalScrollbar(
                         adapter = rememberScrollbarAdapter(controller.searchScrollState),
-                        modifier = Modifier.fillMaxHeight()
+                        modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd)
                     )
                 }
 
@@ -562,6 +562,18 @@ private fun <T> OptionsDropDown(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun BoxScope.TopSideLoadingIndicator(loading: Boolean) {
+    AnimatedVisibility(
+        visible = loading,
+        modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth(),
+        enter = expandVertically(),
+        exit = shrinkVertically()
+    ) {
+        LinearProgressIndicator(Modifier.fillMaxWidth())
     }
 }
 
