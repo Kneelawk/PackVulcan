@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
@@ -69,6 +71,7 @@ fun ModrinthSearchWindow(
 @Composable
 fun ModrinthSearchView(controller: ModrinthSearchInterface) {
     val splitPaneState = rememberSplitPaneState(0.55f)
+    val focusRequester = remember { FocusRequester() }
 
     HorizontalSplitPane(splitPaneState = splitPaneState, modifier = Modifier.fillMaxHeight()) {
         first(200.dp) {
@@ -294,7 +297,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                     SmallTextField(
                         value = controller.searchString,
                         onValueChange = { controller.setSearchString(it) },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).focusRequester(focusRequester),
                         permanentIcon = {
                             Icon(Icons.Default.Search, "search")
                         },
@@ -483,6 +486,10 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
         }
 
         styledSplitter()
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 
