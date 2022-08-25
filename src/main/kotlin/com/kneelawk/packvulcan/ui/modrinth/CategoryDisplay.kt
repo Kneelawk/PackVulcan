@@ -32,9 +32,13 @@ class CategoryDisplay(
                 "food" -> PackVulcanIcons.restaurant
                 "library" -> PackVulcanIcons.codeBox
                 "magic" -> PackVulcanIcons.flame
+                "management" -> PackVulcanIcons.construction
+                "minigame" -> PackVulcanIcons.trophy
                 "optimization" -> PackVulcanIcons.bolt
+                "social" -> PackVulcanIcons.forum
                 "storage" -> PackVulcanIcons.inventory
                 "technology" -> PackVulcanIcons.microscope
+                "transportation" -> PackVulcanIcons.shipping
                 "utility" -> PackVulcanIcons.fancySuitcase
                 "worldgen" -> PackVulcanIcons.public
                 else -> if (json.icon.isNotBlank()) {

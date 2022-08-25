@@ -21,6 +21,8 @@ object PackVulcanIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val codeBox = loader.getResourceAsStream("integration_instructions_black_24dp.svg").orError("codeBox")
         .use { loadSvgPainter(it, Density(1f)) }
+    val construction = loader.getResourceAsStream("construction_black_24dp.svg").orError("construction")
+        .use { loadSvgPainter(it, Density(1f)) }
     val createNewFolder = loader.getResourceAsStream("create_new_folder_black_24dp.svg").orError("createNewFolder")
         .use { loadSvgPainter(it, Density(1f)) }
     val desktop = loader.getResourceAsStream("desktop_mac_black_24dp.svg").orError("desktop")
@@ -38,6 +40,8 @@ object PackVulcanIcons {
     val flame = loader.getResourceAsStream("local_fire_department_black_24dp.svg").orError("flame")
         .use { loadSvgPainter(it, Density(1f)) }
     val folder = loader.getResourceAsStream("folder_black_24dp.svg").orError("folder")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val forum = loader.getResourceAsStream("forum_black_24dp.svg").orError("forum")
         .use { loadSvgPainter(it, Density(1f)) }
     val house = loader.getResourceAsStream("house_black_24dp.svg").orError("house")
         .use { loadSvgPainter(it, Density(1f)) }
@@ -65,7 +69,11 @@ object PackVulcanIcons {
         .use { loadSvgPainter(it, Density(1f)) }
     val shield = loader.getResourceAsStream("shield_black_24dp.svg").orError("shield")
         .use { loadSvgPainter(it, Density(1f)) }
+    val shipping = loader.getResourceAsStream("local_shipping_black_24dp.svg").orError("shipping")
+        .use { loadSvgPainter(it, Density(1f)) }
     val storage = loader.getResourceAsStream("storage_black_24dp.svg").orError("storage")
+        .use { loadSvgPainter(it, Density(1f)) }
+    val trophy = loader.getResourceAsStream("emoji_events_black_24dp.svg").orError("trophy")
         .use { loadSvgPainter(it, Density(1f)) }
     val fabric = loader.getResourceAsStream("fabric_smooth_filled_24dp.svg").orError("fabric")
         .use { loadSvgPainter(it, Density(1f)) }
