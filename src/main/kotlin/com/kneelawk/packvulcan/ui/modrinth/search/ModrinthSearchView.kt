@@ -439,7 +439,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                         }
 
                         SmallButton(
-                            onClick = { },
+                            onClick = { controller.goToPage(controller.currentPage) },
                             minWidth = ButtonDefaults.MinHeight
                         ) {
                             Text("${controller.currentPage}")
