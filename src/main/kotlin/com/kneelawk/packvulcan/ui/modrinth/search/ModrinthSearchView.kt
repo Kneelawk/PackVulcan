@@ -274,7 +274,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                     }
                 }
 
-                Button(onClick = { controller.clearFilters() }, modifier = Modifier.fillMaxWidth()) {
+                SmallButton(onClick = { controller.clearFilters() }, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Default.Clear, "clear")
 
                     Text("Clear Filters", modifier = Modifier.padding(start = 10.dp))
