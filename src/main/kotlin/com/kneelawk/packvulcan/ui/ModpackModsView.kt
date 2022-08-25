@@ -184,7 +184,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.padding(15.dp), horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.Top
         ) {
             ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }

@@ -510,7 +510,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.padding(15.dp), horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.Top
         ) {
             ModIcon(modImage) { scope.launch { loadModImage() } }
