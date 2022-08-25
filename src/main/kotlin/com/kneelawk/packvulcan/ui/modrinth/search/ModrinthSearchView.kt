@@ -294,7 +294,13 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                     SmallTextField(
                         value = controller.searchString,
                         onValueChange = { controller.setSearchString(it) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        permanentIcon = {
+                            Icon(Icons.Default.Search, "search")
+                        },
+                        ghostText = {
+                            Text("Search mods...")
+                        }
                     )
 
                     Text("Sort by", modifier = Modifier.padding(start = 5.dp))

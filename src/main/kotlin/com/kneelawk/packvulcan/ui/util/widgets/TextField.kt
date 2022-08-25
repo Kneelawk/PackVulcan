@@ -6,18 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,7 +29,9 @@ fun SmallTextField(
     shape: Shape = MaterialTheme.shapes.small,
     isError: Boolean = false,
     fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    permanentIcon: @Composable () -> Unit = {},
+    ghostText: @Composable () -> Unit = {}
 ) {
     val isFocused by interactionSource.collectIsFocusedAsState()
 
@@ -72,9 +66,20 @@ fun SmallTextField(
         decorationBox = { innerTextField ->
             Row(
                 Modifier.padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                innerTextField()
+                permanentIcon()
+
+                Box(contentAlignment = Alignment.CenterStart) {
+                    if (value.isEmpty()) {
+                        CompositionLocalProvider(LocalContentAlpha provides 0.5f) {
+                            ghostText()
+                        }
+                    }
+
+                    innerTextField()
+                }
             }
         }
     )
