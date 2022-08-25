@@ -28,6 +28,7 @@ import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.modrinth.DisplayElement
+import com.kneelawk.packvulcan.ui.modrinth.PRIMARY_MOD_LOADERS
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
@@ -213,13 +214,14 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Text("Mod Loaders", fontWeight = FontWeight.Bold)
 
-                                StaticLoadableList(
-                                    controller.loaderList,
-                                    controller.selectedLoaders,
-                                    controller::selectLoader,
-                                    controller::unselectLoader,
-                                    controller.loaderSelectorEnabled,
-                                    controller.loaderSelectorLoading
+                                CollapsableLoadableList(
+                                    list = controller.loaderList,
+                                    selected = controller.selectedLoaders,
+                                    selectItem = controller::selectLoader,
+                                    unselectItem = controller::unselectLoader,
+                                    itemAlwaysVisible = { PRIMARY_MOD_LOADERS.contains(it.apiName) },
+                                    enabled = controller.loaderSelectorEnabled,
+                                    loading = controller.loaderSelectorLoading
                                 )
                             }
 
@@ -252,12 +254,12 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                 Text("Categories", fontWeight = FontWeight.Bold)
 
                                 StaticLoadableList(
-                                    controller.categoryList,
-                                    controller.selectedCategories,
-                                    controller::selectCategory,
-                                    controller::unselectCategory,
-                                    controller.categorySelectorEnabled,
-                                    controller.categorySelectorLoading
+                                    list = controller.categoryList,
+                                    selected = controller.selectedCategories,
+                                    selectItem = controller::selectCategory,
+                                    unselectItem = controller::unselectCategory,
+                                    enabled = controller.categorySelectorEnabled,
+                                    loading = controller.categorySelectorLoading
                                 )
                             }
 
@@ -521,6 +523,66 @@ private fun <T : DisplayElement> StaticLoadableList(
                         },
                         text = item.prettyName
                     )
+                }
+            }
+        }
+
+        if (loading) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+@Composable
+private fun <T : DisplayElement> CollapsableLoadableList(
+    list: List<T>,
+    selected: Map<T, Unit>,
+    selectItem: (T) -> Unit,
+    unselectItem: (T) -> Unit,
+    itemAlwaysVisible: (T) -> Boolean,
+    enabled: Boolean,
+    loading: Boolean
+) {
+    var collapsed by remember { mutableStateOf(true) }
+
+    Box(contentAlignment = Alignment.Center) {
+        Row(verticalAlignment = Alignment.Top) {
+            Column(Modifier.weight(1f)) {
+                for (item in list) {
+                    key(item) {
+                        AnimatedVisibility(visible = !collapsed || itemAlwaysVisible(item)) {
+                            CheckboxButton(
+                                checked = selected.contains(item),
+                                onClick = {
+                                    if (selected.contains(item)) {
+                                        unselectItem(item)
+                                    } else {
+                                        selectItem(item)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = enabled,
+                                icon = {
+                                    item.icon?.icon(item.prettyName, Modifier.size(24.dp)) ?: Box(Modifier.size(24.dp))
+                                },
+                                text = item.prettyName
+                            )
+                        }
+                    }
+                }
+
+                SmallTextButton(
+                    onClick = {
+                        collapsed = !collapsed
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val iconRotation by animateFloatAsState(if (collapsed) 0f else -180f)
+                    Icon(
+                        Icons.Default.ArrowDropDown, "drop-down",
+                        modifier = Modifier.rotate(iconRotation)
+                    )
+                    Text("More", Modifier.padding(start = 5.dp))
                 }
             }
         }

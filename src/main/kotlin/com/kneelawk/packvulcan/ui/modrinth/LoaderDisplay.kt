@@ -18,6 +18,7 @@ import java.util.*
 
 // FIXME: Hardcoded list of 'mod' loaders
 val MOD_LOADERS = setOf("fabric", "forge", "quilt", "liteloader", "modloader", "rift")
+val PRIMARY_MOD_LOADERS = setOf("fabric", "forge", "quilt")
 
 class LoaderDisplay(
     override val prettyName: String, val apiName: String, val loaderType: LoaderVersion.Type?,
