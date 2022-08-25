@@ -7,6 +7,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -19,9 +20,15 @@ import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.AppContainerBox
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
 
+const val CREATE_NEW_WINDOW_TITLE = "Create New Modpack"
+
 @Composable
-fun CreateNewView(component: CreateNewComponent) {
+fun CreateNewView(component: CreateNewComponent, controls: WindowControls) {
     val uriHandler = LocalUriHandler.current
+
+    LaunchedEffect(Unit) {
+        controls.title = CREATE_NEW_WINDOW_TITLE
+    }
 
     AppContainerBox("Create New Modpack") {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

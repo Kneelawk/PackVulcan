@@ -16,13 +16,15 @@ import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.ui.keyboard.rememberKeyboardTracker
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 
+const val DEFAULT_WINDOW_TITLE = "PackVulcan"
+
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun RootView(windowState: WindowState, component: RootComponent, onCloseRequest: () -> Unit) {
     val tracker = rememberKeyboardTracker()
 
     Window(
-        onCloseRequest = onCloseRequest, title = "PackVulcan",
+        onCloseRequest = onCloseRequest, title = component.windowControls.title,
         state = windowState, onKeyEvent = tracker::keyPressed
     ) {
         PackVulcanTheme(GlobalSettings.darkMode) {
@@ -32,10 +34,11 @@ fun RootView(windowState: WindowState, component: RootComponent, onCloseRequest:
                 modifier = Modifier.background(backgroundColor)
             ) { child ->
                 when (val instance = child.instance) {
-                    CurrentScreen.Start -> StartView(
-                        createNew = { component.openCreateNew() }, openExisting = { component.openModpack(it) })
-                    is CurrentScreen.CreateNew -> CreateNewView(instance.component)
-                    is CurrentScreen.Modpack -> ModpackView(instance.component, tracker)
+                    CurrentScreen.Start -> StartView(component.windowControls,
+                        createNew = { component.openCreateNew() }) { component.openModpack(it) }
+
+                    is CurrentScreen.CreateNew -> CreateNewView(instance.component, component.windowControls)
+                    is CurrentScreen.Modpack -> ModpackView(instance.component, component.windowControls, tracker)
                 }
             }
         }

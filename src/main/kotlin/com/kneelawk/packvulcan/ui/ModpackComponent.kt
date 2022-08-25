@@ -10,6 +10,7 @@ import com.kneelawk.packvulcan.engine.packwiz.PackwizProject
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.NewModpack
+import com.kneelawk.packvulcan.ui.instance.InstanceManager
 import com.kneelawk.packvulcan.util.ComponentScope
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.VersionUtils
@@ -40,6 +41,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
      */
 
     var loading by mutableStateOf(true)
+    var openDialogOpen by mutableStateOf(false)
 
     /*
      * Details Stuff.
@@ -125,6 +127,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                     log.info("Creating new packwiz project at '${args.newModpack.location}'...")
                     PackwizProject.createNew(args.newModpack)
                 }
+
                 is ModpackComponentArgs.OpenExisting -> {
                     val projectDir = args.packFile.parent
                     log.info("Loading existing packwiz project at '${projectDir}'...")
@@ -298,6 +301,18 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     fun updateLoaderVersion(version: String) {
         editLoaderVersion = version
         loaderVersionConflator.send(LoaderVersionInput(version, editMinecraftVersion))
+    }
+
+    fun new() {
+        InstanceManager.newRoot(RootInitialState.CreateNew)
+    }
+
+    fun open() {
+        openDialogOpen = true
+    }
+
+    fun open(path: Path) {
+        InstanceManager.newRoot(RootInitialState.Open(path))
     }
 
     private data class LoaderVersionInput(val loaderVersion: String, val minecraftVersion: String)

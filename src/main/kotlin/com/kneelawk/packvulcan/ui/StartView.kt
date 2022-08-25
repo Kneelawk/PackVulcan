@@ -18,7 +18,11 @@ import kotlin.io.path.isDirectory
 const val WELCOME_TEXT = "Modpack Builder"
 
 @Composable
-fun StartView(createNew: () -> Unit, openExisting: (Path) -> Unit) {
+fun StartView(controls: WindowControls, createNew: () -> Unit, openExisting: (Path) -> Unit) {
+    LaunchedEffect(Unit) {
+        controls.title = DEFAULT_WINDOW_TITLE
+    }
+
     var openProjectDialog by remember { mutableStateOf(false) }
 
     if (openProjectDialog) {

@@ -6,10 +6,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import com.arkivanov.decompose.DefaultComponentContext
 import com.kneelawk.packvulcan.ui.RootComponent
+import com.kneelawk.packvulcan.ui.RootInitialState
 import com.kneelawk.packvulcan.ui.RootView
 
-class RootInstance : AbstractInstance(DpSize(1280.dp, 800.dp)) {
-    private val root = RootComponent(DefaultComponentContext(lifecycle))
+class RootInstance(initialState: RootInitialState) : AbstractInstance(DpSize(1280.dp, 800.dp)) {
+    private val root = RootComponent(DefaultComponentContext(lifecycle), initialState)
 
     @Composable
     override fun compose(windowState: WindowState, onCloseRequest: () -> Unit) {

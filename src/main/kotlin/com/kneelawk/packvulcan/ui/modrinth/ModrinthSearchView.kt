@@ -41,11 +41,11 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 @Composable
 fun ModrinthSearchWindow(
     onCloseRequest: () -> Unit, selectedMinecraftVersions: MutableMap<String, Unit>,
-    selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>
+    selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>, modpackName: String
 ) {
     val state = rememberWindowState(size = DpSize(1280.dp, 800.dp))
 
-    Window(state = state, title = "Add from Modrinth", onCloseRequest = onCloseRequest) {
+    Window(state = state, title = "Add from Modrinth to $modpackName", onCloseRequest = onCloseRequest) {
         PackVulcanTheme(GlobalSettings.darkMode) {
             DialogContainerBox {
                 ModrinthSearchView(

@@ -1,13 +1,14 @@
 package com.kneelawk.packvulcan.ui.instance
 
 import androidx.compose.runtime.*
+import com.kneelawk.packvulcan.ui.RootInitialState
 
 object InstanceManager {
     private val instances = mutableStateListOf<Instance>()
     private var settings by mutableStateOf<SettingsInstance?>(null)
 
-    fun newRoot() {
-        instances.add(RootInstance())
+    fun newRoot(initialState: RootInitialState = RootInitialState.None) {
+        instances.add(RootInstance(initialState))
     }
 
     fun openSettings() {
