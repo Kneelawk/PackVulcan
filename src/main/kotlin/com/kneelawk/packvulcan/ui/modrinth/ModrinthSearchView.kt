@@ -10,8 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +32,8 @@ import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.widgets.*
 import com.kneelawk.packvulcan.util.LoadingState
+import com.kneelawk.packvulcan.util.formatHumanReadable
+import com.kneelawk.packvulcan.util.formatRelative
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -516,11 +517,13 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.width(IntrinsicSize.Max)
                 ) {
                     Text(
                         searchHit.title, style = MaterialTheme.typography.h6,
-                        color = PackVulcanTheme.colors.headingColor
+                        color = PackVulcanTheme.colors.headingColor,
+                        modifier = Modifier.weight(1f)
                     )
 
                     Text("by ${searchHit.author}")
@@ -528,10 +531,10 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
 
                 Text(searchHit.description)
 
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(searchHit.categories, { it.apiName }) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             it.icon?.icon(it.prettyName, Modifier.size(24.dp))
@@ -540,16 +543,46 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                     }
                 }
 
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(searchHit.loaders, { it.apiName }) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             it.icon?.icon(it.prettyName, Modifier.size(24.dp))
                             Text(it.prettyName)
                         }
                     }
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Create, "created")
+                        Text("Created ${searchHit.dateCreated.formatRelative()}")
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Refresh, "updated")
+                        Text("Updated ${searchHit.dateModified.formatRelative()}")
+                    }
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.End) {
+                Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Icon(PackVulcanIcons.download, "downloads")
+                    Text(searchHit.downloads.formatHumanReadable(), fontWeight = FontWeight.Bold)
+                    Text("downloads")
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Icon(Icons.Default.Favorite, "follows")
+                    Text(searchHit.follows.formatHumanReadable(), fontWeight = FontWeight.Bold)
+                    Text("followers")
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.kneelawk.packvulcan.ui.modrinth
 import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 import com.kneelawk.packvulcan.util.ifNullOrEmpty
 import mu.KotlinLogging
+import java.time.ZonedDateTime
 
 data class SearchHitDisplay(
     val slug: String,
@@ -11,7 +12,11 @@ data class SearchHitDisplay(
     val description: String,
     val iconUrl: String?,
     val categories: List<CategoryDisplay>,
-    val loaders: List<LoaderDisplay>
+    val loaders: List<LoaderDisplay>,
+    val downloads: Int,
+    val follows: Int,
+    val dateCreated: ZonedDateTime,
+    val dateModified: ZonedDateTime
 ) {
     companion object {
         private val log = KotlinLogging.logger { }
@@ -40,7 +45,8 @@ data class SearchHitDisplay(
             }
 
             return SearchHitDisplay(
-                json.slug, json.title, json.author, json.description, json.iconUrl, categories, loaders
+                json.slug, json.title, json.author, json.description, json.iconUrl, categories, loaders, json.downloads,
+                json.follows, json.dateCreated, json.dateModified
             )
         }
     }
