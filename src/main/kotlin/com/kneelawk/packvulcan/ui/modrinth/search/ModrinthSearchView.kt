@@ -612,7 +612,8 @@ private fun <T> OptionsDropDown(
             colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
         ) {
             Text(buttonText, modifier = Modifier.padding(end = 5.dp))
-            Icon(Icons.Default.ArrowDropDown, "drop-down")
+            val iconRotation by animateFloatAsState(if (expanded) 180f else 0f)
+            Icon(Icons.Default.ArrowDropDown, "drop-down", modifier = Modifier.rotate(iconRotation))
         }
 
         DropdownMenu(
