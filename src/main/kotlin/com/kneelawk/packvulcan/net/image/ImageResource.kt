@@ -13,6 +13,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
@@ -45,6 +46,8 @@ object ImageResource {
                 ImageIO.read(inputStream)
                     ?.let { ImageWrapper.ImageBitmap(ImageUtils.scaleImage(it, size).toComposeImageBitmap()) }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             log.warn("Error loading image", e)
             null
