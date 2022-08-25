@@ -6,7 +6,6 @@ import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchIndex
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
-import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.add
@@ -19,7 +18,7 @@ fun rememberModrinthSearchController(
     val log = remember { KotlinLogging.logger { } }
     val scope = rememberCoroutineScope()
 
-    val searchResults = remember { mutableStateListOf<SearchHitJson>() }
+    val searchResults = remember { mutableStateListOf<SearchHitDisplay>() }
 
     val loadingState = remember { mutableStateOf(true) }
     var loading by loadingState
@@ -106,7 +105,7 @@ fun rememberModrinthSearchController(
             val res = ModrinthApi.search(data.toQuery())
             finalPageC = (res.totalHits + SEARCH_RESULT_LIMIT - 1) / SEARCH_RESULT_LIMIT
             searchResults.clear()
-            searchResults.addAll(res.hits)
+            searchResults.addAll(res.hits.map { SearchHitDisplay.fromJson(it) })
             loading = false
 
             searchScrollState.scrollToItem(0)

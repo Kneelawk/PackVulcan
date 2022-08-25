@@ -2,7 +2,6 @@ package com.kneelawk.packvulcan.ui.modrinth
 
 import androidx.compose.foundation.lazy.LazyListState
 import com.kneelawk.packvulcan.model.MinecraftVersion
-import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 
 interface ModrinthSearchInterface {
     val searchLoading: Boolean
@@ -26,7 +25,7 @@ interface ModrinthSearchInterface {
     val categoryList: List<CategoryDisplay>
     val selectedCategories: Map<CategoryDisplay, Unit>
     val searchString: String
-    val searchResults: List<SearchHitJson>
+    val searchResults: List<SearchHitDisplay>
     val currentPage: Int
     val finalPage: Int
     val searchScrollState: LazyListState

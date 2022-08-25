@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
@@ -24,7 +25,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.model.LoaderVersion
-import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
@@ -473,7 +473,9 @@ private fun <T : DisplayElement> StaticLoadableList(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = enabled,
-                        icon = item.icon,
+                        icon = {
+                            item.icon?.icon(item.prettyName, Modifier.size(24.dp)) ?: Box(Modifier.size(24.dp))
+                        },
                         text = item.prettyName
                     )
                 }
@@ -487,7 +489,7 @@ private fun <T : DisplayElement> StaticLoadableList(
 }
 
 @Composable
-private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitJson) {
+private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDisplay) {
     val scope = rememberCoroutineScope()
 
     var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
@@ -525,6 +527,30 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                 }
 
                 Text(searchHit.description)
+
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(searchHit.categories, { it.apiName }) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            it.icon?.icon(it.prettyName, Modifier.size(24.dp))
+                            Text(it.prettyName)
+                        }
+                    }
+                }
+
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(searchHit.loaders, { it.apiName }) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            it.icon?.icon(it.prettyName, Modifier.size(24.dp))
+                            Text(it.prettyName)
+                        }
+                    }
+                }
             }
         }
     }

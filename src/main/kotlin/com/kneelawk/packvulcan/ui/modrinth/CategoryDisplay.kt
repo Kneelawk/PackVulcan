@@ -1,18 +1,13 @@
 package com.kneelawk.packvulcan.ui.modrinth
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.model.modrinth.tag.CategoryJson
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
+import com.kneelawk.packvulcan.ui.util.ImageWrapper
 import com.kneelawk.packvulcan.ui.util.loadSvgPainter
 import com.kneelawk.packvulcan.util.suspendGet
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +17,7 @@ import java.util.*
 
 class CategoryDisplay(
     override val prettyName: String, val apiName: String, val projectType: String,
-    override val icon: @Composable () -> Unit
+    override val icon: ImageWrapper?
 ) :
     DisplayElement {
     companion object {
@@ -57,21 +52,21 @@ class CategoryDisplay(
             val prettyName = json.name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString()
             }
-            val icon = getPainterFor(json)
-            CategoryDisplay(prettyName, json.name, json.projectType) {
-                if (icon != null) {
-                    Icon(icon, json.name, modifier = Modifier.size(24.dp))
-                } else {
-                    Box(modifier = Modifier.size(24.dp))
-                }
-            }
+            val icon = getPainterFor(json)?.let { ImageWrapper.Painter(it) }
+            CategoryDisplay(prettyName, json.name, json.projectType, icon)
         }
 
         private val categoryCache: AsyncCache<Unit, List<CategoryDisplay>> =
             Caffeine.newBuilder().buildAsync()
+        private val categoryNameCache: AsyncCache<Unit, Map<String, CategoryDisplay>> =
+            Caffeine.newBuilder().buildAsync()
 
         suspend fun categoryList(): List<CategoryDisplay> = categoryCache.suspendGet(Unit) {
             ModrinthApi.categories().map { fromApi(it) }
+        }
+
+        suspend fun categoryNameMap(): Map<String, CategoryDisplay> = categoryNameCache.suspendGet(Unit) {
+            categoryList().associateBy { it.apiName }
         }
     }
 

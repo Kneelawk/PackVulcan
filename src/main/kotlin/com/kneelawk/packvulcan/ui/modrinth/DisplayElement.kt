@@ -1,8 +1,8 @@
 package com.kneelawk.packvulcan.ui.modrinth
 
-import androidx.compose.runtime.Composable
+import com.kneelawk.packvulcan.ui.util.ImageWrapper
 
 interface DisplayElement {
     val prettyName: String
-    val icon: @Composable () -> Unit
+    val icon: ImageWrapper?
 }
