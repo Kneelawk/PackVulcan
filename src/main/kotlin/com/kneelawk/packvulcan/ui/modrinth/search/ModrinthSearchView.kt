@@ -1,9 +1,7 @@
 package com.kneelawk.packvulcan.ui.modrinth.search
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -325,8 +323,6 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                         Divider()
 
                         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                            TopSideLoadingIndicator(controller.searchLoading)
-
                             LazyColumn(
                                 state = controller.searchScrollState, modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -336,6 +332,8 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                     SearchHitView(controller, it)
                                 }
                             }
+
+                            TopSideLoadingIndicator(controller.searchLoading)
                         }
 
                         Divider()
@@ -570,8 +568,8 @@ private fun BoxScope.TopSideLoadingIndicator(loading: Boolean) {
     AnimatedVisibility(
         visible = loading,
         modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth(),
-        enter = expandVertically(),
-        exit = shrinkVertically()
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
         LinearProgressIndicator(Modifier.fillMaxWidth())
     }
