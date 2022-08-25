@@ -1,8 +1,12 @@
 package com.kneelawk.packvulcan.ui.util.widgets
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -15,7 +19,7 @@ import java.awt.Cursor
 fun SplitPaneScope.styledSplitter() {
     splitter {
         visiblePart {
-            Column(verticalArrangement = Arrangement.Center) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
                 Box(
                     Modifier
                         .width(3.dp)
