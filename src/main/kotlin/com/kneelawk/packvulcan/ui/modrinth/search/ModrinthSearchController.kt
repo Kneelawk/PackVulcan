@@ -1,4 +1,4 @@
-package com.kneelawk.packvulcan.ui.modrinth
+package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
@@ -7,6 +7,9 @@ import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchIndex
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
+import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
+import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
+import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.add
 import mu.KotlinLogging

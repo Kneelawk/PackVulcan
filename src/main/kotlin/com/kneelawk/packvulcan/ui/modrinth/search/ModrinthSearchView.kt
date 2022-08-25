@@ -1,4 +1,4 @@
-package com.kneelawk.packvulcan.ui.modrinth
+package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,6 +25,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.net.image.ImageResource
+import com.kneelawk.packvulcan.ui.modrinth.DisplayElement
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper

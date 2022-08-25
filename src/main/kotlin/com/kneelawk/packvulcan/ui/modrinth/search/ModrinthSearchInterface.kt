@@ -1,7 +1,9 @@
-package com.kneelawk.packvulcan.ui.modrinth
+package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.foundation.lazy.LazyListState
 import com.kneelawk.packvulcan.model.MinecraftVersion
+import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
+import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 
 interface ModrinthSearchInterface {
     val searchLoading: Boolean

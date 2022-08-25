@@ -1,6 +1,8 @@
-package com.kneelawk.packvulcan.ui.modrinth
+package com.kneelawk.packvulcan.ui.modrinth.search
 
 import com.kneelawk.packvulcan.model.modrinth.search.result.SearchHitJson
+import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
+import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 import com.kneelawk.packvulcan.util.ifNullOrEmpty
 import mu.KotlinLogging
 import java.time.ZonedDateTime

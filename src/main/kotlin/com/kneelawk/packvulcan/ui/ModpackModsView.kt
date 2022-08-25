@@ -25,7 +25,7 @@ import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.ModProvider
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
-import com.kneelawk.packvulcan.ui.modrinth.ModrinthSearchWindow
+import com.kneelawk.packvulcan.ui.modrinth.search.ModrinthSearchWindow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
