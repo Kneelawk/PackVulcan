@@ -39,6 +39,10 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
+import java.time.Duration
+import java.time.Instant
+
+private val DROPDOWN_WAIT = Duration.ofMillis(200)
 
 @Composable
 fun ModrinthSearchWindow(
@@ -283,11 +287,37 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                 Modifier.padding(top = 20.dp, start = (5 - 1.5).dp, bottom = 20.dp, end = 0.dp)
             ) {
                 Column(Modifier.padding(end = 20.dp)) {
-                    SmallTextField(
-                        value = controller.searchString,
-                        onValueChange = { controller.setSearchString(it) },
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                    )
+                    ) {
+                        SmallTextField(
+                            value = controller.searchString,
+                            onValueChange = { controller.setSearchString(it) },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Text("Sort by", modifier = Modifier.padding(start = 5.dp))
+
+                        OptionsDropDown(
+                            options = SearchIndexDisplay.values(),
+                            buttonText = controller.sortBy.prettyName,
+                            selectOption = controller::setSortBy
+                        ) {
+                            Text(it.prettyName)
+                        }
+
+                        Text("Show per page", modifier = Modifier.padding(start = 5.dp))
+
+                        OptionsDropDown(
+                            options = PerPageDisplay.values(),
+                            buttonText = controller.perPage.limit.toString(),
+                            selectOption = controller::setPerPage
+                        ) {
+                            Text(it.limit.toString())
+                        }
+                    }
 
                     AnimatedVisibility(controller.searchLoading) {
                         LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -486,6 +516,51 @@ private fun <T : DisplayElement> StaticLoadableList(
 
         if (loading) {
             CircularProgressIndicator()
+        }
+    }
+}
+
+@Composable
+private fun <T> OptionsDropDown(
+    options: Array<T>, buttonText: String, selectOption: (T) -> Unit, menuItem: @Composable RowScope.(T) -> Unit
+) {
+    Box {
+        var expanded by remember { mutableStateOf(false) }
+        var expandTimer by remember { mutableStateOf(Instant.now()) }
+
+        SmallButton(
+            onClick = {
+                if (expanded) {
+                    expanded = false
+                } else if (Duration.between(expandTimer, Instant.now()) >= DROPDOWN_WAIT) {
+                    expanded = true
+                }
+            },
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
+        ) {
+            Text(buttonText, modifier = Modifier.padding(end = 5.dp))
+            Icon(Icons.Default.ArrowDropDown, "drop-down")
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+                expandTimer = Instant.now()
+            }
+        ) {
+            for (option in options) {
+                key(option) {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            selectOption(option)
+                        }
+                    ) {
+                        menuItem(option)
+                    }
+                }
+            }
         }
     }
 }

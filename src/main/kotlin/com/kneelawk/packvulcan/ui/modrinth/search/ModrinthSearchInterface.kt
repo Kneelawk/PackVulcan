@@ -27,6 +27,8 @@ interface ModrinthSearchInterface {
     val categoryList: List<CategoryDisplay>
     val selectedCategories: Map<CategoryDisplay, Unit>
     val searchString: String
+    val sortBy: SearchIndexDisplay
+    val perPage: PerPageDisplay
     val searchResults: List<SearchHitDisplay>
     val currentPage: Int
     val finalPage: Int
@@ -51,6 +53,10 @@ interface ModrinthSearchInterface {
     fun setFilterServer(filter: Boolean)
 
     fun setSearchString(string: String)
+
+    fun setSortBy(sortBy: SearchIndexDisplay)
+
+    fun setPerPage(perPage: PerPageDisplay)
 
     fun goToPage(page: Int)
 

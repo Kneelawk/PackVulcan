@@ -4,7 +4,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
-import com.kneelawk.packvulcan.model.modrinth.search.query.SearchIndex
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
@@ -34,6 +33,11 @@ fun rememberModrinthSearchController(
 
     val searchStringState = remember { mutableStateOf("") }
     var searchStringC by searchStringState
+
+    val sortByState = remember { mutableStateOf(SearchIndexDisplay.RELEVANCE) }
+    var sortByC by sortByState
+    val perPageState = remember { mutableStateOf(PerPageDisplay.TWENTY) }
+    var perPageC by perPageState
 
     val minecraftVersions = remember { mutableStateListOf<MinecraftVersion>() }
 
@@ -106,7 +110,7 @@ fun rememberModrinthSearchController(
         Conflator(scope) { data: SearchData ->
             loading = true
             val res = ModrinthApi.search(data.toQuery())
-            finalPageC = (res.totalHits + SEARCH_RESULT_LIMIT - 1) / SEARCH_RESULT_LIMIT
+            finalPageC = (res.totalHits + perPageC.limit - 1) / perPageC.limit
             searchResults.clear()
             searchResults.addAll(res.hits.map { SearchHitDisplay.fromJson(it) })
             loading = false
@@ -118,8 +122,8 @@ fun rememberModrinthSearchController(
     fun startSearch() {
         searchConflator.send(
             SearchData(
-                searchStringC, selectedMinecraftVersions.keys.toSet(), selectedLoaders.keys.toSet(),
-                selectedCategories.keys.toSet(), filterClientC, filterServerC, currentPageC
+                searchStringC, selectedMinecraftVersions.keys.toList(), selectedLoaders.keys.toList(),
+                selectedCategories.keys.toList(), filterClientC, filterServerC, sortByC, currentPageC, perPageC.limit
             )
         )
     }
@@ -151,6 +155,8 @@ fun rememberModrinthSearchController(
             override val categoryList = categoryList
             override val selectedCategories = selectedCategories
             override val searchString by searchStringState
+            override val sortBy by sortByState
+            override val perPage by perPageState
             override val searchResults = searchResults
             override val currentPage by currentPageState
             override val finalPage by finalPageState
@@ -224,6 +230,18 @@ fun rememberModrinthSearchController(
                 startSearch()
             }
 
+            override fun setSortBy(sortBy: SearchIndexDisplay) {
+                sortByC = sortBy
+                currentPageC = 1
+                startSearch()
+            }
+
+            override fun setPerPage(perPage: PerPageDisplay) {
+                perPageC = perPage
+                currentPageC = 1
+                startSearch()
+            }
+
             override fun goToPage(page: Int) {
                 currentPageC = page
                 startSearch()
@@ -242,11 +260,10 @@ fun rememberModrinthSearchController(
     }
 }
 
-val SEARCH_RESULT_LIMIT = 20
-
 data class SearchData(
-    val searchString: String, val minecraftVersions: Set<String>, val loaders: Set<LoaderDisplay>,
-    val categories: Set<CategoryDisplay>, val filterClient: Boolean, val filterServer: Boolean, val currentPage: Int
+    val searchString: String, val minecraftVersions: List<String>, val loaders: List<LoaderDisplay>,
+    val categories: List<CategoryDisplay>, val filterClient: Boolean, val filterServer: Boolean,
+    val sortBy: SearchIndexDisplay, val currentPage: Int, val limit: Int
 ) {
     fun toQuery(): SearchQuery {
         val query = searchString.ifBlank { null }
@@ -278,8 +295,8 @@ data class SearchData(
             facets.add(listOf("server_side:optional", "server_side:required"))
         }
 
-        val offset = (currentPage - 1) * SEARCH_RESULT_LIMIT
+        val offset = (currentPage - 1) * limit
 
-        return SearchQuery(query, facets, SearchIndex.RELEVANCE, offset, SEARCH_RESULT_LIMIT)
+        return SearchQuery(query, facets, sortBy.value, offset, limit)
     }
 }
