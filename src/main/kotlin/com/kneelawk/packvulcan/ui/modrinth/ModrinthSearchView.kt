@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
+import com.google.accompanist.flowlayout.FlowRow
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.net.image.ImageResource
@@ -531,31 +531,33 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
 
                 Text(searchHit.description)
 
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(searchHit.categories, { it.apiName }) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            it.icon?.icon(it.prettyName, Modifier.size(24.dp))
-                            Text(it.prettyName)
+                FlowRow(mainAxisSpacing = 10.dp, crossAxisSpacing = 10.dp) {
+                    for (category in searchHit.categories) {
+                        key(category.apiName) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                category.icon?.icon(category.prettyName, Modifier.size(24.dp))
+                                Text(category.prettyName)
+                            }
+                        }
+                    }
+
+                    for (loader in searchHit.loaders) {
+                        key(loader.apiName) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                loader.icon?.icon(loader.prettyName, Modifier.size(24.dp))
+                                Text(loader.prettyName)
+                            }
                         }
                     }
                 }
 
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(searchHit.loaders, { it.apiName }) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            it.icon?.icon(it.prettyName, Modifier.size(24.dp))
-                            Text(it.prettyName)
-                        }
-                    }
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                FlowRow(mainAxisSpacing = 20.dp, crossAxisSpacing = 10.dp) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically

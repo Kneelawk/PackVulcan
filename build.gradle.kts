@@ -31,6 +31,10 @@ dependencies {
     implementation("com.arkivanov.decompose:decompose:$decomposeVersion")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decomposeVersion")
 
+    // Desktop version of Accompanist
+    val accompanistVersion: String by project
+    implementation("ca.gosyer:accompanist-flowlayout:$accompanistVersion")
+
     // Coroutines
     val coroutinesVersion: String by project
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
