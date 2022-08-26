@@ -38,41 +38,39 @@ object ModrinthApi {
      * Retriever methods.
      */
 
-    private val projectBatcher =
-        Batcher<String, Either<ProjectJson, MissingProject>>(
-            ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
-        ) { requests ->
-            val ids = requests.map { it.request }
-            log.debug("Project batch request, ids: $ids")
+    private val projectBatcher = Batcher<String, Either<ProjectJson, MissingProject>>(
+        ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
+    ) { requests ->
+        val ids = requests.map { it.request }
+        log.debug("Project batch request, ids: $ids")
 
-            val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/projects") {
-                parameter("ids", Json.encodeToString(ids))
-            }.body<List<ProjectJson>>().associateBy { it.id }
+        val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/projects") {
+            parameter("ids", Json.encodeToString(ids))
+        }.body<List<ProjectJson>>().associateBy { it.id }
 
-            log.debug("Request count: ${ids.size}, response count: ${result.size}")
+        log.debug("Request count: ${ids.size}, response count: ${result.size}")
 
-            for ((id, channel) in requests) {
-                channel.send(leftOr(result[id], MissingProject(id)))
-            }
+        for ((id, channel) in requests) {
+            channel.send(leftOr(result[id], MissingProject(id)))
         }
+    }
 
-    private val versionBatcher =
-        Batcher<String, Either<VersionJson, MissingVersion>>(
-            ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
-        ) { requests ->
-            val ids = requests.map { it.request }
-            log.debug("Version batch request, ids: $ids")
+    private val versionBatcher = Batcher<String, Either<VersionJson, MissingVersion>>(
+        ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
+    ) { requests ->
+        val ids = requests.map { it.request }
+        log.debug("Version batch request, ids: $ids")
 
-            val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/versions") {
-                parameter("ids", Json.encodeToString(ids))
-            }.body<List<VersionJson>>().associateBy { it.id }
+        val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/versions") {
+            parameter("ids", Json.encodeToString(ids))
+        }.body<List<VersionJson>>().associateBy { it.id }
 
-            log.debug("Request count: ${ids.size}, response count: ${result.size}")
+        log.debug("Request count: ${ids.size}, response count: ${result.size}")
 
-            for ((id, channel) in requests) {
-                channel.send(leftOr(result[id], MissingVersion(id)))
-            }
+        for ((id, channel) in requests) {
+            channel.send(leftOr(result[id], MissingVersion(id)))
         }
+    }
 
     private suspend fun retrieveTeamMembers(id: String): List<TeamMemberJson> = withContext(Dispatchers.IO) {
         HTTP_CLIENT.get("https://api.modrinth.com/v2/team/$id/members").body()
@@ -84,6 +82,22 @@ object ModrinthApi {
 
     private suspend fun retrieveLoaders(): List<LoaderJson> = withContext(Dispatchers.IO) {
         HTTP_CLIENT.get("https://api.modrinth.com/v2/tag/loader").body()
+    }
+
+    suspend fun search(query: SearchQuery): SearchResultJson = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.get("https://api.modrinth.com/v2/search") {
+            with(url.parameters) {
+                query.query?.let { append("query", it) }
+                query.facets?.let { andList ->
+                    append("facets", andList.joinToString(",", "[", "]") { orList ->
+                        orList.joinToString(",", "[", "]") { "\"$it\"" }
+                    })
+                }
+                query.index?.let { append("index", it.apiName) }
+                query.offset?.let { append("offset", it.toString()) }
+                query.limit?.let { append("limit", it.toString()) }
+            }
+        }.body()
     }
 
     /*
@@ -101,20 +115,4 @@ object ModrinthApi {
     suspend fun categories(): List<CategoryJson> = categoryCache.suspendGet(Unit) { retrieveCategories() }
 
     suspend fun loaders(): List<LoaderJson> = loaderCache.suspendGet(Unit) { retrieveLoaders() }
-
-    suspend fun search(query: SearchQuery): SearchResultJson = withContext(Dispatchers.IO) {
-        HTTP_CLIENT.get("https://api.modrinth.com/v2/search") {
-            with(url.parameters) {
-                query.query?.let { append("query", it) }
-                query.facets?.let { andList ->
-                    append("facets", andList.joinToString(",", "[", "]") { orList ->
-                        orList.joinToString(",", "[", "]") { "\"$it\"" }
-                    })
-                }
-                query.index?.let { append("index", it.apiName) }
-                query.offset?.let { append("offset", it.toString()) }
-                query.limit?.let { append("limit", it.toString()) }
-            }
-        }.body()
-    }
 }

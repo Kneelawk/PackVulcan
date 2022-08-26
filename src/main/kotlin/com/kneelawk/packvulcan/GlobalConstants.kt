@@ -6,6 +6,9 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 
 object GlobalConstants {
+    const val VERSION = "0.1.0"
+    const val REST_USER_AGENT = "PackVulcan/$VERSION"
+
     private const val FOLDER_NAME = ".packvulcan"
     private val FOLDER = Paths.get(System.getProperty("user.home"), FOLDER_NAME)
     val SETTINGS_FILE: Path = FOLDER.resolve("settings.toml")
