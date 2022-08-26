@@ -15,7 +15,8 @@ import mu.KotlinLogging
 
 @Composable
 fun rememberModrinthSearchController(
-    selectedMinecraftVersions: MutableMap<String, Unit>, selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>
+    selectedMinecraftVersions: MutableMap<String, Unit>, selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>,
+    openProject: (id: String) -> Unit, installLatest: (id: String) -> Unit, browseVersions: (id: String) -> Unit
 ): ModrinthSearchInterface {
     val log = remember { KotlinLogging.logger { } }
     val scope = rememberCoroutineScope()
@@ -255,6 +256,18 @@ fun rememberModrinthSearchController(
             override fun pageBackward() {
                 if (currentPageC > 1) currentPageC--
                 startSearch()
+            }
+
+            override fun openProject(project: SearchHitDisplay) {
+                openProject(project.id)
+            }
+
+            override fun installLatest(project: SearchHitDisplay) {
+                installLatest(project.id)
+            }
+
+            override fun browseVersions(project: SearchHitDisplay) {
+                browseVersions(project.id)
             }
         }
     }

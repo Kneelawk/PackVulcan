@@ -53,6 +53,9 @@ fun ModpackModsDialogs(component: ModpackComponent) {
             selectedMinecraftVersions = component.selectedMinecraftVersions,
             selectedKnownLoaders = component.selectedModLoaders,
             modpackName = component.modpackName,
+            openProject = {},
+            installLatest = {},
+            browseVersions = {}
         )
     }
 }

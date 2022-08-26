@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -50,7 +51,8 @@ private val DROPDOWN_WAIT = Duration.ofMillis(200)
 @Composable
 fun ModrinthSearchWindow(
     onCloseRequest: () -> Unit, selectedMinecraftVersions: MutableMap<String, Unit>,
-    selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>, modpackName: String
+    selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>, modpackName: String,
+    openProject: (id: String) -> Unit, installLatest: (id: String) -> Unit, browseVersions: (id: String) -> Unit
 ) {
     val state = rememberWindowState(size = DpSize(1280.dp, 800.dp))
 
@@ -61,6 +63,9 @@ fun ModrinthSearchWindow(
                     rememberModrinthSearchController(
                         selectedMinecraftVersions = selectedMinecraftVersions,
                         selectedKnownLoaders = selectedKnownLoaders,
+                        openProject = openProject,
+                        installLatest = installLatest,
+                        browseVersions = browseVersions
                     )
                 )
             }
@@ -651,6 +656,7 @@ private fun BoxScope.TopSideLoadingIndicator(loading: Boolean) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDisplay) {
     val scope = rememberCoroutineScope()
@@ -670,7 +676,10 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
         loadModImage()
     }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { controller.openProject(searchHit) }
+    ) {
         Row(
             modifier = Modifier.padding(15.dp), horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.Top
@@ -747,6 +756,29 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                     Icon(Icons.Default.Favorite, "follows")
                     Text(searchHit.follows.formatHumanReadable(), fontWeight = FontWeight.Bold)
                     Text("followers")
+                }
+
+                Column(modifier = Modifier.width(IntrinsicSize.Max), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                    SmallButton(
+                        onClick = { controller.installLatest(searchHit) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small.copy(
+                            bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
+                        )
+                    ) {
+                        Icon(PackVulcanIcons.download, "install")
+                        Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
+                    }
+                    SmallButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small.copy(
+                            topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp)
+                        )
+                    ) {
+                        Icon(Icons.Default.List, "browse")
+                        Text("Browse Versions...", modifier = Modifier.padding(start = 5.dp))
+                    }
                 }
             }
         }

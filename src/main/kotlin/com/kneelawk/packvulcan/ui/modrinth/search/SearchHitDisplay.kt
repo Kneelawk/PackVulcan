@@ -8,6 +8,7 @@ import mu.KotlinLogging
 import java.time.ZonedDateTime
 
 data class SearchHitDisplay(
+    val id: String,
     val slug: String,
     val title: String,
     val author: String,
@@ -47,8 +48,8 @@ data class SearchHitDisplay(
             }
 
             return SearchHitDisplay(
-                json.slug, json.title, json.author, json.description, json.iconUrl, categories, loaders, json.downloads,
-                json.follows, json.dateCreated, json.dateModified
+                json.projectId, json.slug, json.title, json.author, json.description, json.iconUrl, categories, loaders,
+                json.downloads, json.follows, json.dateCreated, json.dateModified
             )
         }
     }

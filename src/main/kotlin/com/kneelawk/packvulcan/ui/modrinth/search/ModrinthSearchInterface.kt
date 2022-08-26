@@ -63,4 +63,10 @@ interface ModrinthSearchInterface {
     fun pageForward()
 
     fun pageBackward()
+
+    fun openProject(project: SearchHitDisplay)
+
+    fun installLatest(project: SearchHitDisplay)
+
+    fun browseVersions(project: SearchHitDisplay)
 }
