@@ -9,12 +9,13 @@ private val overriddenKeys =
     setOf("meta-folder", "mods-folder", "acceptable-game-versions", "x-packvulcan-acceptable-loaders")
 
 data class OptionsToml(
-    val modsFolder: String?, val acceptableGameVersions: List<String>, val acceptableLoaders: List<String>,
-    val options: Map<String, Any>
+    val metaFolder: String?, val metaFolderBase: String?, val acceptableGameVersions: List<String>,
+    val acceptableLoaders: List<String>, val options: Map<String, Any>
 ) : ToTomlVersioned {
     companion object : FromTomlVersioned<OptionsToml> {
         override fun fromToml(toml: Toml, packFormat: FormatVersion): OptionsToml {
-            val modsFolder = toml.getString("meta-folder") ?: toml.getString("mods-folder")
+            val metaFolder = toml.getString("meta-folder") ?: toml.getString("mods-folder")
+            val metaFolderBase = toml.getString("meta-folder-base")
             val acceptableGameVersions = toml.getList<String>("acceptable-game-versions", listOf())
             val acceptableLoaders = toml.getList<String>("x-packvulcan-acceptable-loaders", listOf())
 
@@ -25,14 +26,15 @@ data class OptionsToml(
                 }
             }
 
-            return OptionsToml(modsFolder, acceptableGameVersions, acceptableLoaders, options)
+            return OptionsToml(metaFolder, metaFolderBase, acceptableGameVersions, acceptableLoaders, options)
         }
     }
 
     override fun toToml(packFormat: FormatVersion): Map<String, Any> {
         val map = mutableMapOf<String, Any>()
         map.putAll(options)
-        modsFolder?.let { map[packFormat.metaFolderKey] = it }
+        metaFolder?.let { map[packFormat.metaFolderKey] = it }
+        metaFolderBase?.let { map["meta-folder-base"] = it }
         if (acceptableGameVersions.isNotEmpty()) map["acceptable-game-versions"] = acceptableGameVersions
         if (acceptableLoaders.isNotEmpty()) map["x-packvulcan-acceptable-loaders"] = acceptableLoaders
         return map

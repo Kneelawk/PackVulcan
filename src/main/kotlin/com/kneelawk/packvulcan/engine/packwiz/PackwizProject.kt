@@ -179,15 +179,16 @@ class PackwizProject(
         }
     }
 
-    private val modsDirname = pack.options?.modsFolder ?: MODS_DIRNAME
+    private val metaPathStr = pack.options?.metaFolderBase?.let { "$it/" } ?: ""
+    private val modsPathStr = metaPathStr + (pack.options?.metaFolder ?: MODS_DIRNAME)
     private val packFormat = pack.packFormat
 
     val modsDir: Path
-        get() = projectDir.resolve(modsDirname)
+        get() = projectDir.resolve(modsPathStr)
 
     fun getMods(): List<PackwizMod> {
         return files.mapNotNull { packwizFile ->
-            if (packwizFile is PackwizMod && packwizFile.filePath.startsWith(modsDirname)) {
+            if (packwizFile is PackwizMod && packwizFile.filePath.startsWith(modsPathStr)) {
                 packwizFile
             } else {
                 null
@@ -197,7 +198,7 @@ class PackwizProject(
 
     fun setMods(mods: List<PackwizMod>) {
         files.removeAll {
-            it is PackwizMod && it.filePath.startsWith(modsDirname)
+            it is PackwizMod && it.filePath.startsWith(modsPathStr)
         }
         files.addAll(mods.distinctBy { it.filePath })
         files.sortBy { it.filePath }
@@ -213,6 +214,7 @@ class PackwizProject(
                             file.preserve
                         )
                     }
+
                     is PackwizRealFile -> {
                         FileToml(
                             file.filePath, HashHelper.hash(file.file, index.hashFormat), file.alias, null, false,
@@ -281,10 +283,7 @@ class PackwizProject(
                 null
             } else {
                 async(Dispatchers.IO) {
-                    if (((relative.startsWith(modsDirname) || packFormat.metafilesOutsideModsDir) && relative.endsWith(
-                            packFormat.metafileExtension
-                        )) || currentMetaFiles.contains(relative)
-                    ) {
+                    if (packFormat.isMetaFile(relative, modsPathStr) || currentMetaFiles.contains(relative)) {
                         try {
                             val toml = FileSystem.SYSTEM.source(path.toOkioPath()).use {
                                 TomlHelper.read(ModToml, it)
@@ -346,6 +345,7 @@ class PackwizProject(
                     is PackwizMetaFile -> {
                         FileSystem.SYSTEM.sink(path.toOkioPath()).use { TomlHelper.write(packwizFile.toml, it) }
                     }
+
                     is PackwizRealFile -> {
                         if (path.normalize() != packwizFile.file.normalize()) {
                             log.warn(
