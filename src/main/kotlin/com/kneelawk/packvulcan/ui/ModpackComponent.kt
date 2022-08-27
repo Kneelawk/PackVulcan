@@ -165,9 +165,6 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         modsDir = project.modsDir
 
         setModsList(project.getMods())
-
-        log.info("Writing packwiz project to '${project.projectDir}'...")
-        project.write()
     }
 
     fun reload() {
