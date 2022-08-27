@@ -709,7 +709,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                category.icon?.icon(category.prettyName, Modifier.size(24.dp))
+                                category.icon?.icon(category.prettyName, Modifier.size(18.dp))
                                 Text(category.prettyName)
                             }
                         }
@@ -721,7 +721,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                loader.icon?.icon(loader.prettyName, Modifier.size(24.dp))
+                                loader.icon?.icon(loader.prettyName, Modifier.size(18.dp))
                                 Text(loader.prettyName)
                             }
                         }
@@ -733,14 +733,14 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Create, "created")
+                        Icon(Icons.Default.Create, "created", modifier = Modifier.size(18.dp))
                         Text("Created ${searchHit.dateCreated.formatRelative()}")
                     }
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Refresh, "updated")
+                        Icon(Icons.Default.Refresh, "updated", modifier = Modifier.size(18.dp))
                         Text("Updated ${searchHit.dateModified.formatRelative()}")
                     }
                 }

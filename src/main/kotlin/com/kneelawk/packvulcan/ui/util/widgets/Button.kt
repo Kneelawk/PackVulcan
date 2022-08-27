@@ -35,7 +35,38 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterialApi::class)
+object SmallButtonDefaults {
+    val HorizontalPadding = 12.dp
+    val VerticalPadding = 6.dp
+
+    /**
+     * The default content padding used by [SmallButton]
+     */
+    val ContentPadding = PaddingValues(
+        start = HorizontalPadding,
+        top = VerticalPadding,
+        end = HorizontalPadding,
+        bottom = VerticalPadding
+    )
+
+    /**
+     * The default min width applied for the [SmallButton].
+     * Note that you can override it by applying Modifier.widthIn directly on [SmallButton].
+     */
+    val MinWidth = 64.dp
+
+    /**
+     * The default min height applied for the [SmallButton].
+     * Note that you can override it by applying Modifier.heightIn directly on [SmallButton].
+     */
+    val MinHeight = 36.dp
+
+    /**
+     * The default size of the icon when used inside a [SmallButton].
+     */
+    val IconSize = 24.dp
+}
+
 @Composable
 fun ListButton(
     onClick: () -> Unit,
@@ -46,7 +77,7 @@ fun ListButton(
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = SmallButtonDefaults.ContentPadding,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable RowScope.() -> Unit
@@ -72,8 +103,8 @@ fun ListButton(
                 Row(
                     Modifier
                         .defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth,
-                            minHeight = ButtonDefaults.MinHeight
+                            minWidth = SmallButtonDefaults.MinWidth,
+                            minHeight = SmallButtonDefaults.MinHeight
                         )
                         .padding(contentPadding),
                     horizontalArrangement = horizontalArrangement,
@@ -151,9 +182,9 @@ fun SmallButton(
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-    minWidth: Dp = ButtonDefaults.MinWidth,
-    minHeight: Dp = ButtonDefaults.MinHeight,
+    contentPadding: PaddingValues = SmallButtonDefaults.ContentPadding,
+    minWidth: Dp = SmallButtonDefaults.MinWidth,
+    minHeight: Dp = SmallButtonDefaults.MinHeight,
     content: @Composable RowScope.() -> Unit
 ) {
     val contentColor by colors.contentColor(enabled)
@@ -212,7 +243,7 @@ fun SmallTextButton(
     content = content
 )
 
-val SmallIconButtonPadding = PaddingValues(8.dp)
+val SmallIconButtonPadding = PaddingValues(SmallButtonDefaults.VerticalPadding)
 
 @Composable
 fun SmallIconButton(
@@ -230,11 +261,11 @@ fun SmallIconButton(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = 20.dp)
+                indication = rememberRipple(bounded = false, radius = SmallButtonDefaults.MinHeight / 2)
             )
             .defaultMinSize(
-                minWidth = ButtonDefaults.MinHeight,
-                minHeight = ButtonDefaults.MinHeight
+                minWidth = SmallButtonDefaults.MinHeight,
+                minHeight = SmallButtonDefaults.MinHeight
             )
             .padding(contentPadding),
         contentAlignment = Alignment.Center
