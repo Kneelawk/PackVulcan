@@ -103,10 +103,17 @@ fun ModpackView(component: ModpackComponent, controls: WindowControls, tracker: 
             )
         },
         actions = {
-            IconButton(onClick = {
-                component.reload()
-            }) {
-                Icon(Icons.Default.Refresh, "refresh")
+            if (component.loading) {
+                CircularProgressIndicator()
+            } else {
+                IconButton(
+                    onClick = {
+                        component.reload()
+                    },
+                    enabled = !component.loading
+                ) {
+                    Icon(Icons.Default.Refresh, "refresh")
+                }
             }
         }
     ) {
