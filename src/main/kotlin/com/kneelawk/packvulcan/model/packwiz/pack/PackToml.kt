@@ -5,7 +5,8 @@ import com.moandjiezana.toml.Toml
 import mu.KotlinLogging
 
 data class PackToml(
-    val name: String, val author: String?, val version: String?, val description: String?, val packFormat: FormatVersion,
+    val name: String, val author: String?, val version: String?, val description: String?,
+    val packFormat: FormatVersion,
     val index: IndexObjectToml, val versions: VersionsToml, val options: OptionsToml?
 ) : ToToml {
     companion object : FromToml<PackToml> {
@@ -27,7 +28,7 @@ data class PackToml(
                 packFormat,
                 IndexObjectToml.fromToml(toml.mustGetTable("index")),
                 VersionsToml.fromToml(toml.mustGetTable("versions")),
-                toml.getTable("options")?.let { OptionsToml.fromToml(it) }
+                toml.getTable("options")?.let { OptionsToml.fromToml(it, packFormat) }
             )
         }
     }
@@ -41,7 +42,7 @@ data class PackToml(
             "pack-format" to packFormat.toString(),
             "index" to index.toToml(),
             "versions" to versions.toToml(),
-            options?.toToml()?.from("options")
+            options?.toToml(packFormat)?.from("options")
         )
     }
 }

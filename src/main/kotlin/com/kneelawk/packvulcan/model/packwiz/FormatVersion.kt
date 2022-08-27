@@ -6,6 +6,8 @@ sealed class FormatVersion {
     open val metafileExtension = ".pw.toml"
     open val metafilesOutsideModsDir = true
 
+    open val metaFolderKey = "meta-folder"
+
     object Packwiz_1_1_0 : FormatVersion() {
         override fun toString(): String = "packwiz:1.1.0"
     }
@@ -13,6 +15,7 @@ sealed class FormatVersion {
     object Packwiz_1_0_0 : FormatVersion() {
         override val metafileExtension = ".toml"
         override val metafilesOutsideModsDir = false
+        override val metaFolderKey = "mods-folder"
 
         override fun toString(): String = "packwiz:1.0.0"
     }
