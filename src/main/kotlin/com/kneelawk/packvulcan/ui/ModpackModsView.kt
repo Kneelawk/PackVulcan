@@ -7,7 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ import com.kneelawk.packvulcan.ui.util.ImageWrapper
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
+import com.kneelawk.packvulcan.ui.util.widgets.ButtonIcon
 import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
 import com.kneelawk.packvulcan.util.LoadingState
 import kotlinx.coroutines.CancellationException
@@ -103,7 +107,7 @@ fun ModpackModsView(component: ModpackComponent) {
                     shape = startShape,
                     enabled = !component.loading
                 ) {
-                    Icon(PackVulcanIcons.modrinth, "modrinth")
+                    ButtonIcon(PackVulcanIcons.modrinth, "modrinth")
 
                     Text("Add from Modrinth...", modifier = Modifier.padding(start = 10.dp))
                 }
@@ -112,7 +116,7 @@ fun ModpackModsView(component: ModpackComponent) {
                     onClick = { addModJarDialogOpen = true }, modifier = Modifier.weight(1f), shape = endShape,
                     enabled = !component.loading
                 ) {
-                    Icon(PackVulcanIcons.file, "file")
+                    ButtonIcon(PackVulcanIcons.file, "file")
 
                     Text("Add Mod Jar...", modifier = Modifier.padding(start = 10.dp))
                 }

@@ -89,7 +89,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     onClick = { controller.addFavorite() },
                                     modifier = Modifier.weight(1f),
                                     enabled = controller.favoritesAddEnabled,
-                                    icon = { Icon(Icons.Default.Add, "add") },
+                                    icon = { ButtonIcon(Icons.Default.Add, "add") },
                                     text = "Add Favorite"
                                 )
 
@@ -103,7 +103,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     }
                                 }) {
                                     SmallIconButton(onClick = { controller.editFavorites() }) {
-                                        Icon(Icons.Default.Edit, "edit favorites")
+                                        ButtonIcon(Icons.Default.Edit, "edit favorites")
                                     }
                                 }
                             }
@@ -126,7 +126,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     ListButton(
                                         onClick = { controller.favoriteSelect(favorite) },
                                         modifier = Modifier.fillMaxWidth(),
-                                        icon = { Icon(PackVulcanIcons.folder, "favorite") },
+                                        icon = { ButtonIcon(PackVulcanIcons.folder, "favorite") },
                                         text = favorite.name
                                     )
                                 }
@@ -143,7 +143,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                             }
                                         }) {
                                             SmallIconButton(onClick = { controller.moveFavoriteUp(favorite) }) {
-                                                Icon(Icons.Default.KeyboardArrowUp, "move up")
+                                                ButtonIcon(Icons.Default.KeyboardArrowUp, "move up")
                                             }
                                         }
 
@@ -157,7 +157,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                             }
                                         }) {
                                             SmallIconButton(onClick = { controller.moveFavoriteDown(favorite) }) {
-                                                Icon(Icons.Default.KeyboardArrowDown, "move down")
+                                                ButtonIcon(Icons.Default.KeyboardArrowDown, "move down")
                                             }
                                         }
 
@@ -171,7 +171,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                             }
                                         }) {
                                             SmallIconButton(onClick = { controller.removeFavorite(favorite) }) {
-                                                Icon(Icons.Default.Close, "remove")
+                                                ButtonIcon(Icons.Default.Close, "remove")
                                             }
                                         }
                                     }
@@ -189,7 +189,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     controller.driveSelect(drive.path)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                icon = { Icon(PackVulcanIcons.storage, "drive") },
+                                icon = { ButtonIcon(PackVulcanIcons.storage, "drive") },
                                 text = drive.displayName
                             )
                         }
@@ -219,7 +219,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                         SmallIconButton(onClick = {
                             controller.openCreateFolderDialog()
                         }) {
-                            Icon(PackVulcanIcons.createNewFolder, "create new folder")
+                            ButtonIcon(PackVulcanIcons.createNewFolder, "create new folder")
                         }
                     }
 
@@ -254,7 +254,7 @@ fun FileChooserView(controller: FileChooserInterface) {
                                     },
                                     colors = ButtonDefaults.textButtonColors(backgroundColor = background),
                                     icon = {
-                                        Icon(
+                                        ButtonIcon(
                                             when (element.type) {
                                                 FileListItemType.FILE -> PackVulcanIcons.file
                                                 FileListItemType.FOLDER -> PackVulcanIcons.folder
@@ -301,13 +301,13 @@ fun FileChooserView(controller: FileChooserInterface) {
 @Composable
 private fun HomeFolderIcon(item: HomeFolderItem) {
     when (item) {
-        HomeFolderItem.HOME -> Icon(Icons.Default.Home, "home")
-        HomeFolderItem.DESKTOP -> Icon(PackVulcanIcons.desktop, "desktop")
-        HomeFolderItem.DOCUMENTS -> Icon(PackVulcanIcons.file, "documents")
-        HomeFolderItem.DOWNLOADS -> Icon(PackVulcanIcons.download, "downloads")
-        HomeFolderItem.MUSIC -> Icon(PackVulcanIcons.music, "music")
-        HomeFolderItem.PICTURES -> Icon(PackVulcanIcons.image, "pictures")
-        HomeFolderItem.VIDEOS -> Icon(PackVulcanIcons.movie, "videos")
+        HomeFolderItem.HOME -> ButtonIcon(Icons.Default.Home, "home")
+        HomeFolderItem.DESKTOP -> ButtonIcon(PackVulcanIcons.desktop, "desktop")
+        HomeFolderItem.DOCUMENTS -> ButtonIcon(PackVulcanIcons.file, "documents")
+        HomeFolderItem.DOWNLOADS -> ButtonIcon(PackVulcanIcons.download, "downloads")
+        HomeFolderItem.MUSIC -> ButtonIcon(PackVulcanIcons.music, "music")
+        HomeFolderItem.PICTURES -> ButtonIcon(PackVulcanIcons.image, "pictures")
+        HomeFolderItem.VIDEOS -> ButtonIcon(PackVulcanIcons.movie, "videos")
     }
 }
 
@@ -324,7 +324,7 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
                 }
             }
         }) {
-            Icon(Icons.Default.KeyboardArrowLeft, "scroll current path left")
+            ButtonIcon(Icons.Default.KeyboardArrowLeft, "scroll current path left")
         }
 
         Column(modifier = Modifier.weight(1F)) {
@@ -359,7 +359,7 @@ private fun ParentSelector(fullPath: Path, selectedPath: Path, pathSelected: (Pa
                 }
             }
         }) {
-            Icon(Icons.Default.KeyboardArrowRight, "scroll current path right")
+            ButtonIcon(Icons.Default.KeyboardArrowRight, "scroll current path right")
         }
     }
 }
@@ -428,7 +428,7 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                         onConfirm = { controller.createFolder() },
                         confirmEnabled = controller.folderNameValid,
                         confirmContent = {
-                            Icon(PackVulcanIcons.createNewFolder, "create")
+                            ButtonIcon(PackVulcanIcons.createNewFolder, "create")
                             Text("Create", modifier = Modifier.padding(start = 5.dp))
                         }
                     )

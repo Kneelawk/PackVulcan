@@ -25,10 +25,7 @@ import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.layout.slidingTransitionSpec
-import com.kneelawk.packvulcan.ui.util.widgets.DialogButtonBar
-import com.kneelawk.packvulcan.ui.util.widgets.ListButton
-import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
-import com.kneelawk.packvulcan.ui.util.widgets.SmallTextField
+import com.kneelawk.packvulcan.ui.util.widgets.*
 import java.awt.event.MouseEvent
 
 @Composable
@@ -94,6 +91,7 @@ fun LoaderVersionView(
                             LoaderVersion.fabricLoaderList()
                         }
                     }
+
                     LoaderType.QUILT -> {
                         IndependentLoaderVersionSelector(
                             selectedVersion = selectedVersion,
@@ -106,6 +104,7 @@ fun LoaderVersionView(
                             LoaderVersion.quiltLoaderList()
                         }
                     }
+
                     LoaderType.FORGE -> {
                         DependentLoaderVersionSelector(
                             selectedVersion = selectedVersion,

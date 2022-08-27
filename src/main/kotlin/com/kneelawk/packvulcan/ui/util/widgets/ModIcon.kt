@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -27,7 +26,7 @@ fun ModIcon(modImage: LoadingState<ModIconWrapper>, reload: () -> Unit) {
 
             LoadingState.Error -> {
                 IconButton(onClick = reload, modifier = Modifier.align(Alignment.Center)) {
-                    Icon(Icons.Default.Refresh, "reload image")
+                    ButtonIcon(Icons.Default.Refresh, "reload image")
                 }
             }
 

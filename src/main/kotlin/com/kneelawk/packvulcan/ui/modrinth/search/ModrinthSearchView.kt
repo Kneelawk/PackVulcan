@@ -115,7 +115,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                         val iconRotation by animateFloatAsState(
                                             if (controller.showMinecraftExtraTypes) 0f else -90f
                                         )
-                                        Icon(
+                                        ButtonIcon(
                                             Icons.Default.ArrowDropDown, "drop-down",
                                             modifier = Modifier.rotate(iconRotation)
                                         )
@@ -240,14 +240,14 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                         checked = controller.filterClient,
                                         onClick = { controller.setFilterClient(!controller.filterClient) },
                                         modifier = Modifier.weight(1f),
-                                        icon = { Icon(PackVulcanIcons.laptop, "client") },
+                                        icon = { ButtonIcon(PackVulcanIcons.laptop, "client") },
                                         text = "Client"
                                     )
                                     CheckboxButton(
                                         checked = controller.filterServer,
                                         onClick = { controller.setFilterServer(!controller.filterServer) },
                                         modifier = Modifier.weight(1f),
-                                        icon = { Icon(PackVulcanIcons.storage, "server") },
+                                        icon = { ButtonIcon(PackVulcanIcons.storage, "server") },
                                         text = "Server"
                                     )
                                 }
@@ -285,7 +285,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                 }
 
                 SmallButton(onClick = { controller.clearFilters() }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Clear, "clear")
+                    ButtonIcon(Icons.Default.Clear, "clear")
 
                     Text("Clear Filters", modifier = Modifier.padding(start = 10.dp))
                 }
@@ -306,7 +306,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                         onValueChange = { controller.setSearchString(it) },
                         modifier = Modifier.weight(1f).focusRequester(focusRequester),
                         permanentIcon = {
-                            Icon(Icons.Default.Search, "search")
+                            ButtonIcon(Icons.Default.Search, "search")
                         },
                         ghostText = {
                             Text("Search mods...")
@@ -524,7 +524,7 @@ private fun <T : DisplayElement> StaticLoadableList(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = enabled,
                         icon = {
-                            item.icon?.icon(item.prettyName, Modifier.size(24.dp)) ?: Box(Modifier.size(24.dp))
+                            item.icon?.buttonIcon(item.prettyName, size = 18.dp) ?: Box(Modifier.size(18.dp))
                         },
                         text = item.prettyName
                     )
@@ -568,7 +568,7 @@ private fun <T : DisplayElement> CollapsableLoadableList(
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = enabled,
                                 icon = {
-                                    item.icon?.icon(item.prettyName, Modifier.size(24.dp)) ?: Box(Modifier.size(24.dp))
+                                    item.icon?.buttonIcon(item.prettyName, size = 18.dp) ?: Box(Modifier.size(18.dp))
                                 },
                                 text = item.prettyName
                             )
@@ -583,7 +583,7 @@ private fun <T : DisplayElement> CollapsableLoadableList(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val iconRotation by animateFloatAsState(if (collapsed) 0f else -180f)
-                    Icon(
+                    ButtonIcon(
                         Icons.Default.ArrowDropDown, "drop-down",
                         modifier = Modifier.rotate(iconRotation)
                     )
@@ -618,7 +618,7 @@ private fun <T> OptionsDropDown(
         ) {
             Text(buttonText, modifier = Modifier.padding(end = 5.dp))
             val iconRotation by animateFloatAsState(if (expanded) 180f else 0f)
-            Icon(Icons.Default.ArrowDropDown, "drop-down", modifier = Modifier.rotate(iconRotation))
+            ButtonIcon(Icons.Default.ArrowDropDown, "drop-down", modifier = Modifier.rotate(iconRotation))
         }
 
         DropdownMenu(
@@ -709,7 +709,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                category.icon?.icon(category.prettyName, Modifier.size(24.dp))
+                                category.icon?.buttonIcon(category.prettyName)
                                 Text(category.prettyName)
                             }
                         }
@@ -721,7 +721,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                loader.icon?.icon(loader.prettyName, Modifier.size(24.dp))
+                                loader.icon?.buttonIcon(loader.prettyName)
                                 Text(loader.prettyName)
                             }
                         }
@@ -733,14 +733,14 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Create, "created")
+                        ButtonIcon(Icons.Default.Create, "created")
                         Text("Created ${searchHit.dateCreated.formatRelative()}")
                     }
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Refresh, "updated")
+                        ButtonIcon(Icons.Default.Refresh, "updated")
                         Text("Updated ${searchHit.dateModified.formatRelative()}")
                     }
                 }
@@ -748,12 +748,12 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.End) {
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Icon(PackVulcanIcons.download, "downloads")
+                    ButtonIcon(PackVulcanIcons.download, "downloads")
                     Text(searchHit.downloads.formatHumanReadable(), fontWeight = FontWeight.Bold)
                     Text("downloads")
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Icon(Icons.Default.Favorite, "follows")
+                    ButtonIcon(Icons.Default.Favorite, "follows")
                     Text(searchHit.follows.formatHumanReadable(), fontWeight = FontWeight.Bold)
                     Text("followers")
                 }
@@ -766,7 +766,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                             bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
                         )
                     ) {
-                        Icon(PackVulcanIcons.download, "install")
+                        ButtonIcon(PackVulcanIcons.download, "install")
                         Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
                     }
                     SmallButton(
@@ -776,7 +776,7 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                             topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp)
                         )
                     ) {
-                        Icon(Icons.Default.List, "browse")
+                        ButtonIcon(Icons.Default.List, "browse")
                         Text("Browse Versions...", modifier = Modifier.padding(start = 5.dp))
                     }
                 }

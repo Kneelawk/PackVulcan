@@ -19,6 +19,7 @@ import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.AppContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.slidingTransitionSpec
+import com.kneelawk.packvulcan.ui.util.widgets.ButtonIcon
 import com.kneelawk.packvulcan.ui.util.widgets.ListButton
 import kotlin.io.path.isDirectory
 
@@ -65,7 +66,7 @@ fun ModpackView(component: ModpackComponent, controls: WindowControls, tracker: 
                 onClick = { component.new() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.Create, "new")
+                ButtonIcon(Icons.Default.Create, "new")
                 Text("New", modifier = Modifier.padding(start = 10.dp))
                 Box(Modifier.weight(1f))
                 Text(NEW_SHORTCUT.toString())
@@ -75,7 +76,7 @@ fun ModpackView(component: ModpackComponent, controls: WindowControls, tracker: 
                 onClick = { component.open() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(PackVulcanIcons.file, "open")
+                ButtonIcon(PackVulcanIcons.file, "open")
                 Text("Open", modifier = Modifier.padding(start = 10.dp))
                 Box(Modifier.weight(1f))
                 Text(OPEN_SHORTCUT.toString())
@@ -87,7 +88,7 @@ fun ModpackView(component: ModpackComponent, controls: WindowControls, tracker: 
                 onClick = { component.save() },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(PackVulcanIcons.save, "save")
+                ButtonIcon(PackVulcanIcons.save, "save")
                 Text("Save", modifier = Modifier.padding(start = 10.dp))
                 Box(Modifier.weight(1f))
                 Text(SAVE_SHORTCUT.toString())

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -20,11 +19,11 @@ import androidx.compose.ui.unit.dp
 fun DialogButtonBar(
     modifier: Modifier = Modifier, onCancel: () -> Unit, onConfirm: () -> Unit, confirmEnabled: Boolean = true,
     cancelContent: @Composable RowScope.() -> Unit = {
-        Icon(Icons.Default.Close, "cancel")
+        ButtonIcon(Icons.Default.Close, "cancel")
         Text("Cancel", modifier = Modifier.padding(start = 5.dp))
     },
     confirmContent: @Composable RowScope.() -> Unit = {
-        Icon(Icons.Default.Check, "confirm")
+        ButtonIcon(Icons.Default.Check, "confirm")
         Text("Select", modifier = Modifier.padding(start = 5.dp))
     }
 ) {

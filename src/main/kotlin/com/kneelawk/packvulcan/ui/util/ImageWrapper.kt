@@ -1,6 +1,7 @@
 package com.kneelawk.packvulcan.ui.util
 
 import androidx.compose.foundation.Image
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -13,6 +14,8 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
+import com.kneelawk.packvulcan.ui.util.widgets.ButtonIcon
 import androidx.compose.ui.graphics.ImageBitmap as ComposeImageBitmap
 import androidx.compose.ui.graphics.painter.Painter as ComposePainter
 import androidx.compose.ui.graphics.vector.ImageVector as ComposeImageVector
@@ -28,7 +31,7 @@ sealed class ImageWrapper {
     protected abstract fun iconImpl(contentDescription: String?, modifier: Modifier, tint: Color)
 
     @Composable
-    protected abstract fun iconOrBitmapImpl(contentDescription: String?, modifier: Modifier)
+    protected abstract fun buttonIconImpl(contentDescription: String?, size: Dp, modifier: Modifier, tint: Color)
 
     @Composable
     fun image(
@@ -48,8 +51,11 @@ sealed class ImageWrapper {
     }
 
     @Composable
-    fun iconOrBitmap(contentDescription: String?, modifier: Modifier = Modifier) {
-        iconOrBitmapImpl(contentDescription, modifier)
+    fun buttonIcon(
+        contentDescription: String?, size: Dp = ButtonDefaults.IconSize, modifier: Modifier = Modifier,
+        tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    ) {
+        buttonIconImpl(contentDescription, size, modifier, tint)
     }
 
     data class Painter(val painter: ComposePainter) : ImageWrapper() {
@@ -67,8 +73,8 @@ sealed class ImageWrapper {
         }
 
         @Composable
-        override fun iconOrBitmapImpl(contentDescription: String?, modifier: Modifier) {
-            Icon(painter, contentDescription, modifier)
+        override fun buttonIconImpl(contentDescription: String?, size: Dp, modifier: Modifier, tint: Color) {
+            ButtonIcon(painter, contentDescription, size, modifier, tint)
         }
     }
 
@@ -87,8 +93,8 @@ sealed class ImageWrapper {
         }
 
         @Composable
-        override fun iconOrBitmapImpl(contentDescription: String?, modifier: Modifier) {
-            Image(bitmap, contentDescription, modifier)
+        override fun buttonIconImpl(contentDescription: String?, size: Dp, modifier: Modifier, tint: Color) {
+            ButtonIcon(bitmap, contentDescription, size, modifier, tint)
         }
     }
 
@@ -107,8 +113,8 @@ sealed class ImageWrapper {
         }
 
         @Composable
-        override fun iconOrBitmapImpl(contentDescription: String?, modifier: Modifier) {
-            Icon(vector, contentDescription, modifier)
+        override fun buttonIconImpl(contentDescription: String?, size: Dp, modifier: Modifier, tint: Color) {
+            ButtonIcon(vector, contentDescription, size, modifier, tint)
         }
     }
 }

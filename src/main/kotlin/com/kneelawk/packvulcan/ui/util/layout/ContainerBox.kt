@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.kneelawk.packvulcan.ui.instance.InstanceManager
+import com.kneelawk.packvulcan.ui.util.widgets.ButtonIcon
 import com.kneelawk.packvulcan.ui.util.widgets.ListButton
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,7 @@ fun AppContainerBox(
                     InstanceManager.openSettings()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                icon = { Icon(Icons.Default.Settings, "settings") },
+                icon = { ButtonIcon(Icons.Default.Settings, "settings") },
                 text = "Settings"
             )
 

@@ -30,12 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ListButton(
     onClick: () -> Unit,
@@ -230,7 +233,7 @@ fun SmallIconButton(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = 20.dp)
+                indication = rememberRipple(bounded = false, radius = ButtonDefaults.MinHeight / 2)
             )
             .defaultMinSize(
                 minWidth = ButtonDefaults.MinHeight,
@@ -242,4 +245,37 @@ fun SmallIconButton(
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         CompositionLocalProvider(LocalContentAlpha provides contentAlpha, content = content)
     }
+}
+
+@Composable
+fun ButtonIcon(
+    imageVector: ImageVector,
+    contentDescription: String?,
+    size: Dp = ButtonDefaults.IconSize,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+) {
+    Icon(imageVector, contentDescription, modifier.size(size), tint)
+}
+
+@Composable
+fun ButtonIcon(
+    bitmap: ImageBitmap,
+    contentDescription: String?,
+    size: Dp = ButtonDefaults.IconSize,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+) {
+    Icon(bitmap, contentDescription, modifier.size(size), tint)
+}
+
+@Composable
+fun ButtonIcon(
+    painter: Painter,
+    contentDescription: String?,
+    size: Dp = ButtonDefaults.IconSize,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+) {
+    Icon(painter, contentDescription, modifier.size(size), tint)
 }
