@@ -24,6 +24,7 @@ fun SmallTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     singleLine: Boolean = true,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(unfocusedIndicatorColor = Color.Transparent),
     shape: Shape = MaterialTheme.shapes.small,
@@ -52,10 +53,12 @@ fun SmallTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier.defaultMinSize(
-            minWidth = 64.dp,
-            minHeight = 36.dp
+            minWidth = SmallTextFieldDefaults.MinWidth,
+            minHeight = SmallTextFieldDefaults.MinHeight
         ).background(colors.backgroundColor(enabled).value, shape)
             .border(BorderStroke(borderThickness, borderColor), shape),
+        enabled = enabled,
+        readOnly = readOnly,
         singleLine = singleLine,
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colors.onSurface,
@@ -65,7 +68,7 @@ fun SmallTextField(
         interactionSource = interactionSource,
         decorationBox = { innerTextField ->
             Row(
-                Modifier.padding(horizontal = 20.dp),
+                Modifier.padding(horizontal = SmallTextFieldDefaults.HorizontalPadding),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -83,4 +86,11 @@ fun SmallTextField(
             }
         }
     )
+}
+
+object SmallTextFieldDefaults {
+    val HorizontalPadding = 12.dp
+
+    val MinWidth = 64.dp
+    val MinHeight = 36.dp
 }

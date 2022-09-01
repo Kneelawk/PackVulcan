@@ -39,22 +39,26 @@ class Batcher<T, R>(
                         result = messageChannel.tryReceive()
                     } while (result.isSuccess)
 
-                    handler(messages)
+                    try {
+                        handler(messages)
+                    } catch (e: Exception) {
+                        messages.forEach { it.responseChannel.send(Result.failure(e)) }
+                    }
                 }
             }
         }
     }
 
     suspend fun request(request: T): R {
-        val responseChannel = Channel<R>(1)
+        val responseChannel = Channel<Result<R>>(1)
         messageChannel.send(Message(request, responseChannel))
 
-        return responseChannel.receive()
+        return responseChannel.receive().getOrThrow()
     }
 
     override fun close() {
         running.set(false)
     }
 
-    data class Message<T, R>(val request: T, val responseChannel: Channel<R>)
+    data class Message<T, R>(val request: T, val responseChannel: Channel<Result<R>>)
 }

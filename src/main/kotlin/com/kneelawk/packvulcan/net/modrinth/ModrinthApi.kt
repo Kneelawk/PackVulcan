@@ -8,7 +8,8 @@ import com.kneelawk.packvulcan.model.modrinth.search.result.SearchResultJson
 import com.kneelawk.packvulcan.model.modrinth.tag.CategoryJson
 import com.kneelawk.packvulcan.model.modrinth.tag.LoaderJson
 import com.kneelawk.packvulcan.model.modrinth.team.TeamMemberJson
-import com.kneelawk.packvulcan.model.modrinth.version.VersionJson
+import com.kneelawk.packvulcan.model.modrinth.version.query.VersionsQuery
+import com.kneelawk.packvulcan.model.modrinth.version.result.VersionJson
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
 import com.kneelawk.packvulcan.util.*
 import io.ktor.client.call.*
@@ -33,6 +34,8 @@ object ModrinthApi {
         Caffeine.newBuilder().buildAsync()
     private val loaderCache: AsyncCache<Unit, List<LoaderJson>> =
         Caffeine.newBuilder().buildAsync()
+    private val versionListCache: AsyncCache<VersionsQuery, List<VersionJson>> =
+        Caffeine.newBuilder().expireAfterWrite(Duration.ofMinutes(1)).buildAsync()
 
     /*
      * Retriever methods.
@@ -51,7 +54,7 @@ object ModrinthApi {
         log.debug("Request count: ${ids.size}, response count: ${result.size}")
 
         for ((id, channel) in requests) {
-            channel.send(leftOr(result[id], MissingProject(id)))
+            channel.send(Result.success(leftOr(result[id], MissingProject(id))))
         }
     }
 
@@ -68,7 +71,7 @@ object ModrinthApi {
         log.debug("Request count: ${ids.size}, response count: ${result.size}")
 
         for ((id, channel) in requests) {
-            channel.send(leftOr(result[id], MissingVersion(id)))
+            channel.send(Result.success(leftOr(result[id], MissingVersion(id))))
         }
     }
 
@@ -100,6 +103,21 @@ object ModrinthApi {
         }.body()
     }
 
+    private suspend fun retrieveVersions(query: VersionsQuery): List<VersionJson> =
+        withContext(Dispatchers.IO) {
+            HTTP_CLIENT.get("https://api.modrinth.com/v2/project/${query.projectIdOrSlug}/version") {
+                with(url.parameters) {
+                    if (query.loaders.isNotEmpty()) {
+                        append("loaders", query.loaders.joinToString(",", "[", "]"))
+                    }
+                    if (query.gameVersions.isNotEmpty()) {
+                        append("game_versions", query.gameVersions.joinToString(",", "[", "]"))
+                    }
+                    query.featured?.let { append("featured", it.toString()) }
+                }
+            }.body()
+        }
+
     /*
      * Accessor methods.
      */
@@ -115,4 +133,7 @@ object ModrinthApi {
     suspend fun categories(): List<CategoryJson> = categoryCache.suspendGet(Unit) { retrieveCategories() }
 
     suspend fun loaders(): List<LoaderJson> = loaderCache.suspendGet(Unit) { retrieveLoaders() }
+
+    suspend fun versions(query: VersionsQuery): List<VersionJson> =
+        versionListCache.suspendGet(query, ::retrieveVersions)
 }

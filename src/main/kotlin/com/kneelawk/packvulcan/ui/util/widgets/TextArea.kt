@@ -28,6 +28,7 @@ fun TextArea(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    readOnly: Boolean = false,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(unfocusedIndicatorColor = Color.Transparent),
     shape: Shape = MaterialTheme.shapes.small,
     isError: Boolean = false,
@@ -60,6 +61,8 @@ fun TextArea(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = false,
+                enabled = enabled,
+                readOnly = readOnly,
                 textStyle = LocalTextStyle.current.copy(
                     color = MaterialTheme.colors.onSurface,
                     fontSize = fontSize
@@ -78,7 +81,8 @@ fun TextArea(
         }
 
         VerticalScrollbar(
-            rememberScrollbarAdapter(scrollState), modifier = Modifier.padding(horizontal = 2.dp, vertical = 10.dp).fillMaxHeight()
+            rememberScrollbarAdapter(scrollState),
+            modifier = Modifier.padding(horizontal = 2.dp, vertical = 10.dp).fillMaxHeight()
         )
     }
 }

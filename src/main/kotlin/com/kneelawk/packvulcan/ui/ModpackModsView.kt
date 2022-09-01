@@ -53,8 +53,9 @@ fun ModpackModsDialogs(component: ModpackComponent) {
             selectedMinecraftVersions = component.selectedMinecraftVersions,
             selectedKnownLoaders = component.selectedModLoaders,
             modpackName = component.modpackName,
+            acceptableVersions = component.acceptableVersions,
+            modrinthProjects = component.modrinthProjects,
             openProject = {},
-            installLatest = {},
             browseVersions = {}
         )
     }
@@ -128,7 +129,7 @@ fun ModpackModsView(component: ModpackComponent) {
         ) {
             LazyColumn(
                 state = lazyListState, modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(15.dp), contentPadding = PaddingValues(20.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(20.dp)
             ) {
                 items(component.modsList, key = PackwizMod::filePath) { mod ->
                     ModpackModView(component, mod)

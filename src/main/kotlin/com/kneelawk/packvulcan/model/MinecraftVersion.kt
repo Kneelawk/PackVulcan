@@ -10,7 +10,7 @@ import com.kneelawk.packvulcan.model.manifest.minecraft.VersionJson as Minecraft
 
 class MinecraftVersion private constructor(val version: String, val type: Type) {
     companion object {
-        val DEFAULT_VERSION = MinecraftVersion("1.18.2", Type.RELEASE)
+        val DEFAULT_VERSION = MinecraftVersion("1.19.2", Type.RELEASE)
 
         private fun fromMinecraftJson(json: MinecraftVersionJson): MinecraftVersion {
             return MinecraftVersion(json.id, Type.fromJson(json.type))

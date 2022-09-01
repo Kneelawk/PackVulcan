@@ -7,5 +7,5 @@ import java.nio.file.Path
  */
 data class NewModpack(
     val location: Path, val name: String, val author: String, val version: String,
-    val minecraftVersion: MinecraftVersion, val loaderVersion: LoaderVersion
+    val minecraftVersion: MinecraftVersion, val loaderVersion: LoaderVersion, val acceptableVersions: AcceptableVersions
 )

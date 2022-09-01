@@ -9,8 +9,9 @@ private val overriddenKeys =
     setOf("meta-folder", "mods-folder", "acceptable-game-versions", "x-packvulcan-acceptable-loaders")
 
 data class OptionsToml(
-    val metaFolder: String?, val metaFolderBase: String?, val acceptableGameVersions: List<String>,
-    val acceptableLoaders: List<String>, val options: Map<String, Any>
+    val metaFolder: String? = null, val metaFolderBase: String? = null,
+    val acceptableGameVersions: List<String> = listOf(), val acceptableLoaders: List<String> = listOf(),
+    val options: Map<String, Any> = mapOf()
 ) : ToTomlVersioned {
     companion object : FromTomlVersioned<OptionsToml> {
         override fun fromToml(toml: Toml, packFormat: FormatVersion): OptionsToml {

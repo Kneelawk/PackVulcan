@@ -1,4 +1,4 @@
-package com.kneelawk.packvulcan.model.modrinth.version
+package com.kneelawk.packvulcan.model.modrinth.version.result
 
 import com.kneelawk.packvulcan.util.ZonedDateTimeSerializer
 import kotlinx.serialization.SerialName

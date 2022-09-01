@@ -39,6 +39,16 @@ fun ModpackCurrentDetailsView(component: ModpackComponent) {
                 loaderVersion = component.editLoaderVersion,
                 loaderVersionChange = { component.updateLoaderVersion(it) },
                 loaderVersionError = component.loaderVersionError.isNotBlank(),
+                additionalLoaders = component.additionalLoaders,
+                loaderSelected = { component.extraAcceptableVersions.loaders.contains(it.packwizName) },
+                toggleLoader = component::toggleAdditionalLoader,
+                additionalMinecraftText = component.additionalMinecraftText,
+                additionalMinecraftTextChange = { component.additionalMinecraftText = it },
+                additionalMinecraftVersions = component.extraAcceptableVersions.minecraft.toList(),
+                additionalMinecraftOptions = component.minecraftVersions,
+                addAdditionalMinecraft = component::addAdditionalMinecraft,
+                removeAdditionalMinecraft = component::removeAdditionalMinecraft,
+                additionalMinecraftTextError = false,
                 enabled = !component.loading
             )
 

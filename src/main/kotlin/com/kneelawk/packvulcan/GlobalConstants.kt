@@ -18,8 +18,8 @@ object GlobalConstants {
     val HOME_FOLDER: Path = Paths.get(System.getProperty("user.home"))
 
     const val INITIAL_PROJECT_VERSION = "0.1.0"
-    const val INITIAL_MINECRAFT_VERSION = "1.18.2"
-    const val INITIAL_LOADER_VERSION = "Fabric 0.13.3"
+    const val INITIAL_MINECRAFT_VERSION = "1.19.2"
+    const val INITIAL_LOADER_VERSION = "Quilt 0.17.4"
     const val MAX_DOWNLOAD_ATTEMPTS = 10
 
     init {

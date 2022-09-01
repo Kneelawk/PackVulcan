@@ -58,7 +58,7 @@ fun LoaderVersionView(
             LoaderType.fromLoaderVersionType(
                 LoaderVersion.Type.forVersion(previousVersion)
                     ?: LoaderVersion.Type.QUILT
-            )
+            ) ?: LoaderType.QUILT
         )
     }
 
@@ -94,6 +94,7 @@ fun LoaderVersionView(
                             LoaderVersion.fabricLoaderList()
                         }
                     }
+
                     LoaderType.QUILT -> {
                         IndependentLoaderVersionSelector(
                             selectedVersion = selectedVersion,
@@ -106,6 +107,7 @@ fun LoaderVersionView(
                             LoaderVersion.quiltLoaderList()
                         }
                     }
+
                     LoaderType.FORGE -> {
                         DependentLoaderVersionSelector(
                             selectedVersion = selectedVersion,
@@ -307,11 +309,12 @@ private enum class LoaderType(val text: String, val icon: @Composable () -> Unit
     FORGE("Forge", { Icon(PackVulcanIcons.forge, "forge") });
 
     companion object {
-        fun fromLoaderVersionType(type: LoaderVersion.Type): LoaderType {
+        fun fromLoaderVersionType(type: LoaderVersion.Type): LoaderType? {
             return when (type) {
                 LoaderVersion.Type.FABRIC -> FABRIC
                 LoaderVersion.Type.FORGE -> FORGE
                 LoaderVersion.Type.QUILT -> QUILT
+                else -> null
             }
         }
     }

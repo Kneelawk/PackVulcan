@@ -2,6 +2,7 @@ package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
@@ -10,13 +11,15 @@ import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
 import com.kneelawk.packvulcan.util.Conflator
+import com.kneelawk.packvulcan.util.MSet
 import com.kneelawk.packvulcan.util.add
 import mu.KotlinLogging
 
 @Composable
 fun rememberModrinthSearchController(
     selectedMinecraftVersions: MutableMap<String, Unit>, selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>,
-    openProject: (id: String) -> Unit, installLatest: (id: String) -> Unit, browseVersions: (id: String) -> Unit
+    acceptableVersions: AcceptableVersions, modrinthProjects: MSet<String>, browseVersions: (id: String) -> Unit,
+    openProject: (id: String) -> Unit
 ): ModrinthSearchInterface {
     val log = remember { KotlinLogging.logger { } }
     val scope = rememberCoroutineScope()
@@ -113,7 +116,7 @@ fun rememberModrinthSearchController(
             val res = ModrinthApi.search(data.toQuery())
             finalPageC = (res.totalHits + perPageC.limit - 1) / perPageC.limit
             searchResults.clear()
-            searchResults.addAll(res.hits.map { SearchHitDisplay.fromJson(it) })
+            searchResults.addAll(res.hits.map { SearchHitDisplay.fromJson(it, acceptableVersions, scope) })
             loading = false
 
             searchScrollState.scrollToItem(0)
@@ -258,12 +261,14 @@ fun rememberModrinthSearchController(
                 startSearch()
             }
 
+            override fun isModInstalled(project: SearchHitDisplay): Boolean = modrinthProjects.containsKey(project.id)
+
             override fun openProject(project: SearchHitDisplay) {
                 openProject(project.id)
             }
 
             override fun installLatest(project: SearchHitDisplay) {
-                installLatest(project.id)
+
             }
 
             override fun browseVersions(project: SearchHitDisplay) {

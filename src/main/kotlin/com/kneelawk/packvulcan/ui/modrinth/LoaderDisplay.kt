@@ -44,8 +44,11 @@ class LoaderDisplay(
         private fun getLoaderTypeFor(json: LoaderJson): LoaderVersion.Type? {
             return when (json.name) {
                 "fabric" -> LoaderVersion.Type.FABRIC
+                "liteloader" -> LoaderVersion.Type.LITELOADER
+                "modloader" -> LoaderVersion.Type.MODLOADER
                 "forge" -> LoaderVersion.Type.FORGE
                 "quilt" -> LoaderVersion.Type.QUILT
+                "rift" -> LoaderVersion.Type.RIFT
                 else -> {
                     log.warn("Received unknown loader from Modrinth: '${json.name}'")
                     null

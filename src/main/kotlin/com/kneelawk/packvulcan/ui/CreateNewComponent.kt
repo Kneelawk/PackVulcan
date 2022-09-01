@@ -1,13 +1,11 @@
 package com.kneelawk.packvulcan.ui
 
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
 import com.kneelawk.packvulcan.GlobalConstants.INITIAL_LOADER_VERSION
 import com.kneelawk.packvulcan.GlobalConstants.INITIAL_MINECRAFT_VERSION
 import com.kneelawk.packvulcan.GlobalConstants.INITIAL_PROJECT_VERSION
+import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.NewModpack
@@ -15,6 +13,7 @@ import com.kneelawk.packvulcan.util.ComponentScope
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.PathUtils
 import com.kneelawk.packvulcan.util.VersionUtils
+import kotlinx.coroutines.launch
 import java.nio.file.Paths
 
 class CreateNewComponent(context: ComponentContext, private val finish: (CreateNewResult) -> Unit) :
@@ -59,6 +58,12 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
     private val loaderVersion by derivedStateOf { loaderVersionState.version }
     val loaderVersionError by derivedStateOf { loaderVersionState.error }
 
+    var additionalMinecraftText by mutableStateOf("")
+    val minecraftVersions = mutableStateListOf<String>()
+    val additionalLoaders by derivedStateOf { LoaderVersion.Type.values().filter { it != loaderVersion?.type } }
+    var acceptableVersions by mutableStateOf(AcceptableVersions())
+    var acceptableVersionsLoading by mutableStateOf(false)
+
     val createEnabled by derivedStateOf {
         PathUtils.isPathValid(location)
                 && name.isNotBlank()
@@ -68,9 +73,17 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
                 && loaderVersion != null
     }
 
-    val showLoadingIcon by derivedStateOf { minecraftVersionLoading || loaderVersionLoading }
+    val showLoadingIcon by derivedStateOf { minecraftVersionLoading || loaderVersionLoading || acceptableVersionsLoading }
 
     init {
+        scope.launch {
+            acceptableVersionsLoading = true
+            minecraftVersions.addAll(
+                MinecraftVersion.minecraftVersionList()
+                    .asSequence()
+                    .map { it.version })
+            acceptableVersionsLoading = false
+        }
         minecraftVersionConflator.send(INITIAL_MINECRAFT_VERSION)
         loaderVersionConflator.send(LoaderVersionInput(INITIAL_LOADER_VERSION, INITIAL_MINECRAFT_VERSION))
     }
@@ -86,6 +99,25 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
         loaderVersionConflator.send(LoaderVersionInput(version, editMinecraftVersion))
     }
 
+    fun addAdditionalMinecraft(version: String) {
+        additionalMinecraftText = ""
+        acceptableVersions = acceptableVersions.copy(minecraft = acceptableVersions.minecraft + version)
+    }
+
+    fun removeAdditionalMinecraft(version: String) {
+        acceptableVersions = acceptableVersions.copy(minecraft = acceptableVersions.minecraft - version)
+    }
+
+    fun toggleAdditionalLoader(type: LoaderVersion.Type) {
+        val newLoaders = if (acceptableVersions.loaders.contains(type.packwizName)) {
+            acceptableVersions.loaders - type.packwizName
+        } else {
+            acceptableVersions.loaders + type.packwizName
+        }
+
+        acceptableVersions = acceptableVersions.copy(loaders = newLoaders)
+    }
+
     fun cancel() {
         finish(CreateNewResult.Cancel)
     }
@@ -97,6 +129,7 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
         val version = version
         val minecraftVersion = minecraftVersion
         val loaderVersion = loaderVersion
+        val acceptableVersions = acceptableVersions
 
         if (PathUtils.isPathValid(location)
             && name.isNotBlank()
@@ -107,7 +140,9 @@ class CreateNewComponent(context: ComponentContext, private val finish: (CreateN
         ) {
             finish(
                 CreateNewResult.Create(
-                    NewModpack(Paths.get(location), name, author, version, minecraftVersion, loaderVersion)
+                    NewModpack(
+                        Paths.get(location), name, author, version, minecraftVersion, loaderVersion, acceptableVersions
+                    )
                 )
             )
         }

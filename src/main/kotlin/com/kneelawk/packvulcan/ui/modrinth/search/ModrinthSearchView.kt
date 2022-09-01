@@ -26,6 +26,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import com.google.accompanist.flowlayout.FlowRow
 import com.kneelawk.packvulcan.GlobalSettings
+import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.modrinth.DisplayElement
@@ -37,6 +38,7 @@ import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.widgets.*
 import com.kneelawk.packvulcan.util.LoadingState
+import com.kneelawk.packvulcan.util.MSet
 import com.kneelawk.packvulcan.util.formatHumanReadable
 import com.kneelawk.packvulcan.util.formatRelative
 import kotlinx.coroutines.launch
@@ -52,7 +54,8 @@ private val DROPDOWN_WAIT = Duration.ofMillis(200)
 fun ModrinthSearchWindow(
     onCloseRequest: () -> Unit, selectedMinecraftVersions: MutableMap<String, Unit>,
     selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>, modpackName: String,
-    openProject: (id: String) -> Unit, installLatest: (id: String) -> Unit, browseVersions: (id: String) -> Unit
+    acceptableVersions: AcceptableVersions, modrinthProjects: MSet<String>, openProject: (id: String) -> Unit,
+    browseVersions: (id: String) -> Unit
 ) {
     val state = rememberWindowState(size = DpSize(1280.dp, 800.dp))
 
@@ -63,8 +66,9 @@ fun ModrinthSearchWindow(
                     rememberModrinthSearchController(
                         selectedMinecraftVersions = selectedMinecraftVersions,
                         selectedKnownLoaders = selectedKnownLoaders,
+                        acceptableVersions = acceptableVersions,
+                        modrinthProjects = modrinthProjects,
                         openProject = openProject,
-                        installLatest = installLatest,
                         browseVersions = browseVersions
                     )
                 )
@@ -759,18 +763,33 @@ private fun SearchHitView(controller: ModrinthSearchInterface, searchHit: Search
                 }
 
                 Column(modifier = Modifier.width(IntrinsicSize.Max), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                    SmallButton(
-                        onClick = { controller.installLatest(searchHit) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.small.copy(
-                            bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
-                        )
-                    ) {
-                        Icon(PackVulcanIcons.download, "install")
-                        Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
+                    Box(contentAlignment = Alignment.Center) {
+                        val installed = controller.isModInstalled(searchHit)
+                        SmallButton(
+                            onClick = { controller.installLatest(searchHit) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.small.copy(
+                                bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
+                            ),
+                            enabled = searchHit.compatible && !installed
+                        ) {
+                            if (installed) {
+                                Icon(Icons.Default.Check, "installed")
+                                Text("Already Installed", modifier = Modifier.padding(start = 5.dp))
+                            } else {
+                                if (searchHit.compatible) {
+                                    Icon(PackVulcanIcons.download, "install")
+                                    Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
+                                } else {
+                                    Icon(Icons.Default.Close, "incompatible")
+                                    Text("Incompatible", modifier = Modifier.padding(start = 5.dp))
+                                }
+                            }
+                        }
                     }
+
                     SmallButton(
-                        onClick = {},
+                        onClick = { controller.browseVersions(searchHit) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.small.copy(
                             topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp)

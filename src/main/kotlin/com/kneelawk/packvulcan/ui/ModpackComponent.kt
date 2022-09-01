@@ -4,16 +4,17 @@ import androidx.compose.runtime.*
 import com.arkivanov.decompose.ComponentContext
 import com.kneelawk.packvulcan.GlobalConstants.HOME_FOLDER
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
+import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.engine.packwiz.PackwizModFile
 import com.kneelawk.packvulcan.engine.packwiz.PackwizProject
+import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.NewModpack
+import com.kneelawk.packvulcan.model.packwiz.pack.OptionsToml
 import com.kneelawk.packvulcan.ui.instance.InstanceManager
-import com.kneelawk.packvulcan.util.ComponentScope
-import com.kneelawk.packvulcan.util.Conflator
-import com.kneelawk.packvulcan.util.VersionUtils
+import com.kneelawk.packvulcan.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,12 +97,25 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
 
     val showLoadingIcon by derivedStateOf { minecraftVersionLoading || loaderVersionLoading }
 
+    var additionalMinecraftText by mutableStateOf("")
+    val minecraftVersions = mutableStateListOf<String>()
+    val additionalLoaders by derivedStateOf { LoaderVersion.Type.values().filter { it != loaderVersion.type } }
+    var extraAcceptableVersions by mutableStateOf(AcceptableVersions())
+
+    val acceptableVersions by derivedStateOf {
+        extraAcceptableVersions.copy(
+            minecraft = extraAcceptableVersions.minecraft + minecraftVersion.version,
+            loaders = extraAcceptableVersions.loaders + loaderVersion.type.packwizName
+        )
+    }
+
     /*
      * Mod List Stuff.
      */
 
     val modsList = mutableStateListOf<PackwizMod>()
     private val modsMap = mutableMapOf<String, PackwizMod>()
+    val modrinthProjects = mutableMapOf<String, Unit>()
 
     private var modsDir = Paths.get("")
     var previousSelectionDir = HOME_FOLDER
@@ -121,6 +135,12 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     var attributorDialogOpen by mutableStateOf(false)
 
     init {
+        scope.launch {
+            minecraftVersions.addAll(
+                MinecraftVersion.minecraftVersionList()
+                    .asSequence()
+                    .map { it.version })
+        }
         scope.launch {
             val project = when (args) {
                 is ModpackComponentArgs.CreateNew -> {
@@ -164,6 +184,11 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
 
         modsDir = project.modsDir
 
+        extraAcceptableVersions = AcceptableVersions(
+            project.pack.options?.acceptableGameVersions.orEmpty().toSet(),
+            project.pack.options?.acceptableLoaders.orEmpty().toSet()
+        )
+
         setModsList(project.getMods())
     }
 
@@ -187,6 +212,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         modsList.addAll(mods.sortedBy { it.filePath })
         modsMap.clear()
         modsMap.putAll(mods.associateBy { it.filePath })
+        modrinthProjects.clear()
+        modrinthProjects.addAll(mods.mapNotNull { (it as? PackwizMetaFile)?.toml?.update?.modrinth?.modId })
     }
 
     private fun addOrReplaceModInList(mod: PackwizMod) {
@@ -199,6 +226,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         }
 
         modsMap[mod.filePath] = mod
+
+        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.let { modrinthProjects.add(it.modId) }
     }
 
     fun removeMod(filePath: String) {
@@ -258,6 +287,13 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                     versions = project.pack.versions.copy(
                         minecraft = minecraftVersion.version,
                         loaderVersions = mapOf(loaderVersion.type.packwizName to loaderVersion.version)
+                    ),
+                    options = project.pack.options?.copy(
+                        acceptableGameVersions = extraAcceptableVersions.minecraft.toList(),
+                        acceptableLoaders = extraAcceptableVersions.loaders.toList()
+                    ) ?: OptionsToml(
+                        acceptableGameVersions = extraAcceptableVersions.minecraft.toList(),
+                        acceptableLoaders = extraAcceptableVersions.loaders.toList()
                     )
                 )
 
@@ -298,6 +334,25 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     fun updateLoaderVersion(version: String) {
         editLoaderVersion = version
         loaderVersionConflator.send(LoaderVersionInput(version, editMinecraftVersion))
+    }
+
+    fun addAdditionalMinecraft(version: String) {
+        additionalMinecraftText = ""
+        extraAcceptableVersions = extraAcceptableVersions.copy(minecraft = extraAcceptableVersions.minecraft + version)
+    }
+
+    fun removeAdditionalMinecraft(version: String) {
+        extraAcceptableVersions = extraAcceptableVersions.copy(minecraft = extraAcceptableVersions.minecraft - version)
+    }
+
+    fun toggleAdditionalLoader(type: LoaderVersion.Type) {
+        val newLoaders = if (extraAcceptableVersions.loaders.contains(type.packwizName)) {
+            extraAcceptableVersions.loaders - type.packwizName
+        } else {
+            extraAcceptableVersions.loaders + type.packwizName
+        }
+
+        extraAcceptableVersions = extraAcceptableVersions.copy(loaders = newLoaders)
     }
 
     fun new() {

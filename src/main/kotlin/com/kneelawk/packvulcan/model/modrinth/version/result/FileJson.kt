@@ -1,4 +1,4 @@
-package com.kneelawk.packvulcan.model.modrinth.version
+package com.kneelawk.packvulcan.model.modrinth.version.result
 
 import kotlinx.serialization.Serializable
 

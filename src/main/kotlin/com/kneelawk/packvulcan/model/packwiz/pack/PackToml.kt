@@ -6,8 +6,7 @@ import mu.KotlinLogging
 
 data class PackToml(
     val name: String, val author: String?, val version: String?, val description: String?,
-    val packFormat: FormatVersion,
-    val index: IndexObjectToml, val versions: VersionsToml, val options: OptionsToml?
+    val packFormat: FormatVersion, val index: IndexObjectToml, val versions: VersionsToml, val options: OptionsToml?
 ) : ToToml {
     companion object : FromToml<PackToml> {
         private val log = KotlinLogging.logger { }

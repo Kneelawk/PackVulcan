@@ -65,6 +65,20 @@ object SmallButtonDefaults {
      * The default size of the icon when used inside a [SmallButton].
      */
     val IconSize = 24.dp
+
+    private val TextButtonHorizontalPadding = 8.dp
+
+    /**
+     * The default content padding used by [SmallTextButton]
+     */
+    val TextButtonContentPadding = PaddingValues(
+        start = TextButtonHorizontalPadding,
+        top = ContentPadding.calculateTopPadding(),
+        end = TextButtonHorizontalPadding,
+        bottom = ContentPadding.calculateBottomPadding()
+    )
+
+    val IconButtonPadding = PaddingValues(VerticalPadding)
 }
 
 @Composable
@@ -84,17 +98,15 @@ fun ListButton(
 ) {
     val contentColor by colors.contentColor(enabled)
     SmallSurface(
+        onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
-        onClick = onClick,
-        enabled = enabled,
-        role = Role.Button,
-        interactionSource = interactionSource,
-        indication = rememberRipple()
+        interactionSource = interactionSource
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
@@ -189,17 +201,15 @@ fun SmallButton(
 ) {
     val contentColor by colors.contentColor(enabled)
     SmallSurface(
+        onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled).value,
         contentColor = contentColor.copy(alpha = 1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
-        onClick = onClick,
-        enabled = enabled,
-        role = Role.Button,
-        interactionSource = interactionSource,
-        indication = rememberRipple()
+        interactionSource = interactionSource
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(
@@ -228,7 +238,7 @@ fun SmallTextButton(
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
-    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    contentPadding: PaddingValues = SmallButtonDefaults.TextButtonContentPadding,
     content: @Composable RowScope.() -> Unit
 ) = SmallButton(
     onClick = onClick,
@@ -243,15 +253,14 @@ fun SmallTextButton(
     content = content
 )
 
-val SmallIconButtonPadding = PaddingValues(SmallButtonDefaults.VerticalPadding)
-
 @Composable
 fun SmallIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    contentPadding: PaddingValues = SmallIconButtonPadding,
+    contentPadding: PaddingValues = SmallButtonDefaults.IconButtonPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    size: Dp = SmallButtonDefaults.MinHeight,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -261,11 +270,11 @@ fun SmallIconButton(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = SmallButtonDefaults.MinHeight / 2)
+                indication = rememberRipple(bounded = false, radius = size / 2)
             )
             .defaultMinSize(
-                minWidth = SmallButtonDefaults.MinHeight,
-                minHeight = SmallButtonDefaults.MinHeight
+                minWidth = size,
+                minHeight = size
             )
             .padding(contentPadding),
         contentAlignment = Alignment.Center

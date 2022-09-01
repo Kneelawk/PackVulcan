@@ -6,13 +6,14 @@ import com.kneelawk.packvulcan.model.manifest.quilt.QuiltLoaderJson
 import com.kneelawk.packvulcan.net.manifest.ManifestApis
 import com.kneelawk.packvulcan.util.Either
 import com.kneelawk.packvulcan.util.leftOr
+import com.kneelawk.packvulcan.util.right
 import com.kneelawk.packvulcan.util.suspendGet
 import com.kneelawk.packvulcan.model.manifest.forge.LoaderJson as ForgeLoaderJson
 
 
 sealed class LoaderVersion {
     companion object {
-        val DEFAULT_VERSION: LoaderVersion = Fabric("0.13.3")
+        val DEFAULT_VERSION: LoaderVersion = Quilt("0.17.4")
 
         private fun fromFabricJson(json: FabricLoaderJson): Fabric {
             return Fabric(json.version)
@@ -107,16 +108,19 @@ sealed class LoaderVersion {
                     val version = loaderVersion.substring("fabric".length).trim()
                     leftOr(fabricLoaderMap()[version], InvalidLoaderVersionError.Fabric(version))
                 }
+
                 Type.QUILT -> {
                     val version = loaderVersion.substring("quilt".length).trim()
                     leftOr(quiltLoaderMap()[version], InvalidLoaderVersionError.Quilt(version))
                 }
+
                 Type.FORGE -> {
                     val version = loaderVersion.substring("forge".length).trim()
                     leftOr(
                         forgeMap(minecraftVersion)[version], InvalidLoaderVersionError.Forge(version, minecraftVersion)
                     )
                 }
+
                 else -> Either.right(InvalidLoaderVersionError.UnknownLoader)
             }
         }
@@ -128,15 +132,19 @@ sealed class LoaderVersion {
                 Type.FABRIC -> {
                     leftOr(fabricLoaderMap()[loaderVersion], InvalidLoaderVersionError.Fabric(loaderVersion))
                 }
+
                 Type.FORGE -> {
                     leftOr(
                         forgeMap(minecraftVersion)[loaderVersion],
                         InvalidLoaderVersionError.Forge(loaderVersion, minecraftVersion)
                     )
                 }
+
                 Type.QUILT -> {
                     leftOr(quiltLoaderMap()[loaderVersion], InvalidLoaderVersionError.Quilt(loaderVersion))
                 }
+
+                else -> right(InvalidLoaderVersionError.UnknownLoader)
             }
         }
     }
@@ -171,8 +179,11 @@ sealed class LoaderVersion {
 
     enum class Type(val prettyName: String, val packwizName: String) {
         FABRIC("Fabric", "fabric"),
+        LITELOADER("LiteLoader", "liteloader"),
+        MODLOADER("Risugami's ModLoader", "modloader"),
         FORGE("Forge", "forge"),
-        QUILT("Quilt", "quilt");
+        QUILT("Quilt", "quilt"),
+        RIFT("Rift", "rift");
 
         companion object {
             fun fromPackwizName(name: String): Type? {
@@ -183,8 +194,12 @@ sealed class LoaderVersion {
                 val lowercase = version.lowercase()
                 return when {
                     lowercase.startsWith("fabric") -> FABRIC
+                    lowercase.startsWith("liteloader") -> LITELOADER
+                    lowercase.startsWith("modloader") -> MODLOADER
+                    lowercase.startsWith("risugami's modloader") -> MODLOADER
                     lowercase.startsWith("forge") -> FORGE
                     lowercase.startsWith("quilt") -> QUILT
+                    lowercase.startsWith("rift") -> RIFT
                     else -> null
                 }
             }

@@ -33,14 +33,26 @@ fun CreateNewView(component: CreateNewComponent, controls: WindowControls) {
     AppContainerBox("Create New Modpack") {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ModpackDetailsView(
-                component.location, { component.location = it },
-                component.name, { component.name = it },
-                component.author, { component.author = it },
-                component.version, { component.version = it }, component.versionError,
-                component.editMinecraftVersion, { component.setMinecraftVersion(it) },
-                component.minecraftVersionError.isNotBlank(),
-                component.editLoaderVersion, { component.setLoaderVersion(it) },
-                component.loaderVersionError.isNotBlank()
+                location = component.location, locationChange = { component.location = it },
+                name = component.name, nameChange = { component.name = it },
+                author = component.author, authorChange = { component.author = it },
+                version = component.version, versionChange = { component.version = it },
+                versionError = component.versionError,
+                minecraftVersion = component.editMinecraftVersion,
+                minecraftVersionChange = { component.setMinecraftVersion(it) },
+                minecraftVersionError = component.minecraftVersionError.isNotBlank(),
+                loaderVersion = component.editLoaderVersion, loaderVersionChange = { component.setLoaderVersion(it) },
+                loaderVersionError = component.loaderVersionError.isNotBlank(),
+                additionalLoaders = component.additionalLoaders,
+                loaderSelected = { component.acceptableVersions.loaders.contains(it.packwizName) },
+                toggleLoader = component::toggleAdditionalLoader,
+                additionalMinecraftText = component.additionalMinecraftText,
+                additionalMinecraftTextChange = { component.additionalMinecraftText = it },
+                additionalMinecraftVersions = component.acceptableVersions.minecraft.toList(),
+                additionalMinecraftOptions = component.minecraftVersions,
+                addAdditionalMinecraft = component::addAdditionalMinecraft,
+                removeAdditionalMinecraft = component::removeAdditionalMinecraft,
+                additionalMinecraftTextError = false
             )
 
             Row(

@@ -64,6 +64,8 @@ interface ModrinthSearchInterface {
 
     fun pageBackward()
 
+    fun isModInstalled(project: SearchHitDisplay): Boolean
+
     fun openProject(project: SearchHitDisplay)
 
     fun installLatest(project: SearchHitDisplay)
