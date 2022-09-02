@@ -56,6 +56,7 @@ fun ModpackModsDialogs(component: ModpackComponent) {
             acceptableVersions = component.acceptableVersions,
             modrinthProjects = component.modrinthProjects,
             openProject = {},
+            install = component::install,
             browseVersions = {}
         )
     }

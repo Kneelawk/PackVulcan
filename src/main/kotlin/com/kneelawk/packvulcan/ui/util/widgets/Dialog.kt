@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DialogButtonBar(
-    modifier: Modifier = Modifier, onCancel: () -> Unit, onConfirm: () -> Unit, confirmEnabled: Boolean = true,
+    onCancel: () -> Unit, onConfirm: () -> Unit, modifier: Modifier = Modifier, confirmEnabled: Boolean = true,
     cancelContent: @Composable RowScope.() -> Unit = {
         Icon(Icons.Default.Close, "cancel")
         Text("Cancel", modifier = Modifier.padding(start = 5.dp))

@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.mod.ModFileCache
+import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.modfile.IconJson
@@ -44,7 +45,7 @@ object ModFileInfo {
         ignoreUnknownKeys = true
     }
 
-    class Info(val metadata: Metadata, val icon: BufferedImage?)
+    class Info(val path: Path, val metadata: Metadata, val icon: BufferedImage?)
 
     sealed class Metadata {
         data class Fabric(val data: FabricModJson) : Metadata()
@@ -52,13 +53,19 @@ object ModFileInfo {
         data class Quilt(val data: QuiltModJson) : Metadata()
     }
 
-    suspend fun getFileInfo(mod: ModToml): SimpleModInfo? {
+    suspend fun getFileInfo(packwizMod: PackwizMetaFile): SimpleModInfo? {
+        val mod = packwizMod.toml
         val url = mod.download.url ?: return null
         val modFileInfo = modFileInfoCache.suspendGet(url) {
             loadFileInfo(mod)
         } ?: return null
 
-        return getFileInfo(modFileInfo, mod.name, mod.filename)
+        val file = getFileInfo(modFileInfo, mod.name, mod.filename)
+
+        return SimpleModInfo.Url(
+            file.name, file.author, file.filename, file.version, file.description, file.icon, file.projectUrl,
+            file.modId, url, mod.download.hashFormat, mod.download.hash, packwizMod.filePath, mod.side
+        )
     }
 
     suspend fun getFileInfo(path: Path): SimpleModInfo? {
@@ -68,7 +75,7 @@ object ModFileInfo {
 
     private suspend fun getFileInfo(
         info: Info, name: String, filename: String
-    ): SimpleModInfo {
+    ): SimpleModInfo.File {
         val icon = info.icon?.let { original ->
             val bi = if (
                 original.width > ImageUtils.MOD_ICON_SIZE ||
@@ -90,7 +97,7 @@ object ModFileInfo {
 
                 SimpleModInfo.File(
                     meta.data.name ?: name, authors, filename, meta.data.version, meta.data.description, icon,
-                    contact?.get("homepage") ?: contact?.get("sources"), meta.data.id
+                    contact?.get("homepage") ?: contact?.get("sources"), meta.data.id, info.path
                 )
             }
 
@@ -100,7 +107,7 @@ object ModFileInfo {
                 SimpleModInfo.File(
                     modToml?.displayName ?: name, modToml?.authors ?: "Unknown", filename,
                     modToml?.version ?: "unknown", modToml?.description, icon, modToml?.displayURL,
-                    modToml?.modId ?: "unknown"
+                    modToml?.modId ?: "unknown", info.path
                 )
             }
 
@@ -113,7 +120,7 @@ object ModFileInfo {
 
                 SimpleModInfo.File(
                     metadata?.name ?: name, authors, filename, quiltLoader.version, metadata?.description,
-                    icon, contact?.get("homepage") ?: contact?.get("sources"), quiltLoader.id
+                    icon, contact?.get("homepage") ?: contact?.get("sources"), quiltLoader.id, info.path
                 )
             }
         }
@@ -144,7 +151,7 @@ object ModFileInfo {
 
                 val icon = getModFileIcon(data.icon, modFileSystem)
 
-                Info(Metadata.Fabric(data), icon)
+                Info(file, Metadata.Fabric(data), icon)
             }
 
             modFileSystem.exists(QUILT_METADATA_PATH) -> {
@@ -156,7 +163,7 @@ object ModFileInfo {
 
                 val icon = getModFileIcon(data.quiltLoader.metadata?.icon, modFileSystem)
 
-                Info(Metadata.Quilt(data), icon)
+                Info(file, Metadata.Quilt(data), icon)
             }
 
             modFileSystem.exists(FORGE_METADATA_PATH) -> {
@@ -174,7 +181,7 @@ object ModFileInfo {
                     }
                 }
 
-                Info(Metadata.Forge(data), icon)
+                Info(file, Metadata.Forge(data), icon)
             }
 
             else -> null

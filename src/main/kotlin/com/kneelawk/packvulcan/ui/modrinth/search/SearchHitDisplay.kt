@@ -64,5 +64,5 @@ data class SearchHitDisplay(
 }
 
 private fun AcceptableVersions.isCompatible(loaders: List<LoaderDisplay>, minecrafts: List<String>): Boolean {
-    return loadersCompatible(loaders.asSequence().map { it.apiName }) && minecraftCompatible(minecrafts.asSequence())
+    return loadersCompatible(loaders.asSequence().map { it.apiName }) && minecraftCompatible(minecrafts)
 }

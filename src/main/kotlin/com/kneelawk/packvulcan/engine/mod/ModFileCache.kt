@@ -32,7 +32,9 @@ import kotlin.io.path.name
 object ModFileCache {
     private val log = KotlinLogging.logger { }
 
-    private val ILLEGAL_CHARACTERS = Regex("""[^a-zA-Z0-9\-._ !@#$%^*(){}\[\]/]""")
+    // Hopefully making the pattern `..` illegal anywhere in a path string will be enough to prevent files from sneaking
+    // their way out of the cache directory.
+    private val ILLEGAL_PATTERNS = Regex("""([^a-zA-Z0-9\-._ !@#$%^*(){}\[\]/]|\.\.)""")
     private val CACHE_DIR = GlobalConstants.MOD_CACHE_DIR_PATH
 
     init {
@@ -53,7 +55,7 @@ object ModFileCache {
         } else {
             decoded
         }
-        return slashRemoved.replace(ILLEGAL_CHARACTERS, "-")
+        return slashRemoved.replace(ILLEGAL_PATTERNS, "-")
     }
 
     @OptIn(ExperimentalSerializationApi::class)

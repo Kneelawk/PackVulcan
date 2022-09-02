@@ -7,9 +7,12 @@ import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.modrinth.search.query.SearchQuery
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
+import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallVersion
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.MSet
 import com.kneelawk.packvulcan.util.add
@@ -19,7 +22,7 @@ import mu.KotlinLogging
 fun rememberModrinthSearchController(
     selectedMinecraftVersions: MutableMap<String, Unit>, selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>,
     acceptableVersions: AcceptableVersions, modrinthProjects: MSet<String>, browseVersions: (id: String) -> Unit,
-    openProject: (id: String) -> Unit
+    install: (InstallOperation) -> Unit, openProject: (id: String) -> Unit
 ): ModrinthSearchInterface {
     val log = remember { KotlinLogging.logger { } }
     val scope = rememberCoroutineScope()
@@ -77,6 +80,8 @@ fun rememberModrinthSearchController(
     var finalPageC by finalPageState
 
     val searchScrollState = rememberLazyListState()
+
+    val installLatestState = remember { mutableStateOf<InstallDisplay?>(null) }
 
     LaunchedEffect(showMinecraftReleasesC, showMinecraftSnapshotsC, showMinecraftBetasC, showMinecraftAlphasC) {
         minecraftLoading = true
@@ -165,6 +170,9 @@ fun rememberModrinthSearchController(
             override val currentPage by currentPageState
             override val finalPage by finalPageState
             override val searchScrollState = searchScrollState
+            override val acceptableVersions = acceptableVersions
+            override val installedProjects = modrinthProjects
+            override val installLatest by installLatestState
 
             override fun clearFilters() {
                 selectedMinecraftVersions.clear()
@@ -268,7 +276,16 @@ fun rememberModrinthSearchController(
             }
 
             override fun installLatest(project: SearchHitDisplay) {
+                installLatestState.value = InstallDisplay(project.id, InstallVersion.Latest)
+            }
 
+            override fun cancelInstallLatest() {
+                installLatestState.value = null
+            }
+
+            override fun install(install: InstallOperation) {
+                installLatestState.value = null
+                install(install)
             }
 
             override fun browseVersions(project: SearchHitDisplay) {

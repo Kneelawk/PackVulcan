@@ -8,12 +8,15 @@ import com.kneelawk.packvulcan.model.modrinth.search.result.SearchResultJson
 import com.kneelawk.packvulcan.model.modrinth.tag.CategoryJson
 import com.kneelawk.packvulcan.model.modrinth.tag.LoaderJson
 import com.kneelawk.packvulcan.model.modrinth.team.TeamMemberJson
+import com.kneelawk.packvulcan.model.modrinth.version.query.HashLookup
+import com.kneelawk.packvulcan.model.modrinth.version.query.UpdateByHash
 import com.kneelawk.packvulcan.model.modrinth.version.query.VersionsQuery
 import com.kneelawk.packvulcan.model.modrinth.version.result.VersionJson
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
 import com.kneelawk.packvulcan.util.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -92,9 +95,7 @@ object ModrinthApi {
             with(url.parameters) {
                 query.query?.let { append("query", it) }
                 query.facets?.let { andList ->
-                    append("facets", andList.joinToString(",", "[", "]") { orList ->
-                        orList.joinToString(",", "[", "]") { "\"$it\"" }
-                    })
+                    append("facets", Json.encodeToString(andList))
                 }
                 query.index?.let { append("index", it.apiName) }
                 query.offset?.let { append("offset", it.toString()) }
@@ -108,15 +109,29 @@ object ModrinthApi {
             HTTP_CLIENT.get("https://api.modrinth.com/v2/project/${query.projectIdOrSlug}/version") {
                 with(url.parameters) {
                     if (query.loaders.isNotEmpty()) {
-                        append("loaders", query.loaders.joinToString(",", "[", "]"))
+                        append("loaders", Json.encodeToString(query.loaders))
                     }
                     if (query.gameVersions.isNotEmpty()) {
-                        append("game_versions", query.gameVersions.joinToString(",", "[", "]"))
+                        append("game_versions", Json.encodeToString(query.gameVersions))
                     }
                     query.featured?.let { append("featured", it.toString()) }
                 }
             }.body()
         }
+
+    suspend fun hashLookup(lookup: HashLookup): Map<String, VersionJson> = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.post("https://api.modrinth.com/v2/version_files") {
+            contentType(ContentType.Application.Json)
+            setBody(lookup)
+        }.body()
+    }
+
+    suspend fun updateByHash(update: UpdateByHash): Map<String, VersionJson> = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.post("https://api.modrinth.com/v2/version_files/update") {
+            contentType(ContentType.Application.Json)
+            setBody(update)
+        }.body()
+    }
 
     /*
      * Accessor methods.

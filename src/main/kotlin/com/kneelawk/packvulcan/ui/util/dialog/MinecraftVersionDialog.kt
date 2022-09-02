@@ -171,13 +171,13 @@ fun MinecraftVersionView(title: String, previousVersion: String, finished: (Mine
             }
 
             DialogButtonBar(
-                modifier = Modifier.fillMaxWidth(),
                 onCancel = { finished(null) },
                 onConfirm = {
                     if (selectedVersion != null) {
                         finished(selectedVersion)
                     }
                 },
+                modifier = Modifier.fillMaxWidth(),
                 confirmEnabled = selectedVersion != null
             )
         }

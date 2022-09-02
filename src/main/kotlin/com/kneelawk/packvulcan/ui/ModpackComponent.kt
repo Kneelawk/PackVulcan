@@ -6,7 +6,6 @@ import com.kneelawk.packvulcan.GlobalConstants.HOME_FOLDER
 import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
-import com.kneelawk.packvulcan.engine.packwiz.PackwizModFile
 import com.kneelawk.packvulcan.engine.packwiz.PackwizProject
 import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.LoaderVersion
@@ -118,6 +117,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     val modrinthProjects = mutableMapOf<String, Unit>()
 
     private var modsDir = Paths.get("")
+    private var modsPathStr = "mods/"
+    private var metafileExtension = ".pw.toml"
     var previousSelectionDir = HOME_FOLDER
 
     /*
@@ -183,6 +184,8 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         updateMinecraftAndLoaderVersions(loaderVersion, minecraftVersion)
 
         modsDir = project.modsDir
+        modsPathStr = project.modsPathStr
+        metafileExtension = project.packFormat.metafileExtension
 
         extraAcceptableVersions = AcceptableVersions(
             project.pack.options?.acceptableGameVersions.orEmpty().toSet(),
@@ -222,17 +225,23 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
             modsList[index] = mod
         } else {
             val index = modsList.indexOfFirst { it.filePath > mod.filePath }
-            modsList.add(index, mod)
+            if (index == -1) {
+                modsList.add(mod)
+            } else {
+                modsList.add(index, mod)
+            }
         }
 
         modsMap[mod.filePath] = mod
 
-        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.let { modrinthProjects.add(it.modId) }
+        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let(modrinthProjects::add)
     }
 
     fun removeMod(filePath: String) {
         modsList.removeAll { it.filePath == filePath }
-        modsMap.remove(filePath)
+        val mod = modsMap.remove(filePath)
+
+        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let(modrinthProjects::remove)
     }
 
     fun modFilenameConflicts(path: Path): Boolean {
@@ -256,12 +265,9 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
                 }
 
                 if (path.name.endsWith(".jar")) {
-                    val info = ModFileInfo.getFileInfo(newModFile)
-                    if (info != null) {
-                        val relative = newModFile.relativeTo(modpackLocation).invariantSeparatorsPathString
-
-                        addOrReplaceModInList(PackwizModFile(relative, null, false, newModFile, info))
-                    }
+                    ModFileInfo.getFileInfo(newModFile)
+                        ?.toPackwizMod(modpackLocation, modsPathStr, metafileExtension, null, false)
+                        ?.let(::addOrReplaceModInList)
                 }
 
                 loading = false
@@ -353,6 +359,14 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         }
 
         extraAcceptableVersions = extraAcceptableVersions.copy(loaders = newLoaders)
+    }
+
+    fun install(install: InstallOperation) {
+        log.info("Installing: ${install.toInstall.map { it.name }}")
+
+        for (mod in install.toInstall) {
+            addOrReplaceModInList(mod.toPackwizMod(modpackLocation, modsPathStr, metafileExtension, null, false))
+        }
     }
 
     fun new() {

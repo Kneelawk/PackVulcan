@@ -423,15 +423,14 @@ private fun CreateFolderDialog(controller: CreateFolderInterface) {
                     Box(Modifier.weight(1f))
 
                     DialogButtonBar(
-                        modifier = Modifier.fillMaxWidth(),
                         onCancel = { controller.cancel() },
                         onConfirm = { controller.createFolder() },
-                        confirmEnabled = controller.folderNameValid,
-                        confirmContent = {
-                            Icon(PackVulcanIcons.createNewFolder, "create")
-                            Text("Create", modifier = Modifier.padding(start = 5.dp))
-                        }
-                    )
+                        modifier = Modifier.fillMaxWidth(),
+                        confirmEnabled = controller.folderNameValid
+                    ) {
+                        Icon(PackVulcanIcons.createNewFolder, "create")
+                        Text("Create", modifier = Modifier.padding(start = 5.dp))
+                    }
 
                     SideEffect {
                         requester.requestFocus()

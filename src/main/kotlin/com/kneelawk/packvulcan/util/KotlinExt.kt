@@ -5,6 +5,10 @@ import java.time.Period
 import java.time.ZonedDateTime
 import java.util.*
 
+fun <T> T?.requireNotNull(error: String): T {
+    return this ?: throw NullPointerException(error)
+}
+
 inline fun <R : Collection<*>?, T : R> T?.ifNullOrEmpty(default: () -> R): R {
     return if (this.isNullOrEmpty()) {
         default()

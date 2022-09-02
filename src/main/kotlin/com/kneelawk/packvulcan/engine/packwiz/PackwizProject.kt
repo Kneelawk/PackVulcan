@@ -179,9 +179,9 @@ class PackwizProject(
         }
     }
 
-    private val metaPathStr = pack.options?.metaFolderBase?.let { "$it/" } ?: ""
-    private val modsPathStr = metaPathStr + (pack.options?.metaFolder ?: MODS_DIRNAME)
-    private val packFormat = pack.packFormat
+    val metaPathStr = pack.options?.metaFolderBase?.let { "$it/" } ?: ""
+    val modsPathStr = metaPathStr + (pack.options?.metaFolder ?: MODS_DIRNAME)
+    val packFormat = pack.packFormat
 
     val modsDir: Path
         get() = projectDir.resolve(modsPathStr)

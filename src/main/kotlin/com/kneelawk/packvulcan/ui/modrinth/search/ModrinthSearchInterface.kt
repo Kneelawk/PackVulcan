@@ -1,9 +1,13 @@
 package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.foundation.lazy.LazyListState
+import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.MinecraftVersion
+import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
+import com.kneelawk.packvulcan.util.MSet
 
 interface ModrinthSearchInterface {
     val searchLoading: Boolean
@@ -33,6 +37,9 @@ interface ModrinthSearchInterface {
     val currentPage: Int
     val finalPage: Int
     val searchScrollState: LazyListState
+    val acceptableVersions: AcceptableVersions
+    val installedProjects: MSet<String>
+    val installLatest: InstallDisplay?
 
     fun clearFilters()
 
@@ -69,6 +76,10 @@ interface ModrinthSearchInterface {
     fun openProject(project: SearchHitDisplay)
 
     fun installLatest(project: SearchHitDisplay)
+
+    fun cancelInstallLatest()
+
+    fun install(install: InstallOperation)
 
     fun browseVersions(project: SearchHitDisplay)
 }

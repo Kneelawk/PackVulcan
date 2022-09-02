@@ -135,13 +135,13 @@ fun LoaderVersionView(
             )
 
             DialogButtonBar(
-                modifier = Modifier.padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp).fillMaxWidth(),
                 onCancel = { finished(null) },
                 onConfirm = {
                     if (selectedVersion != null) {
                         finished(selectedVersion)
                     }
                 },
+                modifier = Modifier.padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp).fillMaxWidth(),
                 confirmEnabled = selectedVersion != null
             )
         }
