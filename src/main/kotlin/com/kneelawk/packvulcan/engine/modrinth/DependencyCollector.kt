@@ -4,15 +4,13 @@ import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.modrinth.version.result.DependencyJson
 import com.kneelawk.packvulcan.model.modrinth.version.result.DependencyTypeJson
-import com.kneelawk.packvulcan.util.MSet
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 object DependencyCollector {
     suspend fun collectDependencies(
-        dependencies: List<DependencyJson>?, acceptableVersions: AcceptableVersions,
-        alreadyInstalled: MSet<String>
+        dependencies: List<DependencyJson>?, acceptableVersions: AcceptableVersions, alreadyInstalled: Set<String>
     ): List<SimpleModInfo.Modrinth> {
         if (dependencies.isNullOrEmpty()) return emptyList()
 
@@ -26,7 +24,7 @@ object DependencyCollector {
     }
 
     private suspend fun collectDependencies(
-        dependencies: List<DependencyJson>?, acceptableVersions: AcceptableVersions, alreadyInstalled: MSet<String>,
+        dependencies: List<DependencyJson>?, acceptableVersions: AcceptableVersions, alreadyInstalled: Set<String>,
         collected: ConcurrentHashMap<String, CollectedDependency>
     ) {
         if (dependencies.isNullOrEmpty()) return
@@ -40,7 +38,7 @@ object DependencyCollector {
                     val childMod = childPav.toModInfo()
                     val childVersion = DepVersion.fromJson(dep)
 
-                    if (alreadyInstalled.containsKey(childPav.project.id)) return@launch
+                    if (alreadyInstalled.contains(childPav.project.id)) return@launch
 
                     var collectChildren = false
                     collected.compute(childPav.project.id) { _, existing ->

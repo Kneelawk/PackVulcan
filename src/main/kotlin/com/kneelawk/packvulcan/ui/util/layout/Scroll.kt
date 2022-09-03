@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 fun VerticalScrollWrapper(
     adapter: ScrollbarAdapter, modifier: Modifier = Modifier, backgroundColor: Color = MaterialTheme.colors.surface,
     backgroundShape: Shape = MaterialTheme.shapes.medium, scrollbarPadding: PaddingValues = PaddingValues(end = 15.dp),
-    content: @Composable RowScope.() -> Unit
+    enabled: Boolean = true, content: @Composable RowScope.() -> Unit
 ) {
     Row(modifier = modifier.background(backgroundColor, backgroundShape).clip(backgroundShape)) {
         content()
@@ -29,10 +29,10 @@ fun VerticalScrollWrapper(
         val isScrollable by remember { derivedStateOf { adapter.maxScrollOffset(containerSize) > 0f } }
 
         Layout({
-            AnimatedVisibility(visible = isScrollable) {
+            AnimatedVisibility(visible = isScrollable && enabled) {
                 VerticalScrollbar(
                     adapter = adapter,
-                    modifier = Modifier.fillMaxHeight().padding(scrollbarPadding)
+                    modifier = Modifier.fillMaxHeight().padding(scrollbarPadding),
                 )
             }
         }, Modifier.fillMaxHeight(), measure)

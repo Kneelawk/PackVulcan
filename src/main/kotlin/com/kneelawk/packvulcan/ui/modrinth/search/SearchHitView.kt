@@ -2,21 +2,26 @@ package com.kneelawk.packvulcan.ui.modrinth.search
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import com.kneelawk.packvulcan.net.image.ImageResource
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallView
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallButton
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
+import com.kneelawk.packvulcan.ui.modrinth.install.InstallVersion
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
-import com.kneelawk.packvulcan.ui.util.widgets.Dropdown
 import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
@@ -25,7 +30,6 @@ import com.kneelawk.packvulcan.util.formatHumanReadable
 import com.kneelawk.packvulcan.util.formatRelative
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDisplay) {
     val scope = rememberCoroutineScope()
@@ -132,42 +136,31 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
                 }
 
                 Column(modifier = Modifier.width(IntrinsicSize.Max), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                    Box(contentAlignment = Alignment.Center) {
-                        val installed = controller.isModInstalled(searchHit)
-                        SmallButton(
-                            onClick = { controller.installLatest(searchHit) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.small.copy(
-                                bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
-                            ),
-                            enabled = searchHit.compatible && !installed
-                        ) {
-                            if (installed) {
-                                Icon(Icons.Default.Check, "installed")
-                                Text("Already Installed", modifier = Modifier.padding(start = 5.dp))
-                            } else {
-                                if (searchHit.compatible) {
-                                    Icon(PackVulcanIcons.download, "install")
-                                    Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
-                                } else {
-                                    Icon(Icons.Default.Close, "incompatible")
-                                    Text("Incompatible", modifier = Modifier.padding(start = 5.dp))
-                                }
-                            }
-                        }
+                    val installed = controller.installedProjects.contains(searchHit.id)
 
-                        Dropdown(
-                            expanded = searchHit.id == controller.installLatest?.projectId,
-                            onDismissRequest = controller::cancelInstallLatest
-                        ) {
-                            controller.installLatest?.let {
-                                InstallView(
-                                    display = it,
-                                    acceptableVersions = controller.acceptableVersions,
-                                    installedProjects = controller.installedProjects,
-                                    onCloseRequest = controller::cancelInstallLatest,
-                                    install = controller::install
-                                )
+                    InstallButton(
+                        display = InstallDisplay(searchHit.id, InstallVersion.Latest),
+                        acceptableVersions = controller.acceptableVersions,
+                        installedProjects = controller.installedProjects,
+                        install = controller::install,
+                        onLoading = { controller.installLoading(searchHit, it) },
+                        autoInstall = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.small.copy(
+                            bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)
+                        ),
+                        enabled = searchHit.compatible && !installed
+                    ) {
+                        if (installed) {
+                            Icon(Icons.Default.Check, "installed", tint = Color.Green)
+                            Text("Already Installed", modifier = Modifier.padding(start = 5.dp))
+                        } else {
+                            if (searchHit.compatible) {
+                                Icon(PackVulcanIcons.download, "install")
+                                Text("Install Latest...", modifier = Modifier.padding(start = 5.dp))
+                            } else {
+                                Icon(Icons.Default.Close, "incompatible")
+                                Text("Incompatible", modifier = Modifier.padding(start = 5.dp))
                             }
                         }
                     }

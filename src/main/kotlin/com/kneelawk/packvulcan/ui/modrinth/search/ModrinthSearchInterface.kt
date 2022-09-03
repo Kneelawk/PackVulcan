@@ -6,8 +6,6 @@ import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
-import com.kneelawk.packvulcan.util.MSet
 
 interface ModrinthSearchInterface {
     val searchLoading: Boolean
@@ -38,8 +36,8 @@ interface ModrinthSearchInterface {
     val finalPage: Int
     val searchScrollState: LazyListState
     val acceptableVersions: AcceptableVersions
-    val installedProjects: MSet<String>
-    val installLatest: InstallDisplay?
+    val scrollEnabled: Boolean
+    val installedProjects: Set<String>
 
     fun clearFilters()
 
@@ -71,13 +69,9 @@ interface ModrinthSearchInterface {
 
     fun pageBackward()
 
-    fun isModInstalled(project: SearchHitDisplay): Boolean
-
     fun openProject(project: SearchHitDisplay)
 
-    fun installLatest(project: SearchHitDisplay)
-
-    fun cancelInstallLatest()
+    fun installLoading(install: SearchHitDisplay, loading: Boolean)
 
     fun install(install: InstallOperation)
 

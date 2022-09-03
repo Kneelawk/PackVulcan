@@ -13,7 +13,9 @@ import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.NewModpack
 import com.kneelawk.packvulcan.model.packwiz.pack.OptionsToml
 import com.kneelawk.packvulcan.ui.instance.InstanceManager
-import com.kneelawk.packvulcan.util.*
+import com.kneelawk.packvulcan.util.ComponentScope
+import com.kneelawk.packvulcan.util.Conflator
+import com.kneelawk.packvulcan.util.VersionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -114,7 +116,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
 
     val modsList = mutableStateListOf<PackwizMod>()
     private val modsMap = mutableMapOf<String, PackwizMod>()
-    val modrinthProjects = mutableMapOf<String, Unit>()
+    var modrinthProjects by mutableStateOf(emptySet<String>())
 
     private var modsDir = Paths.get("")
     private var modsPathStr = "mods/"
@@ -215,8 +217,7 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         modsList.addAll(mods.sortedBy { it.filePath })
         modsMap.clear()
         modsMap.putAll(mods.associateBy { it.filePath })
-        modrinthProjects.clear()
-        modrinthProjects.addAll(mods.mapNotNull { (it as? PackwizMetaFile)?.toml?.update?.modrinth?.modId })
+        modrinthProjects = mods.mapNotNull { (it as? PackwizMetaFile)?.toml?.update?.modrinth?.modId }.toSet()
     }
 
     private fun addOrReplaceModInList(mod: PackwizMod) {
@@ -234,14 +235,14 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
 
         modsMap[mod.filePath] = mod
 
-        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let(modrinthProjects::add)
+        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let { modrinthProjects += it }
     }
 
     fun removeMod(filePath: String) {
         modsList.removeAll { it.filePath == filePath }
         val mod = modsMap.remove(filePath)
 
-        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let(modrinthProjects::remove)
+        (mod as? PackwizMetaFile)?.toml?.update?.modrinth?.modId?.let { modrinthProjects -= it }
     }
 
     fun modFilenameConflicts(path: Path): Boolean {

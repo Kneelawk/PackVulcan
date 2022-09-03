@@ -11,17 +11,14 @@ import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallVersion
 import com.kneelawk.packvulcan.util.Conflator
-import com.kneelawk.packvulcan.util.MSet
 import com.kneelawk.packvulcan.util.add
 import mu.KotlinLogging
 
 @Composable
 fun rememberModrinthSearchController(
     selectedMinecraftVersions: MutableMap<String, Unit>, selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>,
-    acceptableVersions: AcceptableVersions, modrinthProjects: MSet<String>, browseVersions: (id: String) -> Unit,
+    acceptableVersions: AcceptableVersions, modrinthProjects: Set<String>, browseVersions: (id: String) -> Unit,
     install: (InstallOperation) -> Unit, openProject: (id: String) -> Unit
 ): ModrinthSearchInterface {
     val log = remember { KotlinLogging.logger { } }
@@ -81,7 +78,7 @@ fun rememberModrinthSearchController(
 
     val searchScrollState = rememberLazyListState()
 
-    val installLatestState = remember { mutableStateOf<InstallDisplay?>(null) }
+    val installsProcessingState = remember { mutableStateOf(emptySet<String>()) }
 
     LaunchedEffect(showMinecraftReleasesC, showMinecraftSnapshotsC, showMinecraftBetasC, showMinecraftAlphasC) {
         minecraftLoading = true
@@ -141,7 +138,7 @@ fun rememberModrinthSearchController(
         startSearch()
     }
 
-    return remember {
+    return remember(modrinthProjects) {
         object : ModrinthSearchInterface {
             override val searchLoading by loadingState
             override val minecraftSelectorEnabled by minecraftSelectorEnabledState
@@ -171,8 +168,9 @@ fun rememberModrinthSearchController(
             override val finalPage by finalPageState
             override val searchScrollState = searchScrollState
             override val acceptableVersions = acceptableVersions
+            override val scrollEnabled: Boolean
+                get() = installsProcessingState.value.isEmpty()
             override val installedProjects = modrinthProjects
-            override val installLatest by installLatestState
 
             override fun clearFilters() {
                 selectedMinecraftVersions.clear()
@@ -269,22 +267,19 @@ fun rememberModrinthSearchController(
                 startSearch()
             }
 
-            override fun isModInstalled(project: SearchHitDisplay): Boolean = modrinthProjects.containsKey(project.id)
-
             override fun openProject(project: SearchHitDisplay) {
                 openProject(project.id)
             }
 
-            override fun installLatest(project: SearchHitDisplay) {
-                installLatestState.value = InstallDisplay(project.id, InstallVersion.Latest)
-            }
-
-            override fun cancelInstallLatest() {
-                installLatestState.value = null
+            override fun installLoading(install: SearchHitDisplay, loading: Boolean) {
+                if (loading) {
+                    installsProcessingState.value += install.id
+                } else {
+                    installsProcessingState.value -= install.id
+                }
             }
 
             override fun install(install: InstallOperation) {
-                installLatestState.value = null
                 install(install)
             }
 

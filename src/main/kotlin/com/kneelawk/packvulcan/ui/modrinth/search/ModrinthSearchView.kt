@@ -31,7 +31,6 @@ import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextField
 import com.kneelawk.packvulcan.ui.util.widgets.styledSplitter
-import com.kneelawk.packvulcan.util.MSet
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
@@ -40,7 +39,7 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 fun ModrinthSearchWindow(
     onCloseRequest: () -> Unit, selectedMinecraftVersions: MutableMap<String, Unit>,
     selectedKnownLoaders: MutableMap<LoaderVersion.Type, Unit>, modpackName: String,
-    acceptableVersions: AcceptableVersions, modrinthProjects: MSet<String>, openProject: (id: String) -> Unit,
+    acceptableVersions: AcceptableVersions, modrinthProjects: Set<String>, openProject: (id: String) -> Unit,
     install: (InstallOperation) -> Unit, browseVersions: (id: String) -> Unit
 ) {
     val state = rememberWindowState(size = DpSize(1280.dp, 800.dp))
@@ -123,9 +122,11 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
 
                         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                             LazyColumn(
-                                state = controller.searchScrollState, modifier = Modifier.fillMaxSize(),
+                                state = controller.searchScrollState,
+                                modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                                contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
+                                contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp),
+                                userScrollEnabled = controller.scrollEnabled
                             ) {
                                 items(controller.searchResults, { it.slug }) {
                                     SearchHitView(controller, it)
@@ -138,10 +139,12 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                         Divider()
                     }
 
-                    VerticalScrollbar(
-                        adapter = rememberScrollbarAdapter(controller.searchScrollState),
-                        modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd)
-                    )
+                    if (controller.scrollEnabled) {
+                        VerticalScrollbar(
+                            adapter = rememberScrollbarAdapter(controller.searchScrollState),
+                            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd)
+                        )
+                    }
                 }
 
                 PaginationBar(controller)
