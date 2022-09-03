@@ -30,6 +30,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.KeyEventType
@@ -84,6 +85,38 @@ fun LazyDropdownMenu(
     listState: LazyListState = rememberLazyListState(),
     content: LazyListScope.() -> Unit
 ) {
+    Dropdown(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        focusable = focusable,
+        offset = offset
+    ) {
+        VerticalScrollWrapper(
+            adapter = rememberScrollbarAdapter(listState),
+            modifier = modifier
+                .size(size),
+            backgroundColor = Color.Transparent
+        ) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                state = listState,
+                content = content
+            )
+        }
+    }
+}
+
+@Composable
+fun Dropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    focusable: Boolean = true,
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    contentColor: Color = contentColorFor(backgroundColor),
+    shape: Shape = MaterialTheme.shapes.medium,
+    content: @Composable () -> Unit
+) {
     val expandedStates = remember { MutableTransitionState(false) }
     expandedStates.targetState = expanded
 
@@ -114,12 +147,12 @@ fun LazyDropdownMenu(
                 }
             },
         ) {
-            LazyDropdownMenuContent(
+            DropdownContent(
                 expandedStates = expandedStates,
                 transformOriginState = transformOriginState,
-                listState = listState,
-                size = size,
-                modifier = modifier,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                shape = shape,
                 content = content
             )
         }
@@ -127,13 +160,13 @@ fun LazyDropdownMenu(
 }
 
 @Composable
-private fun LazyDropdownMenuContent(
+private fun DropdownContent(
     expandedStates: MutableTransitionState<Boolean>,
     transformOriginState: MutableState<TransformOrigin>,
-    listState: LazyListState,
-    size: DpSize,
-    modifier: Modifier = Modifier,
-    content: LazyListScope.() -> Unit
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    contentColor: Color = contentColorFor(backgroundColor),
+    shape: Shape = MaterialTheme.shapes.medium,
+    content: @Composable () -> Unit
 ) {
     // Menu open/close animation.
     val transition = updateTransition(expandedStates, "DropDownMenu")
@@ -190,21 +223,12 @@ private fun LazyDropdownMenuContent(
             this.alpha = alpha
             transformOrigin = transformOriginState.value
         },
-        elevation = MenuElevation
-    ) {
-        VerticalScrollWrapper(
-            adapter = rememberScrollbarAdapter(listState),
-            modifier = modifier
-                .size(size),
-            backgroundColor = Color.Transparent
-        ) {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                state = listState,
-                content = content
-            )
-        }
-    }
+        elevation = MenuElevation,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+        shape = shape,
+        content = content
+    )
 }
 
 @Immutable

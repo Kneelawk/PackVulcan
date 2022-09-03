@@ -41,7 +41,7 @@ private fun InstallView(controller: InstallInterface) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                modifier = Modifier.padding(10.dp)
             ) {
                 Text(controller.modName, fontWeight = FontWeight.Bold)
                 Text(controller.modVersion)
@@ -76,7 +76,7 @@ private fun InstallView(controller: InstallInterface) {
             DialogButtonBar(
                 onCancel = controller::cancel,
                 onConfirm = controller::install,
-                modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp),
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
                 confirmEnabled = !controller.loading
             )
         }

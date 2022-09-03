@@ -16,6 +16,7 @@ import com.kneelawk.packvulcan.ui.modrinth.install.InstallView
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
+import com.kneelawk.packvulcan.ui.util.widgets.Dropdown
 import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
 import com.kneelawk.packvulcan.util.LoadingState
@@ -150,7 +151,7 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
                             }
                         }
 
-                        DropdownMenu(
+                        Dropdown(
                             expanded = searchHit.id == controller.installLatest?.projectId,
                             onDismissRequest = controller::cancelInstallLatest
                         ) {
