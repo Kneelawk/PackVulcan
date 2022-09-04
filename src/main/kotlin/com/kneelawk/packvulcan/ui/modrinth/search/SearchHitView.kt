@@ -15,10 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
+import com.kneelawk.packvulcan.engine.modrinth.install.InstallRequest
+import com.kneelawk.packvulcan.engine.modrinth.install.InstallVersion
 import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.modrinth.install.InstallButton
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallDisplay
-import com.kneelawk.packvulcan.ui.modrinth.install.InstallVersion
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
@@ -139,12 +139,8 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
                     val installed = controller.installedProjects.contains(searchHit.id)
 
                     InstallButton(
-                        display = InstallDisplay(searchHit.id, InstallVersion.Latest),
-                        acceptableVersions = controller.acceptableVersions,
-                        installedProjects = controller.installedProjects,
-                        install = controller::install,
-                        onLoading = { controller.installLoading(searchHit, it) },
-                        autoInstall = true,
+                        state = controller.installerState,
+                        request = InstallRequest(searchHit.id, InstallVersion.Latest),
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.small.copy(
                             bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)

@@ -1,4 +1,4 @@
-package com.kneelawk.packvulcan.ui.modrinth.install
+package com.kneelawk.packvulcan.engine.modrinth.install
 
 sealed interface InstallVersion {
     object Latest : InstallVersion

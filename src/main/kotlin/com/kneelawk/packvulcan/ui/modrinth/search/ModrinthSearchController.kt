@@ -11,6 +11,7 @@ import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.modrinth.CategoryDisplay
 import com.kneelawk.packvulcan.ui.modrinth.LoaderDisplay
 import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
+import com.kneelawk.packvulcan.ui.modrinth.install.rememberSimpleInstallerState
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.add
 import mu.KotlinLogging
@@ -77,6 +78,8 @@ fun rememberModrinthSearchController(
     var finalPageC by finalPageState
 
     val searchScrollState = rememberLazyListState()
+
+    val installerState = rememberSimpleInstallerState(acceptableVersions, modrinthProjects, install)
 
     val installsProcessingState = remember { mutableStateOf(emptySet<String>()) }
 
@@ -167,9 +170,7 @@ fun rememberModrinthSearchController(
             override val currentPage by currentPageState
             override val finalPage by finalPageState
             override val searchScrollState = searchScrollState
-            override val acceptableVersions = acceptableVersions
-            override val scrollEnabled: Boolean
-                get() = installsProcessingState.value.isEmpty()
+            override val installerState = installerState
             override val installedProjects = modrinthProjects
 
             override fun clearFilters() {

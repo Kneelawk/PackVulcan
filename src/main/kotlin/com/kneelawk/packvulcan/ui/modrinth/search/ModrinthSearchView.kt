@@ -69,6 +69,8 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
     val splitPaneState = rememberSplitPaneState(0.55f)
     val focusRequester = remember { FocusRequester() }
 
+    controller.installerState.showHiddenDependencyDialog()
+
     HorizontalSplitPane(splitPaneState = splitPaneState, modifier = Modifier.fillMaxHeight()) {
         first(200.dp) {
             FilterSidebar(controller)
@@ -125,8 +127,7 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                                 state = controller.searchScrollState,
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                                contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp),
-                                userScrollEnabled = controller.scrollEnabled
+                                contentPadding = PaddingValues(top = 10.dp, start = 0.dp, bottom = 10.dp, end = 0.dp)
                             ) {
                                 items(controller.searchResults, { it.slug }) {
                                     SearchHitView(controller, it)
@@ -139,12 +140,10 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
                         Divider()
                     }
 
-                    if (controller.scrollEnabled) {
-                        VerticalScrollbar(
-                            adapter = rememberScrollbarAdapter(controller.searchScrollState),
-                            modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd)
-                        )
-                    }
+                    VerticalScrollbar(
+                        adapter = rememberScrollbarAdapter(controller.searchScrollState),
+                        modifier = Modifier.fillMaxHeight().align(Alignment.CenterEnd)
+                    )
                 }
 
                 PaginationBar(controller)

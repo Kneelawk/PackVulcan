@@ -24,7 +24,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             onClick = { controller.pageBackward() },
             minWidth = ButtonDefaults.MinHeight,
             colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-            enabled = (controller.currentPage > 1) && controller.scrollEnabled
+            enabled = (controller.currentPage > 1)
         ) {
             Text("<")
         }
@@ -37,8 +37,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
                 SmallButton(
                     onClick = { controller.goToPage(i) },
                     minWidth = ButtonDefaults.MinHeight,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = background),
-                    enabled = controller.scrollEnabled
+                    colors = ButtonDefaults.buttonColors(backgroundColor = background)
                 ) {
                     Text("$i")
                 }
@@ -51,8 +50,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
                 SmallButton(
                     onClick = { controller.goToPage(i) },
                     minWidth = ButtonDefaults.MinHeight,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = background),
-                    enabled = controller.scrollEnabled
+                    colors = ButtonDefaults.buttonColors(backgroundColor = background)
                 ) {
                     Text("$i")
                 }
@@ -63,8 +61,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.goToPage(controller.finalPage) },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("${controller.finalPage}")
             }
@@ -72,8 +69,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.goToPage(1) },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("1")
             }
@@ -88,8 +84,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
                 SmallButton(
                     onClick = { controller.goToPage(page) },
                     minWidth = ButtonDefaults.MinHeight,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = background),
-                    enabled = controller.scrollEnabled
+                    colors = ButtonDefaults.buttonColors(backgroundColor = background)
                 ) {
                     Text("$page")
                 }
@@ -98,8 +93,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.goToPage(1) },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("1")
             }
@@ -109,16 +103,14 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.pageBackward() },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("${controller.currentPage - 1}")
             }
 
             SmallButton(
                 onClick = { controller.goToPage(controller.currentPage) },
-                minWidth = ButtonDefaults.MinHeight,
-                enabled = controller.scrollEnabled
+                minWidth = ButtonDefaults.MinHeight
             ) {
                 Text("${controller.currentPage}")
             }
@@ -126,8 +118,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.pageForward() },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("${controller.currentPage + 1}")
             }
@@ -137,8 +128,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             SmallButton(
                 onClick = { controller.goToPage(controller.finalPage) },
                 minWidth = ButtonDefaults.MinHeight,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-                enabled = controller.scrollEnabled
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary)
             ) {
                 Text("${controller.finalPage}")
             }
@@ -148,7 +138,7 @@ fun PaginationBar(controller: ModrinthSearchInterface) {
             onClick = { controller.pageForward() },
             minWidth = ButtonDefaults.MinHeight,
             colors = ButtonDefaults.buttonColors(MaterialTheme.colors.secondary),
-            enabled = (controller.currentPage < controller.finalPage) && controller.scrollEnabled
+            enabled = (controller.currentPage < controller.finalPage)
         ) {
             Text(">")
         }
