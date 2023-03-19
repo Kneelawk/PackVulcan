@@ -148,7 +148,13 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
             val project = when (args) {
                 is ModpackComponentArgs.CreateNew -> {
                     log.info("Creating new packwiz project at '${args.newModpack.location}'...")
-                    PackwizProject.createNew(args.newModpack)
+                    val project = PackwizProject.createNew(args.newModpack)
+
+                    // specifically when creating a project, we want it to index and create project files
+                    project.refresh()
+                    project.write()
+
+                    project
                 }
 
                 is ModpackComponentArgs.OpenExisting -> {

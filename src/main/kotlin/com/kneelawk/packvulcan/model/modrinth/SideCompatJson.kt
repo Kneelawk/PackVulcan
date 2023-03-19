@@ -12,5 +12,8 @@ enum class SideCompatJson {
     OPTIONAL,
 
     @SerialName("unsupported")
-    UNSUPPORTED;
+    UNSUPPORTED,
+
+    @SerialName("unknown")
+    UNKNOWN;
 }

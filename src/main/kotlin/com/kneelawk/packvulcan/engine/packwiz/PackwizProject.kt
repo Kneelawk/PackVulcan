@@ -10,6 +10,7 @@ import com.kneelawk.packvulcan.model.packwiz.index.FileToml
 import com.kneelawk.packvulcan.model.packwiz.index.IndexToml
 import com.kneelawk.packvulcan.model.packwiz.mod.ModToml
 import com.kneelawk.packvulcan.model.packwiz.pack.IndexObjectToml
+import com.kneelawk.packvulcan.model.packwiz.pack.OptionsToml
 import com.kneelawk.packvulcan.model.packwiz.pack.PackToml
 import com.kneelawk.packvulcan.model.packwiz.pack.VersionsToml
 import kotlinx.coroutines.*
@@ -75,9 +76,14 @@ class PackwizProject(
             val loaderVersions = mapOf(loaderVersion.type.packwizName to loaderVersion.version)
             val versions = VersionsToml(newModpack.minecraftVersion.version, loaderVersions)
 
+            val options = OptionsToml(
+                acceptableGameVersions = newModpack.acceptableVersions.minecraft.toList(),
+                acceptableLoaders = newModpack.acceptableVersions.loaders.toList()
+            )
+
             val pack = PackToml(
                 newModpack.name, newModpack.author, newModpack.version, null, FormatVersion.NEW_PACK_FORMAT,
-                indexObject, versions, null
+                indexObject, versions, options
             )
 
             return PackwizProject(
@@ -340,6 +346,12 @@ class PackwizProject(
         files.map { packwizFile ->
             launch(Dispatchers.IO) {
                 val path = projectDir.resolve(packwizFile.filePath)
+
+                // Make sure the parent dir exists if it doesn't for some reason
+                val parent = path.parent
+                if (!parent.exists()) {
+                    parent.createDirectories()
+                }
 
                 when (packwizFile) {
                     is PackwizMetaFile -> {
