@@ -345,7 +345,15 @@ class PackwizProject(
         // now we can write out all the files we're aware of
         files.map { packwizFile ->
             launch(Dispatchers.IO) {
-                val path = projectDir.resolve(packwizFile.filePath)
+                val path = projectDir.resolve(packwizFile.filePath).normalize()
+
+                // Make sure we aren't vulnerable to path-escape stuff
+                if (!path.startsWith(projectDir)) {
+                    log.warn(
+                        "File '${packwizFile.filePath}' has an invalid path extending outside the project directory. It is possible this modpack is malicious. This file is being ignored."
+                    )
+                    return@launch
+                }
 
                 // Make sure the parent dir exists if it doesn't for some reason
                 val parent = path.parent
@@ -359,7 +367,7 @@ class PackwizProject(
                     }
 
                     is PackwizRealFile -> {
-                        if (path.normalize() != packwizFile.file.normalize()) {
+                        if (path != packwizFile.file.normalize()) {
                             log.warn(
                                 "File '${packwizFile.filePath}' should be at '$path' but is at '${packwizFile.file}' instead. Copying to the correct location..."
                             )
