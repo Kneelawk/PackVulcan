@@ -1,26 +1,26 @@
 package com.kneelawk.packvulcan.model
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import com.kneelawk.packvulcan.model.manifest.minecraft.TypeJson
+import com.kneelawk.packvulcan.model.manifest.minecraft.MinecraftVersionJson
+import com.kneelawk.packvulcan.model.manifest.minecraft.VersionTypeJson
 import com.kneelawk.packvulcan.net.manifest.ManifestApis
 import com.kneelawk.packvulcan.util.Either
 import com.kneelawk.packvulcan.util.leftOr
 import com.kneelawk.packvulcan.util.suspendGet
-import com.kneelawk.packvulcan.model.manifest.minecraft.VersionJson as MinecraftVersionJson
 
 class MinecraftVersion private constructor(val version: String, val type: Type) {
     companion object {
         val DEFAULT_VERSION = MinecraftVersion("1.19.2", Type.RELEASE)
 
         private fun fromMinecraftJson(json: MinecraftVersionJson): MinecraftVersion {
-            return MinecraftVersion(json.id, Type.fromJson(json.type))
+            return MinecraftVersion(json.version, Type.fromJson(json.versionType))
         }
 
         private val minecraftVersionListCache = Caffeine.newBuilder().buildAsync<Unit, List<MinecraftVersion>>()
         private val minecraftVersionMapCache = Caffeine.newBuilder().buildAsync<Unit, Map<String, MinecraftVersion>>()
 
         suspend fun minecraftVersionList(): List<MinecraftVersion> = minecraftVersionListCache.suspendGet(Unit) {
-            ManifestApis.minecraftManifest().versions.map { fromMinecraftJson(it) }
+            ManifestApis.minecraftManifest().map { fromMinecraftJson(it) }
         }
 
         private suspend fun minecraftVersionMap(): Map<String, MinecraftVersion> =
@@ -59,12 +59,12 @@ class MinecraftVersion private constructor(val version: String, val type: Type) 
         SNAPSHOT;
 
         companion object {
-            fun fromJson(typeJson: TypeJson): Type {
-                return when (typeJson) {
-                    TypeJson.OLD_ALPHA -> OLD_ALPHA
-                    TypeJson.OLD_BETA -> OLD_BETA
-                    TypeJson.RELEASE -> RELEASE
-                    TypeJson.SNAPSHOT -> SNAPSHOT
+            fun fromJson(versionTypeJson: VersionTypeJson): Type {
+                return when (versionTypeJson) {
+                    VersionTypeJson.ALPHA -> OLD_ALPHA
+                    VersionTypeJson.BETA -> OLD_BETA
+                    VersionTypeJson.RELEASE -> RELEASE
+                    VersionTypeJson.SNAPSHOT -> SNAPSHOT
                 }
             }
         }

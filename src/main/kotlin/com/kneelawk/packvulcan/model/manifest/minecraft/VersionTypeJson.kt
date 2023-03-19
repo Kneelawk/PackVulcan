@@ -4,12 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class TypeJson {
-    @SerialName("old_alpha")
-    OLD_ALPHA,
+enum class VersionTypeJson {
+    @SerialName("alpha")
+    ALPHA,
 
-    @SerialName("old_beta")
-    OLD_BETA,
+    @SerialName("beta")
+    BETA,
 
     @SerialName("release")
     RELEASE,

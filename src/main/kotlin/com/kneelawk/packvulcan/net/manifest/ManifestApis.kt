@@ -3,7 +3,7 @@ package com.kneelawk.packvulcan.net.manifest
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.model.manifest.fabric.FabricLoaderJson
 import com.kneelawk.packvulcan.model.manifest.forge.ForgeManifestJson
-import com.kneelawk.packvulcan.model.manifest.minecraft.MinecraftManifestJson
+import com.kneelawk.packvulcan.model.manifest.minecraft.MinecraftVersionJson
 import com.kneelawk.packvulcan.model.manifest.quilt.QuiltLoaderJson
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
 import com.kneelawk.packvulcan.util.suspendGet
@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 object ManifestApis {
     private val fabricLoadersCache = Caffeine.newBuilder().buildAsync<Unit, List<FabricLoaderJson>>()
     private val forgeManifestCache = Caffeine.newBuilder().buildAsync<Unit, ForgeManifestJson>()
-    private val minecraftManifestCache = Caffeine.newBuilder().buildAsync<Unit, MinecraftManifestJson>()
+    private val minecraftManifestCache = Caffeine.newBuilder().buildAsync<Unit, List<MinecraftVersionJson>>()
     private val quiltManifestCache = Caffeine.newBuilder().buildAsync<Unit, List<QuiltLoaderJson>>()
 
     /*
@@ -30,8 +30,8 @@ object ManifestApis {
         HTTP_CLIENT.get("https://meta.modrinth.com/gamedata/forge/v0/manifest.json").body()
     }
 
-    private suspend fun retrieveMinecraftManifest(): MinecraftManifestJson = withContext(Dispatchers.IO) {
-        HTTP_CLIENT.get("https://meta.modrinth.com/gamedata/minecraft/v0/manifest.json").body()
+    private suspend fun retrieveMinecraftManifest(): List<MinecraftVersionJson> = withContext(Dispatchers.IO) {
+        HTTP_CLIENT.get("https://api.modrinth.com/v2/tag/game_version").body()
     }
 
     private suspend fun retrieveQuiltManifest(): List<QuiltLoaderJson> = withContext(Dispatchers.IO) {
@@ -50,7 +50,7 @@ object ManifestApis {
         retrieveForgeManifest()
     }
 
-    suspend fun minecraftManifest(): MinecraftManifestJson = minecraftManifestCache.suspendGet(Unit) {
+    suspend fun minecraftManifest(): List<MinecraftVersionJson> = minecraftManifestCache.suspendGet(Unit) {
         retrieveMinecraftManifest()
     }
 
