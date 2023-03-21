@@ -32,7 +32,7 @@ sealed class LicenseJson {
 }
 
 object LicenseSerializer : JsonContentPolymorphicSerializer<LicenseJson>(LicenseJson::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out LicenseJson> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<LicenseJson> {
         return when (element) {
             is JsonObject -> LicenseJson.Object.serializer()
             else -> Identifier
@@ -58,9 +58,10 @@ object LicenseListSerializer : MaybeListWrapperSerializer<LicenseListJson, Licen
     override val elementSerializer = LicenseSerializer
 
     @OptIn(ExperimentalSerializationApi::class)
-    override val descriptor = buildClassSerialDescriptor("com.kneelawk.packvulcan.model.modfile.quilt.LicenseListJson") {
-        element("licenses", listSerialDescriptor(elementSerializer.descriptor))
-    }
+    override val descriptor =
+        buildClassSerialDescriptor("com.kneelawk.packvulcan.model.modfile.quilt.LicenseListJson") {
+            element("licenses", listSerialDescriptor(elementSerializer.descriptor))
+        }
 
     override fun new(elements: List<LicenseJson>): LicenseListJson = LicenseListJson(elements)
 

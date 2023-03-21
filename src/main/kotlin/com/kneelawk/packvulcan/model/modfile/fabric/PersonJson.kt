@@ -22,7 +22,7 @@ sealed class PersonJson {
 }
 
 private class PersonSerializer : JsonContentPolymorphicSerializer<PersonJson>(PersonJson::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out PersonJson> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<PersonJson> {
         return when (element) {
             is JsonObject -> PersonJson.Contact.serializer()
             else -> Simple

@@ -25,7 +25,7 @@ abstract class MaybeListSerializer<T : Any, S : T, M : T, E>(baseClass: KClass<T
     abstract fun getElement(single: S): E
     abstract fun getElements(multiple: M): List<E>
 
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out T> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<T> {
         return when (element) {
             is JsonArray -> multiple
             else -> single

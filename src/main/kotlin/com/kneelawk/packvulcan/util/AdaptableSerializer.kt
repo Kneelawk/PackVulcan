@@ -47,15 +47,15 @@ abstract class AdaptableSerializer<T> : KSerializer<T> {
         }
     }
 
-    override fun serialize(encoder: Encoder, t: T) {
-        val value = getValue(t)
-        val adapter = getAdapter(t)
+    override fun serialize(encoder: Encoder, value: T) {
+        val valueStr = getValue(value)
+        val adapter = getAdapter(value)
         if (adapter == adapterDefaultValue) {
-            encoder.encodeString(value)
+            encoder.encodeString(valueStr)
         } else {
             val output = encoder.asJsonEncoder()
             val obj = buildJsonObject {
-                put(valueElementName, value)
+                put(valueElementName, valueStr)
                 put(adapterElementName, adapter)
             }
             output.encodeJsonElement(obj)

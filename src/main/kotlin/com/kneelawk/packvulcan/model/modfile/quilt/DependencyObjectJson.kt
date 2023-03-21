@@ -88,7 +88,7 @@ object DependencyObjectObjectSerializer : KSerializer<DependencyObjectJson.Objec
 
 object DependencyObjectSerializer :
     JsonContentPolymorphicSerializer<DependencyObjectJson>(DependencyObjectJson::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out DependencyObjectJson> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<DependencyObjectJson> {
         return when (element) {
             is JsonObject -> DependencyObjectObjectSerializer
             else -> Identifier

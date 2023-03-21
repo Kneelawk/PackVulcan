@@ -20,7 +20,7 @@ sealed class IconJson {
 }
 
 object IconSerializer : JsonContentPolymorphicSerializer<IconJson>(IconJson::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out IconJson> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<IconJson> {
         return when (element) {
             is JsonObject -> Multiple
             else -> Single

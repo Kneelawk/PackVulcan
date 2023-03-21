@@ -203,7 +203,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                         color = PackVulcanTheme.colors.headingColor
                     )
 
-                    when (val modInfo = modInfo) {
+                    when (@Suppress("NAME_SHADOWING") val modInfo = modInfo) {
                         LoadingState.Loading -> {
                             Text("Loading mod author...")
                         }
@@ -227,7 +227,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
 
                 Text(providerStr)
 
-                when (val modInfo = modInfo) {
+                when (@Suppress("NAME_SHADOWING") val modInfo = modInfo) {
                     LoadingState.Loading -> {
                         Text("Loading mod info...")
                     }
@@ -244,13 +244,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
 
                     is LoadingState.Loaded -> {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            val description = when (val modInfo = modInfo) {
-                                LoadingState.Loading -> "Loading description..."
-                                LoadingState.Error -> "Error loading description."
-                                is LoadingState.Loaded -> modInfo.data.description ?: "No description."
-                            }
-
-                            Text(description)
+                            Text(modInfo.data.description ?: "No description.")
 
                             Text("Version: ${modInfo.data.version}")
                         }

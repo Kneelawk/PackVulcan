@@ -20,7 +20,7 @@ import com.kneelawk.packvulcan.util.LoadingState
 @Composable
 fun ModIcon(modImage: LoadingState<ModIconWrapper>, reload: () -> Unit) {
     Box(modifier = Modifier.size(ImageUtils.MOD_ICON_SIZE.dp)) {
-        when (val modImage = modImage) {
+        when (modImage) {
             LoadingState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }

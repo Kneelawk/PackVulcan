@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -91,12 +90,11 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "17"
-        // FIXME: Compose Desktop doesn't support Kotlin v1.7.10 yet so we're suppressing compatibility checks
-        freeCompilerArgs += listOf(
-            "-Xallow-jvm-ir-dependencies",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
-        )
+//        // FIXME: Compose Desktop doesn't support Kotlin v1.7.10 yet so we're suppressing compatibility checks
+//        freeCompilerArgs += listOf(
+//            "-P",
+//            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+//        )
     }
 }
 

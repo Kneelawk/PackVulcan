@@ -1,9 +1,11 @@
 package com.kneelawk.packvulcan.ui
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.push
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.value.Value
 import com.kneelawk.packvulcan.model.NewModpack
 import com.kneelawk.packvulcan.ui.util.popSafe
 import com.kneelawk.packvulcan.ui.util.replace
@@ -11,7 +13,8 @@ import java.nio.file.Path
 
 class RootComponent(context: ComponentContext, initialState: RootInitialState) :
     ComponentContext by context {
-    private val router: Router<CurrentScreenConfig, CurrentScreen>
+    private val childNavigation = StackNavigation<CurrentScreenConfig>()
+    val childStack: Value<ChildStack<CurrentScreenConfig, CurrentScreen>>
 
     private var modpackComponentArgs: ModpackComponentArgs? = null
 
@@ -19,7 +22,8 @@ class RootComponent(context: ComponentContext, initialState: RootInitialState) :
         // this is so cursed
         when (initialState) {
             RootInitialState.None -> {
-                router = router(
+                childStack = childStack(
+                    source = childNavigation,
                     initialConfiguration = CurrentScreenConfig.Start,
                     handleBackButton = true,
                     childFactory = ::componentFactory
@@ -27,17 +31,19 @@ class RootComponent(context: ComponentContext, initialState: RootInitialState) :
             }
 
             RootInitialState.CreateNew -> {
-                router = router(
+                childStack = childStack(
+                    source = childNavigation,
                     initialConfiguration = CurrentScreenConfig.Start,
                     handleBackButton = true,
                     childFactory = ::componentFactory
                 )
-                router.push(CurrentScreenConfig.CreateNew)
+                childNavigation.push(CurrentScreenConfig.CreateNew)
             }
 
             is RootInitialState.Open -> {
                 modpackComponentArgs = ModpackComponentArgs.OpenExisting(initialState.path)
-                router = router(
+                childStack = childStack(
+                    source = childNavigation,
                     initialConfiguration = CurrentScreenConfig.Modpack,
                     handleBackButton = true,
                     childFactory = ::componentFactory
@@ -45,8 +51,6 @@ class RootComponent(context: ComponentContext, initialState: RootInitialState) :
             }
         }
     }
-
-    val routerState = router.state
 
     val windowControls = WindowControls(DEFAULT_WINDOW_TITLE)
 
@@ -70,20 +74,20 @@ class RootComponent(context: ComponentContext, initialState: RootInitialState) :
     }
 
     fun openCreateNew() {
-        router.push(CurrentScreenConfig.CreateNew)
+        childNavigation.push(CurrentScreenConfig.CreateNew)
     }
 
     fun goBack() {
-        router.popSafe()
+        childNavigation.popSafe()
     }
 
     fun createNewModpack(newModpack: NewModpack) {
         modpackComponentArgs = ModpackComponentArgs.CreateNew(newModpack)
-        router.replace(CurrentScreenConfig.Modpack)
+        childNavigation.replace(CurrentScreenConfig.Modpack)
     }
 
     fun openModpack(packFile: Path) {
         modpackComponentArgs = ModpackComponentArgs.OpenExisting(packFile)
-        router.replace(CurrentScreenConfig.Modpack)
+        childNavigation.replace(CurrentScreenConfig.Modpack)
     }
 }

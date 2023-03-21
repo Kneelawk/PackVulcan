@@ -1,9 +1,9 @@
 package com.kneelawk.packvulcan.ui.util
 
-import com.arkivanov.decompose.router.Router
-import com.arkivanov.decompose.router.navigate
+import com.arkivanov.decompose.router.stack.StackNavigator
+import com.arkivanov.decompose.router.stack.navigate
 
-fun <C : Any> Router<C, *>.popSafe() {
+fun <C : Any> StackNavigator<C>.popSafe() {
     navigate {
         if (it.size > 1) {
             it.dropLast(1)
@@ -13,6 +13,6 @@ fun <C : Any> Router<C, *>.popSafe() {
     }
 }
 
-fun <C : Any> Router<C, *>.replace(config: C) {
+fun <C : Any> StackNavigator<C>.replace(config: C) {
     navigate { listOf(config) }
 }
