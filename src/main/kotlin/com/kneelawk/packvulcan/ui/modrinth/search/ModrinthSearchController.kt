@@ -14,6 +14,7 @@ import com.kneelawk.packvulcan.ui.modrinth.MOD_LOADERS
 import com.kneelawk.packvulcan.ui.modrinth.install.rememberSimpleInstallerState
 import com.kneelawk.packvulcan.util.Conflator
 import com.kneelawk.packvulcan.util.add
+import kotlinx.coroutines.delay
 import mu.KotlinLogging
 
 @Composable
@@ -118,6 +119,8 @@ fun rememberModrinthSearchController(
     val searchConflator = remember {
         Conflator(scope) { data: SearchData ->
             loading = true
+            // Delay between requests to not spam the search endpoint
+            delay(250)
             val res = ModrinthApi.search(data.toQuery())
             finalPageC = (res.totalHits + perPageC.limit - 1) / perPageC.limit
             searchResults.clear()
