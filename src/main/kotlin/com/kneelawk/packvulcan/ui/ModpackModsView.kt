@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +34,9 @@ import com.kneelawk.packvulcan.ui.util.ModIconWrapper
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
 import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
+import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
+import com.kneelawk.packvulcan.ui.util.widgets.SmallButtonDefaults
+import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
 import com.kneelawk.packvulcan.util.LoadingState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -192,30 +196,44 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
             modifier = Modifier.padding(15.dp), horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.Top
         ) {
-            ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
+            SmallTextButton(
+                onClick = { component.openMod(mod.filePath) }, shape = RoundedCornerShape(5.dp),
+                contentPadding = SmallButtonDefaults.IconButtonPadding
+            ) {
+                ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically
+                SmallTextButton(
+                    onClick = { component.openMod(mod.filePath) },
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(
-                        mod.displayName, style = MaterialTheme.typography.h6,
-                        color = PackVulcanTheme.colors.headingColor
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.width(IntrinsicSize.Max)
+                    ) {
+                        Text(
+                            mod.displayName, style = MaterialTheme.typography.h6,
+                            color = PackVulcanTheme.colors.headingColor
+                        )
 
-                    when (@Suppress("NAME_SHADOWING") val modInfo = modInfo) {
-                        LoadingState.Loading -> {
-                            Text("Loading mod author...")
-                        }
+                        when (@Suppress("NAME_SHADOWING") val modInfo = modInfo) {
+                            LoadingState.Loading -> {
+                                Text("Loading mod author...", color = MaterialTheme.colors.onSurface)
+                            }
 
-                        LoadingState.Error -> {
-                            Text("Error loading mod author.")
-                        }
+                            LoadingState.Error -> {
+                                Text("Error loading mod author.", color = MaterialTheme.colors.onSurface)
+                            }
 
-                        is LoadingState.Loaded -> {
-                            Text("by ${modInfo.data.author}")
+                            is LoadingState.Loaded -> {
+                                Text("by ${modInfo.data.author}", color = MaterialTheme.colors.onSurface)
+                            }
                         }
                     }
+
+                    Spacer(Modifier.weight(1f))
                 }
 
                 val providerStr = buildAnnotatedString {
@@ -252,7 +270,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                 }
             }
 
-            Button(onClick = {
+            SmallButton(onClick = {
                 component.removeMod(mod.filePath)
             }, enabled = !component.loading) {
                 Text("Remove")

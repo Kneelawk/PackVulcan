@@ -67,7 +67,8 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 SmallTextButton(
-                    onClick = { controller.openProject(searchHit) }
+                    onClick = { controller.openProject(searchHit) },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -82,6 +83,8 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
 
                         Text("by ${searchHit.author}", color = MaterialTheme.colors.onSurface)
                     }
+
+                    Spacer(Modifier.weight(1f))
                 }
 
                 Text(searchHit.description)

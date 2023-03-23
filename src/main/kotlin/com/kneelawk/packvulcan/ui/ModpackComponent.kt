@@ -388,6 +388,10 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         InstanceManager.newRoot(RootInitialState.Open(path))
     }
 
+    fun openMod(filePath: String) {
+        // TODO: Not implemented yet
+    }
+
     private data class LoaderVersionInput(val loaderVersion: String, val minecraftVersion: String)
 }
 
