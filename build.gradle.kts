@@ -82,9 +82,13 @@ dependencies {
     val sejdaWebpVersion: String by project
     implementation("org.sejda.imageio:webp-imageio:$sejdaWebpVersion")
 
-    // Use logback logger because nothing seems to have updated their log4j yet
-    val logbackVersion: String by project
-    runtimeOnly("ch.qos.logback:logback-classic:$logbackVersion")
+    // Force the use of a specific Gson version
+    val gsonVersion: String by project
+    implementation("com.google.code.gson:gson:$gsonVersion")
+
+    // Reload4j Slf4j backend
+    val slf4jVersion: String by project
+    runtimeOnly("org.slf4j:slf4j-reload4j:$slf4jVersion")
 }
 
 tasks.withType<KotlinCompile> {

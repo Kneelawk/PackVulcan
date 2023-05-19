@@ -14,9 +14,13 @@ import com.kneelawk.packvulcan.model.modrinth.version.query.VersionsQuery
 import com.kneelawk.packvulcan.model.modrinth.version.result.VersionJson
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
 import com.kneelawk.packvulcan.util.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -48,13 +52,13 @@ object ModrinthApi {
         ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
     ) { requests ->
         val ids = requests.map { it.request }
-        log.debug("Project batch request, ids: $ids")
+        log.debug("Project batch request, ids: {}", ids)
 
         val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/projects") {
             parameter("ids", Json.encodeToString(ids))
         }.body<List<ProjectJson>>().associateBy { it.id }
 
-        log.debug("Request count: ${ids.size}, response count: ${result.size}")
+        log.debug("Project request count: {} ({}), response count: {}", ids.size, ids, result.size)
 
         for ((id, channel) in requests) {
             channel.send(Result.success(leftOr(result[id], MissingProject(id))))
@@ -65,13 +69,13 @@ object ModrinthApi {
         ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
     ) { requests ->
         val ids = requests.map { it.request }
-        log.debug("Version batch request, ids: $ids")
+        log.debug("Version batch request, ids: {}", ids)
 
         val result = HTTP_CLIENT.get("https://api.modrinth.com/v2/versions") {
             parameter("ids", Json.encodeToString(ids))
         }.body<List<VersionJson>>().associateBy { it.id }
 
-        log.debug("Request count: ${ids.size}, response count: ${result.size}")
+        log.debug("Version request count: {} ({}), response count: {}", ids.size, ids, result.size)
 
         for ((id, channel) in requests) {
             channel.send(Result.success(leftOr(result[id], MissingVersion(id))))
