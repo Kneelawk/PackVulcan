@@ -6,4 +6,6 @@ interface DetailInterface {
     val subView: LoadingState<DetailSubView>
 
     val curTab: ViewType
+
+    fun reloadSubViews()
 }

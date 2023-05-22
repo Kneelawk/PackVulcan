@@ -44,6 +44,7 @@ object ModrinthUtils {
         return SimpleModFileInfo.Modrinth(
             project.title, authors, file.filename, version.versionNumber, project.description,
             project.iconUrl?.let { ModIconSource.Url(it) }, projectUrl, project.id, version.id, project.slug,
+            project.body,
             Side.fromSideCompat(project.clientSide, project.serverSide), file.url, file.hashes.sha1, file.hashes.sha512
         )
     }
@@ -61,7 +62,7 @@ object ModrinthUtils {
 
         return SimpleModInfo.Modrinth(
             project.title, authors, project.description, project.iconUrl?.let { ModIconSource.Url(it) }, projectUrl,
-            project.id, project.slug
+            project.id, project.slug, project.body
         )
     }
 

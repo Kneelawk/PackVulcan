@@ -1,6 +1,5 @@
 package com.kneelawk.packvulcan.ui.modrinth.search
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -30,6 +28,7 @@ import com.kneelawk.packvulcan.ui.InstallOperation
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextField
+import com.kneelawk.packvulcan.ui.util.widgets.TopSideLoadingIndicator
 import com.kneelawk.packvulcan.ui.util.widgets.styledSplitter
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -155,17 +154,5 @@ fun ModrinthSearchView(controller: ModrinthSearchInterface) {
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-    }
-}
-
-@Composable
-private fun BoxScope.TopSideLoadingIndicator(loading: Boolean) {
-    AnimatedVisibility(
-        visible = loading,
-        modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth(),
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()
-    ) {
-        LinearProgressIndicator(Modifier.fillMaxWidth())
     }
 }

@@ -1,5 +1,5 @@
 package com.kneelawk.packvulcan.ui.detail
 
 enum class ViewType(val prettyName: String) {
-    BODY("Body"), GALLERY("Gallery"), VERSIONS("Versions")
+    BODY("Description"), GALLERY("Gallery"), VERSIONS("Versions")
 }

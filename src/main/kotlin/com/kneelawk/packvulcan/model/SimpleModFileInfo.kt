@@ -9,38 +9,6 @@ import java.nio.file.Path
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 
-sealed interface SimpleModInfo {
-    val name: String
-    val author: String
-    val description: String?
-    val icon: ModIconSource?
-    val projectUrl: String?
-
-    data class Modrinth(
-        override val name: String, override val author: String, override val description: String?,
-        override val icon: ModIconSource?, override val projectUrl: String, override val projectId: String,
-        override val slug: String
-    ) : SimpleModInfo, ModrinthModInfo
-
-    data class Curseforge(
-        override val name: String, override val author: String, override val description: String?,
-        override val icon: ModIconSource?, override val projectUrl: String, override val projectId: Long,
-        override val slug: String
-    ) : SimpleModInfo, CurseforgeModInfo
-}
-
-sealed interface ModrinthModInfo : SimpleModInfo {
-    override val projectUrl: String
-    val projectId: String
-    val slug: String
-}
-
-sealed interface CurseforgeModInfo : SimpleModInfo {
-    override val projectUrl: String
-    val projectId: Long
-    val slug: String
-}
-
 sealed interface SimpleModFileInfo : SimpleModInfo {
     val filename: String
     val version: String
@@ -51,9 +19,10 @@ sealed interface SimpleModFileInfo : SimpleModInfo {
 
     data class Modrinth(
         override val name: String, override val author: String, override val filename: String,
-        override val version: String, override val description: String?, override val icon: ModIconSource?,
+        override val version: String, override val description: String, override val icon: ModIconSource?,
         override val projectUrl: String, override val projectId: String, val versionId: String,
-        override val slug: String, val side: Side, val downloadUrl: String, val sha1: String, val sha512: String
+        override val slug: String, override val body: String, val side: Side, val downloadUrl: String, val sha1: String,
+        val sha512: String
     ) : SimpleModFileInfo, ModrinthModInfo {
         override fun toPackwizMod(
             modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
