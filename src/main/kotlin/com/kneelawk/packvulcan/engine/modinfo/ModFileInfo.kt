@@ -6,7 +6,7 @@ import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.mod.ModFileCache
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.model.ModIconSource
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.modfile.IconJson
 import com.kneelawk.packvulcan.model.modfile.fabric.FabricModJson
 import com.kneelawk.packvulcan.model.modfile.forge.ModsToml
@@ -53,7 +53,7 @@ object ModFileInfo {
         data class Quilt(val data: QuiltModJson) : Metadata()
     }
 
-    suspend fun getFileInfo(packwizMod: PackwizMetaFile): SimpleModInfo? {
+    suspend fun getFileInfo(packwizMod: PackwizMetaFile): SimpleModFileInfo? {
         val mod = packwizMod.toml
         val url = mod.download.url ?: return null
         val modFileInfo = modFileInfoCache.suspendGet(url) {
@@ -62,20 +62,20 @@ object ModFileInfo {
 
         val file = getFileInfo(modFileInfo, mod.name, mod.filename)
 
-        return SimpleModInfo.Url(
+        return SimpleModFileInfo.Url(
             file.name, file.author, file.filename, file.version, file.description, file.icon, file.projectUrl,
             file.modId, url, mod.download.hashFormat, mod.download.hash, packwizMod.filePath, mod.side
         )
     }
 
-    suspend fun getFileInfo(path: Path): SimpleModInfo? {
+    suspend fun getFileInfo(path: Path): SimpleModFileInfo? {
         val info = loadFileInfo(path) ?: return null
         return getFileInfo(info, path.name, path.name)
     }
 
     private suspend fun getFileInfo(
         info: Info, name: String, filename: String
-    ): SimpleModInfo.File {
+    ): SimpleModFileInfo.File {
         val icon = info.icon?.let { original ->
             val bi = if (
                 original.width > ImageUtils.MOD_ICON_SIZE ||
@@ -95,7 +95,7 @@ object ModFileInfo {
                 val authors = ModInfo.authorString(meta.data.authors?.map { it.name })
                 val contact = meta.data.contact
 
-                SimpleModInfo.File(
+                SimpleModFileInfo.File(
                     meta.data.name ?: name, authors, filename, meta.data.version, meta.data.description, icon,
                     contact?.get("homepage") ?: contact?.get("sources"), meta.data.id, info.path
                 )
@@ -104,7 +104,7 @@ object ModFileInfo {
             is Metadata.Forge -> {
                 val modToml = meta.data.mods.firstOrNull()
 
-                SimpleModInfo.File(
+                SimpleModFileInfo.File(
                     modToml?.displayName ?: name, modToml?.authors ?: "Unknown", filename,
                     modToml?.version ?: "unknown", modToml?.description, icon, modToml?.displayURL,
                     modToml?.modId ?: "unknown", info.path
@@ -118,7 +118,7 @@ object ModFileInfo {
                 val authors = ModInfo.authorString(metadata?.contributors?.keys?.toList())
                 val contact = metadata?.contact
 
-                SimpleModInfo.File(
+                SimpleModFileInfo.File(
                     metadata?.name ?: name, authors, filename, quiltLoader.version, metadata?.description,
                     icon, contact?.get("homepage") ?: contact?.get("sources"), quiltLoader.id, info.path
                 )

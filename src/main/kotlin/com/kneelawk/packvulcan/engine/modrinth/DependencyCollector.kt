@@ -1,7 +1,7 @@
 package com.kneelawk.packvulcan.engine.modrinth
 
 import com.kneelawk.packvulcan.model.AcceptableVersions
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.modrinth.version.result.DependencyJson
 import com.kneelawk.packvulcan.model.modrinth.version.result.DependencyTypeJson
 import kotlinx.coroutines.coroutineScope
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 object DependencyCollector {
     suspend fun collectDependencies(
         dependencies: List<DependencyJson>?, acceptableVersions: AcceptableVersions, alreadyInstalled: Set<String>
-    ): List<SimpleModInfo.Modrinth> {
+    ): List<SimpleModFileInfo.Modrinth> {
         if (dependencies.isNullOrEmpty()) return emptyList()
 
         val collected = ConcurrentHashMap<String, CollectedDependency>()
@@ -58,7 +58,7 @@ object DependencyCollector {
         }
     }
 
-    private data class CollectedDependency(val mod: SimpleModInfo.Modrinth, val version: DepVersion)
+    private data class CollectedDependency(val mod: SimpleModFileInfo.Modrinth, val version: DepVersion)
 
     private enum class DepVersion {
         ANY_VERSION,

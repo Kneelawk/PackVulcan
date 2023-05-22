@@ -2,7 +2,7 @@ package com.kneelawk.packvulcan.engine.packwiz
 
 import com.kneelawk.packvulcan.engine.modinfo.ModInfo
 import com.kneelawk.packvulcan.model.ModProvider
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.packwiz.mod.ModToml
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -18,12 +18,12 @@ sealed interface PackwizMod : PackwizFile {
     val displayName: String
     val provider: ModProvider
 
-    suspend fun getSimpleInfo(): SimpleModInfo?
+    suspend fun getSimpleInfo(): SimpleModFileInfo?
 }
 
 data class PackwizMetaFile(
     override val filePath: String, override val alias: String?, override val preserve: Boolean, val toml: ModToml,
-    private var info: SimpleModInfo? = null
+    private var info: SimpleModFileInfo? = null
 ) : PackwizFile, PackwizMod {
     override val displayName: String
         get() = toml.name
@@ -31,7 +31,7 @@ data class PackwizMetaFile(
 
     private val infoMutex = Mutex()
 
-    override suspend fun getSimpleInfo(): SimpleModInfo? {
+    override suspend fun getSimpleInfo(): SimpleModFileInfo? {
         // quick return path
         val info1 = info
         if (info1 != null) return info1
@@ -55,14 +55,14 @@ sealed interface PackwizRealFile : PackwizFile {
 
 data class PackwizModFile(
     override val filePath: String, override val alias: String?, override val preserve: Boolean, override val file: Path,
-    val info: SimpleModInfo
+    val info: SimpleModFileInfo
 ) : PackwizRealFile, PackwizMod {
     override val displayName: String
         get() = info.name
     override val provider: ModProvider
         get() = ModProvider.FILESYSTEM
 
-    override suspend fun getSimpleInfo(): SimpleModInfo {
+    override suspend fun getSimpleInfo(): SimpleModFileInfo {
         return info
     }
 }

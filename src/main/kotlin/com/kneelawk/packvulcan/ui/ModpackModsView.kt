@@ -24,8 +24,9 @@ import com.kneelawk.packvulcan.engine.modinfo.ModFileInfo
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMod
 import com.kneelawk.packvulcan.model.ModIconSource
 import com.kneelawk.packvulcan.model.ModProvider
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.net.image.ImageResource
+import com.kneelawk.packvulcan.ui.detail.DetailWindow
 import com.kneelawk.packvulcan.ui.modrinth.search.ModrinthSearchWindow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
@@ -59,10 +60,19 @@ fun ModpackModsDialogs(component: ModpackComponent) {
             modpackName = component.modpackName,
             acceptableVersions = component.acceptableVersions,
             modrinthProjects = component.modrinthProjects,
-            openProject = {},
+            openProject = { component.openModrinthProject(it) },
             install = component::install,
             browseVersions = {}
         )
+    }
+
+    for ((key, sel) in component.openProjectWindows) {
+        key(key) {
+            DetailWindow(
+                onCloseRequest = { component.openProjectWindows -= key },
+                selector = sel
+            )
+        }
     }
 }
 
@@ -148,7 +158,7 @@ fun ModpackModsView(component: ModpackComponent) {
 fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
     val scope = rememberCoroutineScope()
 
-    var modInfo by remember { mutableStateOf<LoadingState<SimpleModInfo>>(LoadingState.Loading) }
+    var modInfo by remember { mutableStateOf<LoadingState<SimpleModFileInfo>>(LoadingState.Loading) }
 
     suspend fun loadModInfo() {
         modInfo = supervisorScope {
@@ -170,7 +180,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
 
     var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
 
-    suspend fun loadModIcon(modInfo: LoadingState<SimpleModInfo>) {
+    suspend fun loadModIcon(modInfo: LoadingState<SimpleModFileInfo>) {
         modImage = when (modInfo) {
             is LoadingState.Loaded -> LoadingState.Loaded(
                 when (val icon = modInfo.data.icon) {
@@ -197,7 +207,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
             verticalAlignment = Alignment.Top
         ) {
             SmallTextButton(
-                onClick = { component.openMod(mod.filePath) }, shape = RoundedCornerShape(5.dp),
+                onClick = { component.openModProject(mod) }, shape = RoundedCornerShape(5.dp),
                 contentPadding = SmallButtonDefaults.IconButtonPadding
             ) {
                 ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
@@ -205,7 +215,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {
                 SmallTextButton(
-                    onClick = { component.openMod(mod.filePath) },
+                    onClick = { component.openModProject(mod) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(

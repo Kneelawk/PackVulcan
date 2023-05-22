@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.kneelawk.packvulcan.GlobalSettings
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.widgets.DialogButtonBar
@@ -28,9 +28,9 @@ import com.kneelawk.packvulcan.ui.util.widgets.Dropdown
 fun DependenciesDialog(
     modName: String,
     modVersion: String,
-    dependencies: List<SimpleModInfo>,
+    dependencies: List<SimpleModFileInfo>,
     onCancel: () -> Unit,
-    onInstall: (selectedDeps: List<SimpleModInfo>) -> Unit
+    onInstall: (selectedDeps: List<SimpleModFileInfo>) -> Unit
 ) {
     val state = rememberDialogState(width = 480.dp, height = 270.dp)
 
@@ -58,9 +58,9 @@ fun DependenciesPopup(
     expanded: Boolean,
     modName: String,
     modVersion: String,
-    dependencies: List<SimpleModInfo>,
+    dependencies: List<SimpleModFileInfo>,
     onCancel: () -> Unit,
-    onInstall: (selectedDeps: List<SimpleModInfo>) -> Unit
+    onInstall: (selectedDeps: List<SimpleModFileInfo>) -> Unit
 ) {
     Dropdown(
         expanded = expanded,
@@ -80,9 +80,9 @@ fun DependenciesPopup(
 fun DependenciesView(
     modName: String,
     modVersion: String,
-    dependencies: List<SimpleModInfo>,
+    dependencies: List<SimpleModFileInfo>,
     onCancel: () -> Unit,
-    onInstall: (selectedDeps: List<SimpleModInfo>) -> Unit
+    onInstall: (selectedDeps: List<SimpleModFileInfo>) -> Unit
 ) {
     val collectedDependencies = remember(dependencies) {
         dependencies.map { DependencyDisplay(it, mutableStateOf(true)) }

@@ -3,6 +3,7 @@ package com.kneelawk.packvulcan.engine.modrinth
 import com.kneelawk.packvulcan.engine.modinfo.ModInfo
 import com.kneelawk.packvulcan.model.AcceptableVersions
 import com.kneelawk.packvulcan.model.ModIconSource
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.SimpleModInfo
 import com.kneelawk.packvulcan.model.modrinth.project.ProjectJson
 import com.kneelawk.packvulcan.model.modrinth.version.result.DependencyJson
@@ -18,13 +19,19 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
 object ModrinthUtils {
-    suspend fun getModrinthInfo(projectIdOrSlug: String, versionId: String): SimpleModInfo.Modrinth? {
-        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+    suspend fun getModrinthFileInfo(versionId: String): SimpleModFileInfo.Modrinth? {
         val version = ModrinthApi.version(versionId).escapeIfRight { return null }
-        return getModrinthInfo(project, version)
+        val project = ModrinthApi.project(version.projectId).escapeIfRight { return null }
+        return getModrinthFileInfo(project, version)
     }
 
-    suspend fun getModrinthInfo(project: ProjectJson, version: VersionJson): SimpleModInfo.Modrinth {
+    suspend fun getModrinthFileInfo(projectIdOrSlug: String, versionId: String): SimpleModFileInfo.Modrinth? {
+        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+        val version = ModrinthApi.version(versionId).escapeIfRight { return null }
+        return getModrinthFileInfo(project, version)
+    }
+
+    suspend fun getModrinthFileInfo(project: ProjectJson, version: VersionJson): SimpleModFileInfo.Modrinth {
         val teamMembers = ModrinthApi.teamMembers(project.team)
 
         val authors = ModInfo.authorString(teamMembers.map { it.user.username })
@@ -34,10 +41,27 @@ object ModrinthUtils {
             "Encountered version ${version.versionNumber} of ${project.title} with no files!"
         )
 
-        return SimpleModInfo.Modrinth(
+        return SimpleModFileInfo.Modrinth(
             project.title, authors, file.filename, version.versionNumber, project.description,
             project.iconUrl?.let { ModIconSource.Url(it) }, projectUrl, project.id, version.id, project.slug,
             Side.fromSideCompat(project.clientSide, project.serverSide), file.url, file.hashes.sha1, file.hashes.sha512
+        )
+    }
+
+    suspend fun getModrinthProjectInfo(projectIdOrSlug: String): SimpleModInfo.Modrinth? {
+        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+        return getModrinthProjectInfo(project)
+    }
+
+    suspend fun getModrinthProjectInfo(project: ProjectJson): SimpleModInfo.Modrinth {
+        val teamMembers = ModrinthApi.teamMembers(project.team)
+
+        val authors = ModInfo.authorString(teamMembers.map { it.user.username })
+        val projectUrl = "https://modrinth.com/mod/${project.slug}"
+
+        return SimpleModInfo.Modrinth(
+            project.title, authors, project.description, project.iconUrl?.let { ModIconSource.Url(it) }, projectUrl,
+            project.id, project.slug
         )
     }
 
@@ -47,17 +71,19 @@ object ModrinthUtils {
         return versions.firstOrNull()
     }
 
-    suspend fun chooseLatest(projectIdOrSlug: String, acceptableVersions: AcceptableVersions): SimpleModInfo.Modrinth? {
+    suspend fun chooseLatest(
+        projectIdOrSlug: String, acceptableVersions: AcceptableVersions
+    ): SimpleModFileInfo.Modrinth? {
         val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
         val version = latestVersion(projectIdOrSlug, acceptableVersions) ?: return null
 
-        return getModrinthInfo(project, version)
+        return getModrinthFileInfo(project, version)
     }
 
     suspend fun chooseLatest(
         projectIdOrSlugList: List<String>, acceptableVersions: AcceptableVersions,
         progress: ProgressListener = EMPTY_PROGRESS_LISTENER
-    ): List<SimpleModInfo.Modrinth?> {
+    ): List<SimpleModFileInfo.Modrinth?> {
         // collect all the projects first so they get batched
         progress(0f, "Downloading projects' data...")
         val projects = coroutineScope {
@@ -83,7 +109,7 @@ object ModrinthUtils {
                     }.awaitAll().asSequence().filterNotNull().filter { acceptableVersions.compatible(it) }
                         .sortedByDescending { it.datePublished }.firstOrNull() ?: return@projectAsync null
 
-                    getModrinthInfo(project, version)
+                    getModrinthFileInfo(project, version)
                 }
             }.awaitAll()
         }

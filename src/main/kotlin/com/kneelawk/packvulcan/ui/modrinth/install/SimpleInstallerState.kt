@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.kneelawk.packvulcan.engine.modrinth.install.InstallRequest
 import com.kneelawk.packvulcan.engine.modrinth.install.ModInstaller
 import com.kneelawk.packvulcan.model.AcceptableVersions
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.ui.InstallOperation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -143,5 +143,5 @@ private data class SimpleInstallState(
 )
 
 private data class QueuedDialog(
-    val request: InstallRequest, val mod: SimpleModInfo, val dependencies: List<SimpleModInfo>
+    val request: InstallRequest, val mod: SimpleModFileInfo, val dependencies: List<SimpleModFileInfo>
 )

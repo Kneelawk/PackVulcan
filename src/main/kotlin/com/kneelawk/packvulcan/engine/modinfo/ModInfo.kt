@@ -3,7 +3,7 @@ package com.kneelawk.packvulcan.engine.modinfo
 import com.kneelawk.packvulcan.engine.modrinth.ModrinthUtils
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.model.ModProvider
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 
 object ModInfo {
     fun getModProvider(mod: PackwizMetaFile): ModProvider {
@@ -14,10 +14,10 @@ object ModInfo {
         }
     }
 
-    suspend fun getSimpleInfo(mod: PackwizMetaFile): SimpleModInfo? {
+    suspend fun getSimpleInfo(mod: PackwizMetaFile): SimpleModFileInfo? {
         val modToml = mod.toml
         return modToml.update?.modrinth?.let { modrinth ->
-            ModrinthUtils.getModrinthInfo(modrinth.modId, modrinth.version)
+            ModrinthUtils.getModrinthFileInfo(modrinth.modId, modrinth.version)
         } ?: ModFileInfo.getFileInfo(mod)
     }
 

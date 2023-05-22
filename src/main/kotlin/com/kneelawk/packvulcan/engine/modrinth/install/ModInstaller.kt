@@ -4,7 +4,7 @@ import com.kneelawk.packvulcan.engine.modrinth.DependencyCollector
 import com.kneelawk.packvulcan.engine.modrinth.ModrinthUtils
 import com.kneelawk.packvulcan.engine.modrinth.ProjectAndVersion
 import com.kneelawk.packvulcan.model.AcceptableVersions
-import com.kneelawk.packvulcan.model.SimpleModInfo
+import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.modrinth.project.ProjectJson
 import com.kneelawk.packvulcan.net.modrinth.ModrinthApi
 
@@ -40,8 +40,8 @@ object ModInstaller {
     }
 
     sealed interface Result
-    data class InstallSingle(val mod: SimpleModInfo) : Result
-    data class Dependencies(val mod: SimpleModInfo, val dependencies: List<SimpleModInfo>) : Result
+    data class InstallSingle(val mod: SimpleModFileInfo) : Result
+    data class Dependencies(val mod: SimpleModFileInfo, val dependencies: List<SimpleModFileInfo>) : Result
     data class ProjectError(val projectId: String) : Result
     data class VersionError(val project: ProjectJson, val installVersion: InstallVersion) : Result
 }

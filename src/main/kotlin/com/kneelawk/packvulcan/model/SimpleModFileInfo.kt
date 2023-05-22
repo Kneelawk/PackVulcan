@@ -12,11 +12,38 @@ import kotlin.io.path.relativeTo
 sealed interface SimpleModInfo {
     val name: String
     val author: String
-    val filename: String
-    val version: String
     val description: String?
     val icon: ModIconSource?
     val projectUrl: String?
+
+    data class Modrinth(
+        override val name: String, override val author: String, override val description: String?,
+        override val icon: ModIconSource?, override val projectUrl: String, override val projectId: String,
+        override val slug: String
+    ) : SimpleModInfo, ModrinthModInfo
+
+    data class Curseforge(
+        override val name: String, override val author: String, override val description: String?,
+        override val icon: ModIconSource?, override val projectUrl: String, override val projectId: Long,
+        override val slug: String
+    ) : SimpleModInfo, CurseforgeModInfo
+}
+
+sealed interface ModrinthModInfo : SimpleModInfo {
+    override val projectUrl: String
+    val projectId: String
+    val slug: String
+}
+
+sealed interface CurseforgeModInfo : SimpleModInfo {
+    override val projectUrl: String
+    val projectId: Long
+    val slug: String
+}
+
+sealed interface SimpleModFileInfo : SimpleModInfo {
+    val filename: String
+    val version: String
 
     fun toPackwizMod(
         modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
@@ -25,21 +52,17 @@ sealed interface SimpleModInfo {
     data class Modrinth(
         override val name: String, override val author: String, override val filename: String,
         override val version: String, override val description: String?, override val icon: ModIconSource?,
-        override val projectUrl: String, val projectId: String, val versionId: String, val slug: String, val side: Side,
-        val downloadUrl: String, val sha1: String, val sha512: String
-    ) : SimpleModInfo {
+        override val projectUrl: String, override val projectId: String, val versionId: String,
+        override val slug: String, val side: Side, val downloadUrl: String, val sha1: String, val sha512: String
+    ) : SimpleModFileInfo, ModrinthModInfo {
         override fun toPackwizMod(
             modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
         ): PackwizMod {
             return PackwizMetaFile(
-                "$modsPathStr/$slug$metafileExtension",
-                alias,
-                preserve,
-                ModToml(
+                "$modsPathStr/$slug$metafileExtension", alias, preserve, ModToml(
                     name, filename, side, DownloadToml(downloadUrl, HashFormat.SHA512, sha512, ""), null,
                     UpdateToml(modrinth = ModrinthToml(projectId, versionId))
-                ),
-                this
+                ), this
             )
         }
     }
@@ -47,21 +70,17 @@ sealed interface SimpleModInfo {
     data class Curseforge(
         override val name: String, override val author: String, override val filename: String,
         override val version: String, override val description: String?, override val icon: ModIconSource?,
-        override val projectUrl: String, val projectId: Long, val fileId: Long, val slug: String, val side: Side,
-        val sha1: String
-    ) : SimpleModInfo {
+        override val projectUrl: String, override val projectId: Long, val fileId: Long, override val slug: String,
+        val side: Side, val sha1: String
+    ) : SimpleModFileInfo, CurseforgeModInfo {
         override fun toPackwizMod(
             modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
         ): PackwizMod {
             return PackwizMetaFile(
-                "$modsPathStr/$slug$metafileExtension",
-                alias,
-                preserve,
-                ModToml(
+                "$modsPathStr/$slug$metafileExtension", alias, preserve, ModToml(
                     name, filename, side, DownloadToml(null, HashFormat.SHA1, sha1, "metadata:curseforge"), null,
                     UpdateToml(curseforge = CurseforgeToml(fileId, projectId))
-                ),
-                this
+                ), this
             )
         }
     }
@@ -71,18 +90,14 @@ sealed interface SimpleModInfo {
         override val version: String, override val description: String?, override val icon: ModIconSource?,
         override val projectUrl: String?, val modId: String, val downloadUrl: String, val hashFormat: HashFormat,
         val hash: String, val metaFilePath: String, val side: Side
-    ) : SimpleModInfo {
+    ) : SimpleModFileInfo {
         override fun toPackwizMod(
             modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
         ): PackwizMod {
             return PackwizMetaFile(
-                metaFilePath,
-                alias,
-                preserve,
-                ModToml(
+                metaFilePath, alias, preserve, ModToml(
                     name, filename, side, DownloadToml(downloadUrl, hashFormat, hash, ""), null, null
-                ),
-                this
+                ), this
             )
         }
     }
@@ -91,18 +106,14 @@ sealed interface SimpleModInfo {
         override val name: String, override val author: String, override val filename: String,
         override val version: String, override val description: String?, override val icon: ModIconSource?,
         override val projectUrl: String?, val modId: String, val path: Path
-    ) : SimpleModInfo {
+    ) : SimpleModFileInfo {
         override fun toPackwizMod(
             modpackLocation: Path, modsPathStr: String, metafileExtension: String, alias: String?, preserve: Boolean
         ): PackwizMod {
             val relative = path.relativeTo(modpackLocation).invariantSeparatorsPathString
 
             return PackwizModFile(
-                relative,
-                alias,
-                preserve,
-                path,
-                this
+                relative, alias, preserve, path, this
             )
         }
     }

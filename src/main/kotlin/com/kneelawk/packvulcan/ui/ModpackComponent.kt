@@ -12,6 +12,10 @@ import com.kneelawk.packvulcan.model.LoaderVersion
 import com.kneelawk.packvulcan.model.MinecraftVersion
 import com.kneelawk.packvulcan.model.NewModpack
 import com.kneelawk.packvulcan.model.packwiz.pack.OptionsToml
+import com.kneelawk.packvulcan.ui.detail.DetailSelector
+import com.kneelawk.packvulcan.ui.detail.ModrinthProjectSel
+import com.kneelawk.packvulcan.ui.detail.PackwizFileSel
+import com.kneelawk.packvulcan.ui.detail.ViewType
 import com.kneelawk.packvulcan.ui.instance.InstanceManager
 import com.kneelawk.packvulcan.util.ComponentScope
 import com.kneelawk.packvulcan.util.Conflator
@@ -130,6 +134,12 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
     var modrinthSearchDialogOpen by mutableStateOf(false)
     val selectedMinecraftVersions = mutableStateMapOf<String, Unit>()
     val selectedModLoaders = mutableStateMapOf<LoaderVersion.Type, Unit>()
+
+    /*
+     * Mod Details Stuff.
+     */
+
+    var openProjectWindows by mutableStateOf(emptyMap<Any, DetailSelector>())
 
     /*
      * Attribution Stuff.
@@ -388,8 +398,26 @@ class ModpackComponent(context: ComponentContext, args: ModpackComponentArgs) : 
         InstanceManager.newRoot(RootInitialState.Open(path))
     }
 
-    fun openMod(filePath: String) {
-        // TODO: Not implemented yet
+    fun openModProject(mod: PackwizMod) {
+        val key = getModProjectKey(mod)
+        if (!openProjectWindows.containsKey(key)) {
+            openProjectWindows += key to PackwizFileSel(mod, ViewType.BODY)
+        }
+    }
+
+    fun openModrinthProject(projectId: String) {
+        if (!openProjectWindows.containsKey(projectId)) {
+            openProjectWindows += projectId to ModrinthProjectSel(projectId)
+        }
+    }
+
+    private fun getModProjectKey(mod: PackwizMod): Any {
+        return when {
+            mod is PackwizMetaFile && mod.toml.update?.modrinth?.modId != null -> mod.toml.update.modrinth.modId
+            mod is PackwizMetaFile && mod.toml.update?.curseforge?.projectId != null -> mod.toml.update.curseforge.projectId
+            mod is PackwizMetaFile && mod.toml.download.url != null -> mod.toml.download.url
+            else -> mod.filePath
+        }
     }
 
     private data class LoaderVersionInput(val loaderVersion: String, val minecraftVersion: String)
