@@ -1,10 +1,14 @@
 package com.kneelawk.packvulcan.ui.modrinth.detail
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.model.ModrinthModInfo
 import com.kneelawk.packvulcan.ui.detail.DetailSubView
 import com.kneelawk.packvulcan.ui.util.ModIconWrapper
@@ -27,7 +31,9 @@ class ModrinthDetailSubView(val mod: ModrinthModInfo) : DetailSubView {
 
     @Composable
     override fun doBody() {
-        Text(mod.body)
+        Box(modifier = Modifier.padding(20.dp)) {
+            Text(mod.body)
+        }
     }
 
     @Composable

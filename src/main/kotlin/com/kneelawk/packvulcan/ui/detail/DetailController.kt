@@ -38,6 +38,10 @@ fun rememberDetailController(selector: DetailSelector, updateTitle: (String) -> 
                     loadSubView()
                 }
             }
+
+            override fun setCurTab(tab: ViewType) {
+                curTabState.value = tab
+            }
         }
     }
 }

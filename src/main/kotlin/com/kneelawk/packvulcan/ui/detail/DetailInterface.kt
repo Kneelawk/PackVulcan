@@ -8,4 +8,6 @@ interface DetailInterface {
     val curTab: ViewType
 
     fun reloadSubViews()
+
+    fun setCurTab(tab: ViewType)
 }
