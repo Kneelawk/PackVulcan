@@ -19,7 +19,7 @@ sealed interface SimpleModFileInfo : SimpleModInfo {
 
     data class Modrinth(
         override val name: String, override val author: String, override val filename: String,
-        override val version: String, override val description: String, override val icon: ModIconSource?,
+        override val version: String, override val description: String, override val icon: IconSource?,
         override val projectUrl: String, override val projectId: String, val versionId: String,
         override val slug: String, override val body: String, val side: Side, val downloadUrl: String, val sha1: String,
         val sha512: String
@@ -38,7 +38,7 @@ sealed interface SimpleModFileInfo : SimpleModInfo {
 
     data class Curseforge(
         override val name: String, override val author: String, override val filename: String,
-        override val version: String, override val description: String?, override val icon: ModIconSource?,
+        override val version: String, override val description: String?, override val icon: IconSource?,
         override val projectUrl: String, override val projectId: Long, val fileId: Long, override val slug: String,
         val side: Side, val sha1: String
     ) : SimpleModFileInfo, CurseforgeModInfo {
@@ -56,7 +56,7 @@ sealed interface SimpleModFileInfo : SimpleModInfo {
 
     data class Url(
         override val name: String, override val author: String, override val filename: String,
-        override val version: String, override val description: String?, override val icon: ModIconSource?,
+        override val version: String, override val description: String?, override val icon: IconSource?,
         override val projectUrl: String?, val modId: String, val downloadUrl: String, val hashFormat: HashFormat,
         val hash: String, val metaFilePath: String, val side: Side
     ) : SimpleModFileInfo {
@@ -73,7 +73,7 @@ sealed interface SimpleModFileInfo : SimpleModInfo {
 
     data class File(
         override val name: String, override val author: String, override val filename: String,
-        override val version: String, override val description: String?, override val icon: ModIconSource?,
+        override val version: String, override val description: String?, override val icon: IconSource?,
         override val projectUrl: String?, val modId: String, val path: Path
     ) : SimpleModFileInfo {
         override fun toPackwizMod(

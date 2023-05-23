@@ -19,7 +19,7 @@ import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.slidingTransitionSpec
-import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
+import com.kneelawk.packvulcan.ui.util.widgets.ReloadableIcon
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
 import com.kneelawk.packvulcan.ui.util.widgets.TopSideLoadingIndicator
 import com.kneelawk.packvulcan.ui.util.widgets.styledSplitter
@@ -98,7 +98,7 @@ private fun LeftPanel(controller: DetailInterface) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        ModIcon(modIcon) {
+                        ReloadableIcon(modIcon) {
                             when (val subView = controller.subView) {
                                 LoadingState.Error -> controller.reloadSubViews()
                                 is LoadingState.Loaded -> scope.launch { subView.data.loadModIcon() }
@@ -116,7 +116,7 @@ private fun LeftPanel(controller: DetailInterface) {
 
                         Text(
                             data.title, style = MaterialTheme.typography.h6,
-                            color = PackVulcanTheme.colors.headingColor, modifier = Modifier.weight(1f)
+                            color = PackVulcanTheme.colors.headingColor
                         )
 
                         Text(data.description)

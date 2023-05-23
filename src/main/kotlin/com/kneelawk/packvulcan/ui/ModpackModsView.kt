@@ -27,10 +27,10 @@ import com.kneelawk.packvulcan.ui.detail.DetailWindow
 import com.kneelawk.packvulcan.ui.modrinth.search.ModrinthSearchWindow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
-import com.kneelawk.packvulcan.ui.util.ModIconWrapper
+import com.kneelawk.packvulcan.ui.util.IconWrapper
 import com.kneelawk.packvulcan.ui.util.dialog.file.OpenFileDialog
 import com.kneelawk.packvulcan.ui.util.layout.VerticalScrollWrapper
-import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
+import com.kneelawk.packvulcan.ui.util.widgets.ReloadableIcon
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButtonDefaults
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
@@ -174,12 +174,12 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
         loadModInfo()
     }
 
-    var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
+    var modImage by remember { mutableStateOf<LoadingState<IconWrapper>>(LoadingState.Loading) }
 
     suspend fun loadModIcon(modInfo: LoadingState<SimpleModFileInfo>) {
         modImage = when (modInfo) {
-            is LoadingState.Loaded -> LoadingState.Loaded(ModIconWrapper.fromIconSource(modInfo.data.icon))
-            LoadingState.Error -> LoadingState.Loaded(ModIconWrapper.icon(PackVulcanIcons.error))
+            is LoadingState.Loaded -> LoadingState.Loaded(IconWrapper.fromIconSource(modInfo.data.icon))
+            LoadingState.Error -> LoadingState.Loaded(IconWrapper.icon(PackVulcanIcons.error))
             LoadingState.Loading -> LoadingState.Loading
         }
     }
@@ -197,7 +197,7 @@ fun ModpackModView(component: ModpackComponent, mod: PackwizMod) {
                 onClick = { component.openModProject(mod) }, shape = RoundedCornerShape(5.dp),
                 contentPadding = SmallButtonDefaults.IconButtonPadding
             ) {
-                ModIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
+                ReloadableIcon(modImage) { scope.launch { loadModIcon(modInfo) } }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {

@@ -1,7 +1,7 @@
 package com.kneelawk.packvulcan.ui.detail
 
 import androidx.compose.runtime.Composable
-import com.kneelawk.packvulcan.ui.util.ModIconWrapper
+import com.kneelawk.packvulcan.ui.util.IconWrapper
 import com.kneelawk.packvulcan.util.LoadingState
 
 interface DetailSubView {
@@ -10,7 +10,7 @@ interface DetailSubView {
 
     val supportsGallery: Boolean
     val supportsVersions: Boolean
-    val modIcon: LoadingState<ModIconWrapper>
+    val modIcon: LoadingState<IconWrapper>
 
     suspend fun loadModIcon()
 

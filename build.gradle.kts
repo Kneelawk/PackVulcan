@@ -82,6 +82,12 @@ dependencies {
     val sejdaWebpVersion: String by project
     implementation("org.sejda.imageio:webp-imageio:$sejdaWebpVersion")
 
+    // Flexmark
+    val flexmarkVersion: String by project
+    implementation("com.vladsch.flexmark:flexmark-all:$flexmarkVersion") {
+        exclude(module = "flexmark-pdf-converter")
+    }
+
     // Force the use of a specific Gson version
     val gsonVersion: String by project
     implementation("com.google.code.gson:gson:$gsonVersion")

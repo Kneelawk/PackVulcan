@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.engine.mod.ModFileCache
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
-import com.kneelawk.packvulcan.model.ModIconSource
+import com.kneelawk.packvulcan.model.IconSource
 import com.kneelawk.packvulcan.model.SimpleModFileInfo
 import com.kneelawk.packvulcan.model.modfile.IconJson
 import com.kneelawk.packvulcan.model.modfile.fabric.FabricModJson
@@ -87,7 +87,7 @@ object ModFileInfo {
                 original
             }
 
-            ModIconSource.Buffered(bi)
+            IconSource.Buffered(bi)
         }
 
         return when (val meta = info.metadata) {

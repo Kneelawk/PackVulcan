@@ -22,8 +22,8 @@ import com.kneelawk.packvulcan.net.image.ImageResource
 import com.kneelawk.packvulcan.ui.modrinth.install.InstallButton
 import com.kneelawk.packvulcan.ui.theme.PackVulcanIcons
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
-import com.kneelawk.packvulcan.ui.util.ModIconWrapper
-import com.kneelawk.packvulcan.ui.util.widgets.ModIcon
+import com.kneelawk.packvulcan.ui.util.IconWrapper
+import com.kneelawk.packvulcan.ui.util.widgets.ReloadableIcon
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButton
 import com.kneelawk.packvulcan.ui.util.widgets.SmallButtonDefaults
 import com.kneelawk.packvulcan.ui.util.widgets.SmallTextButton
@@ -36,13 +36,13 @@ import kotlinx.coroutines.launch
 fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDisplay) {
     val scope = rememberCoroutineScope()
 
-    var modImage by remember { mutableStateOf<LoadingState<ModIconWrapper>>(LoadingState.Loading) }
+    var modImage by remember { mutableStateOf<LoadingState<IconWrapper>>(LoadingState.Loading) }
 
     suspend fun loadModImage() {
         modImage = if (searchHit.iconUrl.isNullOrBlank()) {
-            LoadingState.Loaded(ModIconWrapper.icon(PackVulcanIcons.noImage))
+            LoadingState.Loaded(IconWrapper.icon(PackVulcanIcons.noImage))
         } else {
-            ImageResource.getModIcon(searchHit.iconUrl)?.let { LoadingState.Loaded(ModIconWrapper.image(it)) }
+            ImageResource.getModIcon(searchHit.iconUrl)?.let { LoadingState.Loaded(IconWrapper.image(it)) }
                 ?: LoadingState.Error
         }
     }
@@ -62,7 +62,7 @@ fun SearchHitView(controller: ModrinthSearchInterface, searchHit: SearchHitDispl
                 onClick = { controller.openProject(searchHit) }, shape = RoundedCornerShape(5.dp),
                 contentPadding = SmallButtonDefaults.IconButtonPadding
             ) {
-                ModIcon(modImage) { scope.launch { loadModImage() } }
+                ReloadableIcon(modImage) { scope.launch { loadModImage() } }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.weight(1f)) {

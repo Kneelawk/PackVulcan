@@ -5,14 +5,15 @@ import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.unit.Density
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
-import com.kneelawk.packvulcan.engine.image.ImageUtils
 import com.kneelawk.packvulcan.net.HTTP_CLIENT
 import com.kneelawk.packvulcan.ui.util.ImageWrapper
 import com.kneelawk.packvulcan.util.suspendGet
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,7 +28,7 @@ object ImageResource {
         Caffeine.newBuilder().expireAfterAccess(Duration.ofMinutes(10)).maximumSize(500)
             .buildAsync()
 
-    private suspend fun retrieveIcon(url: String, size: Int): ImageWrapper? = withContext(Dispatchers.IO) {
+    private suspend fun retrieveIcon(url: String): ImageWrapper? = withContext(Dispatchers.IO) {
         try {
             // TODO: filesystem image caching
             val response: HttpResponse = HTTP_CLIENT.get(url)
@@ -78,6 +79,6 @@ object ImageResource {
     }
 
     suspend fun getModIcon(url: String): ImageWrapper? = modIconCache.suspendGet(url) {
-        retrieveIcon(url, ImageUtils.MOD_ICON_SIZE)
+        retrieveIcon(url)
     }
 }
