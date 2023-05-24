@@ -80,6 +80,14 @@ fun AnnotatedString.Builder.appendMarkdownChild(child: Node, pvColors: PackVulca
             pop()
             pop()
         }
+        is LinkRef -> {
+            pushStyle(SpanStyle(pvColors.linkColor, textDecoration = TextDecoration.Underline))
+            val url = child.getReferenceNode(child.document).url.unescape()
+            pushStringAnnotation(TAG_URL, url)
+            appendMarkdownChildren(child, pvColors)
+            pop()
+            pop()
+        }
     }
 }
 
