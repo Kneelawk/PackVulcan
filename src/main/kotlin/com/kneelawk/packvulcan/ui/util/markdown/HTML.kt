@@ -4,12 +4,15 @@ import com.kneelawk.packvulcan.model.IconSource
 import com.vladsch.flexmark.ast.HtmlBlock
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.jsoup.safety.Cleaner
+import org.jsoup.safety.Safelist
 
 object MDHTML {
     fun parseBlock(block: HtmlBlock): MDNode? {
         val str = block.chars.unescape()
 
-        val doc = Jsoup.parseBodyFragment(str)
+        val cleaner = Cleaner(Safelist.basicWithImages())
+        val doc = cleaner.clean(Jsoup.parseBodyFragment(str))
         val body = doc.body()
         val tag = body.child(0)
 
