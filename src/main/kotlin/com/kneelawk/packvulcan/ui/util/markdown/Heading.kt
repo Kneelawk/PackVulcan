@@ -11,12 +11,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.kneelawk.packvulcan.ui.theme.PackVulcanColors
 import com.vladsch.flexmark.ast.Heading
 import com.vladsch.flexmark.util.ast.Document
 
 class MDHeading(private val text: AnnotatedString, private val style: TextStyle, private val padding: Dp) : MDNode {
     companion object {
-        fun parse(heading: Heading, typography: Typography, colors: Colors): MDHeading? {
+        fun parse(heading: Heading, typography: Typography, colors: Colors, pvColors: PackVulcanColors): MDHeading? {
             val style = when (heading.level) {
                 1 -> typography.h1
                 2 -> typography.h2
@@ -32,7 +33,7 @@ class MDHeading(private val text: AnnotatedString, private val style: TextStyle,
             val padding = if (heading.parent is Document) 8.dp else 0.dp
 
             val text = buildAnnotatedString {
-                appendMarkdownChildren(heading, colors)
+                appendMarkdownChildren(heading, pvColors)
             }
 
             return MDHeading(text, style, padding)

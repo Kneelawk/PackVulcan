@@ -88,6 +88,11 @@ dependencies {
         exclude(module = "flexmark-pdf-converter")
     }
 
+    // Markdown can have raw HTML inside it :(
+    // That means we need to parse HTML
+    val jsoupVersion: String by project
+    implementation("org.jsoup:jsoup:$jsoupVersion")
+
     // Force the use of a specific Gson version
     val gsonVersion: String by project
     implementation("com.google.code.gson:gson:$gsonVersion")

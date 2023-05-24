@@ -7,20 +7,23 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.unit.dp
+import com.kneelawk.packvulcan.ui.theme.PackVulcanColors
 import com.vladsch.flexmark.ast.Heading
+import com.vladsch.flexmark.ast.HtmlBlock
 import com.vladsch.flexmark.ast.Paragraph
 import com.vladsch.flexmark.util.ast.Node
 
 class MDBlock(private val children: List<MDNode>) : MDNode {
     companion object {
-        fun parse(node: Node, typography: Typography, colors: Colors): MDBlock {
+        fun parse(node: Node, typography: Typography, colors: Colors, pvColors: PackVulcanColors): MDBlock {
             var child = node.firstChild
             val children = mutableListOf<MDNode>()
 
             while (child != null) {
                 when (child) {
-                    is Heading -> MDHeading.parse(child, typography, colors)?.let(children::add)
-                    is Paragraph -> children.add(MDParagraph.parse(child, typography, colors))
+                    is Heading -> MDHeading.parse(child, typography, colors, pvColors)?.let(children::add)
+                    is Paragraph -> children.add(MDParagraph.parse(child, typography, colors, pvColors))
+                    is HtmlBlock -> MDHTML.parseBlock(child)?.let(children::add)
                 }
 
                 child = child.next

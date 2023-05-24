@@ -6,6 +6,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
 import com.kneelawk.packvulcan.util.LoadingState
 import com.vladsch.flexmark.parser.Parser
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +18,14 @@ fun MarkdownView(text: String) {
 
     val typography = MaterialTheme.typography
     val colors = MaterialTheme.colors
+    val pvColors = PackVulcanTheme.colors
 
     LaunchedEffect(text, typography, colors) {
         println(text)
         println()
         withContext(Dispatchers.IO) {
             val parser = Parser.builder().build()
-            val parsed = MDBlock.parse(parser.parse(text), typography, colors)
+            val parsed = MDBlock.parse(parser.parse(text), typography, colors, pvColors)
             withContext(Dispatchers.Main) {
                 println(parsed.toString())
                 document = LoadingState.Loaded(parsed)
