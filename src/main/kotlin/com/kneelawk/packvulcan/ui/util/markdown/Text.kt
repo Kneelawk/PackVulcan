@@ -7,11 +7,10 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +23,7 @@ import com.kneelawk.packvulcan.ui.util.widgets.AsyncIcon
 import com.vladsch.flexmark.ast.*
 import com.vladsch.flexmark.ast.Paragraph
 import com.vladsch.flexmark.util.ast.Node
+import java.awt.Cursor
 
 private const val TAG_IMAGE_URL = "TAG_IMAGE_URL"
 private const val TAG_URL = "TAG_URL"
@@ -83,6 +83,7 @@ fun AnnotatedString.Builder.appendMarkdownChild(child: Node, pvColors: PackVulca
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MarkdownText(
     text: AnnotatedString,
@@ -95,6 +96,7 @@ fun MarkdownText(
 ) {
     val uriHandler = LocalUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    var pointerIcon by remember { mutableStateOf(PointerIcon(Cursor.getDefaultCursor())) }
     val pressIndicator = Modifier.pointerInput(Unit) {
         detectTapGestures { pos ->
             layoutResult.value?.let { layoutResult ->
@@ -108,6 +110,24 @@ fun MarkdownText(
                     }
                 }
             }
+        }
+    }.pointerHoverIcon(pointerIcon, false).onPointerEvent(PointerEventType.Move) {
+        val pos = it.changes.first().position
+        val layout = layoutResult.value
+        pointerIcon = if (layout != null) {
+            val position = layout.getOffsetForPosition(pos)
+            val sa = text.getStringAnnotations(position, position).firstOrNull()
+            if (sa != null) {
+                if (sa.tag == TAG_URL || sa.tag == TAG_IMAGE_URL) {
+                    PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
+                } else {
+                    PointerIcon(Cursor.getDefaultCursor())
+                }
+            } else {
+                PointerIcon(Cursor.getDefaultCursor())
+            }
+        } else {
+            PointerIcon(Cursor.getDefaultCursor())
         }
     }
 

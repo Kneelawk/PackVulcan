@@ -43,6 +43,11 @@ class MDParagraph(private val children: List<MDNode>) : MDNode {
                             builder.append(" ")
                         }
                     }
+                    child is HardLineBreak -> {
+                        builder.dump(children, typography, colors)
+                        children.add(MDHardLineBreak)
+                        builder = AnnotatedString.Builder()
+                    }
                 }
 
                 child = child.next

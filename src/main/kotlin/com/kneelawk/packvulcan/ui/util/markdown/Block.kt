@@ -8,9 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.ui.theme.PackVulcanColors
-import com.vladsch.flexmark.ast.Heading
-import com.vladsch.flexmark.ast.HtmlBlock
-import com.vladsch.flexmark.ast.Paragraph
+import com.vladsch.flexmark.ast.*
 import com.vladsch.flexmark.util.ast.Node
 
 class MDBlock(private val children: List<MDNode>) : MDNode {
@@ -24,6 +22,8 @@ class MDBlock(private val children: List<MDNode>) : MDNode {
                     is Heading -> MDHeading.parse(child, typography, colors, pvColors)?.let(children::add)
                     is Paragraph -> children.add(MDParagraph.parse(child, typography, colors, pvColors))
                     is HtmlBlock -> MDHTML.parseBlock(child)?.let(children::add)
+                    is ThematicBreak -> children.add(MDThematicBreak)
+                    is BulletList -> children.add(MDBulletList.parse(child, typography, colors, pvColors))
                 }
 
                 child = child.next
@@ -35,7 +35,7 @@ class MDBlock(private val children: List<MDNode>) : MDNode {
 
     @Composable
     override fun render() {
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             for ((index, child) in children.withIndex()) {
                 key(index) {
                     child.render()

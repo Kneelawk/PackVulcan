@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.model.IconSource
 import com.kneelawk.packvulcan.ui.util.widgets.AsyncIcon
 import com.vladsch.flexmark.ast.Image
+import java.awt.Cursor
 
 class MDImage(private val src: IconSource, private val link: String? = null, private val width: Width = Max) : MDNode {
     companion object {
@@ -29,7 +32,7 @@ class MDImage(private val src: IconSource, private val link: String? = null, pri
         if (link != null) {
             modifier = modifier.clickable {
                 uriHandler.openUri(link)
-            }
+            }.pointerHoverIcon(PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)))
         }
 
         AsyncIcon(src, modifier)
