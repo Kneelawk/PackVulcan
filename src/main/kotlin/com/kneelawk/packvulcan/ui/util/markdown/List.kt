@@ -11,18 +11,27 @@ import com.vladsch.flexmark.ast.BulletList
 import com.vladsch.flexmark.ast.BulletListItem
 import com.vladsch.flexmark.ast.Paragraph
 
-class MDBulletList(private val children: List<MDNode>) : MDNode {
+class MDBulletList(private val children: List<List<MDNode>>) : MDNode {
     companion object {
         fun parse(list: BulletList, ctx: MDContext): MDBulletList {
             var child = list.firstChild
-            val children = mutableListOf<MDNode>()
+            val children = mutableListOf<List<MDNode>>()
 
             while (child != null) {
                 if (child is BulletListItem) {
-                    val childChild = child.firstChild
-                    if (childChild is Paragraph) {
-                        children.add(MDParagraph.parse(childChild, ctx))
+                    val itemChildren = mutableListOf<MDNode>()
+
+                    var itemChild = child.firstChild
+                    while (itemChild != null) {
+                        when (itemChild) {
+                            is Paragraph -> itemChildren.add(MDParagraph.parse(itemChild, ctx))
+                            is BulletList -> itemChildren.add(parse(itemChild, ctx))
+                        }
+
+                        itemChild = itemChild.next
                     }
+
+                    children.add(itemChildren)
                 }
 
                 child = child.next
@@ -40,7 +49,13 @@ class MDBulletList(private val children: List<MDNode>) : MDNode {
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         Text("\u2022")
 
-                        child.render()
+                        Column {
+                            for ((subIndex, subChild) in child.withIndex()) {
+                                key(subIndex) {
+                                    subChild.render()
+                                }
+                            }
+                        }
                     }
                 }
             }
