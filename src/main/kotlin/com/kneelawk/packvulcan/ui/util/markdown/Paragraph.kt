@@ -5,7 +5,7 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.kneelawk.packvulcan.ui.theme.PackVulcanColors
 import com.vladsch.flexmark.ast.*
@@ -70,7 +70,7 @@ class MDParagraph(private val children: List<MDNode>) : MDNode {
 
     @Composable
     override fun render() {
-        FlowRow(mainAxisSpacing = 2.dp) {
+        FlowRow(crossAxisAlignment = FlowCrossAxisAlignment.End) {
             for ((index, child) in children.withIndex()) {
                 key(index) {
                     child.render()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
@@ -35,7 +36,7 @@ class MDImage(private val src: IconSource, private val link: String? = null, pri
             }.pointerHoverIcon(PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)))
         }
 
-        AsyncIcon(src, modifier)
+        AsyncIcon(src, modifier, shape = RectangleShape)
     }
 
     override fun toString(): String {

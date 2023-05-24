@@ -14,11 +14,14 @@ object MDHTML {
         val cleaner = Cleaner(Safelist.basicWithImages())
         val doc = cleaner.clean(Jsoup.parseBodyFragment(str))
         val body = doc.body()
-        val tag = body.child(0)
 
-        when (tag.tag().name) {
-            "img" -> {
-                return parseImg(tag)
+        if (body.childrenSize() > 0) {
+            val tag = body.child(0)
+
+            when (tag.tag().name) {
+                "img" -> {
+                    return parseImg(tag)
+                }
             }
         }
 

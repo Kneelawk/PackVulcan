@@ -62,4 +62,9 @@ object PackVulcanTheme {
         @Composable
         @ReadOnlyComposable
         get() = PackVulcanLocalColors.current
+
+    val typography: PackVulcanTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = PackVulcanLocalTypography.current
 }
