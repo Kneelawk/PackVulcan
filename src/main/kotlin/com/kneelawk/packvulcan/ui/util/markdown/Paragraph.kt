@@ -31,9 +31,9 @@ class MDParagraph(
             var child = parent.firstChild
             val children = mutableListOf<MDNode>()
 
-            println("Paragraph [")
+            println("> Paragraph [")
             while (child != null) {
-                println("  $child")
+                println(">   $child")
 
                 when {
                     child is Link && (child.firstChild is Image || child.firstChild is ImageRef) -> {
@@ -44,8 +44,8 @@ class MDParagraph(
                             builder = AnnotatedString.Builder()
                         }
                     }
-                    child is Text || child is Emphasis || child is StrongEmphasis || child is Link || child is LinkRef -> builder.appendMarkdownChild(
-                        child, ctx.pvColors
+                    child is Text || child is Emphasis || child is StrongEmphasis || child is Link || child is LinkRef || child is Code -> builder.appendMarkdownChild(
+                        child, ctx
                     )
                     child is Image -> {
                         builder.dump(children, ctx)
@@ -74,7 +74,7 @@ class MDParagraph(
 
                 child = child.next
             }
-            println("]")
+            println("> ]")
 
             builder.dump(children, ctx)
 

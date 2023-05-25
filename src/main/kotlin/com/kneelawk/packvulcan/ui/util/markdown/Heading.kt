@@ -33,7 +33,7 @@ class MDHeading(
             }
 
             val text = buildAnnotatedString {
-                appendMarkdownChildren(heading, ctx.pvColors)
+                appendMarkdownChildren(heading, ctx)
             }
 
             return MDHeading(text, style, 8.dp, heading.level <= 2)

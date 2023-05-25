@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import com.kneelawk.packvulcan.model.IconSource
-import com.kneelawk.packvulcan.ui.theme.PackVulcanColors
 import com.kneelawk.packvulcan.ui.util.widgets.AsyncIcon
 import com.vladsch.flexmark.ast.*
 import com.vladsch.flexmark.ast.Paragraph
@@ -41,19 +41,19 @@ class MDText(private val text: AnnotatedString, private val style: TextStyle) : 
 
 fun AnnotatedString.Builder.toMDText(style: TextStyle) = MDText(toAnnotatedString(), style)
 
-fun AnnotatedString.Builder.appendMarkdownChildren(parent: Node, pvColors: PackVulcanColors) {
+fun AnnotatedString.Builder.appendMarkdownChildren(parent: Node, ctx: MDContext) {
     var child = parent.firstChild
 
     while (child != null) {
-        appendMarkdownChild(child, pvColors)
+        appendMarkdownChild(child, ctx)
 
         child = child.next
     }
 }
 
-fun AnnotatedString.Builder.appendMarkdownChild(child: Node, pvColors: PackVulcanColors) {
+fun AnnotatedString.Builder.appendMarkdownChild(child: Node, ctx: MDContext) {
     when (child) {
-        is Paragraph -> appendMarkdownChildren(child, pvColors)
+        is Paragraph -> appendMarkdownChildren(child, ctx)
         is Text -> {
             append(child.chars.unescape())
         }
@@ -65,27 +65,36 @@ fun AnnotatedString.Builder.appendMarkdownChild(child: Node, pvColors: PackVulca
         }
         is Emphasis -> {
             pushStyle(SpanStyle(fontStyle = FontStyle.Italic))
-            appendMarkdownChildren(child, pvColors)
+            appendMarkdownChildren(child, ctx)
             pop()
         }
         is StrongEmphasis -> {
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            appendMarkdownChildren(child, pvColors)
+            appendMarkdownChildren(child, ctx)
             pop()
         }
         is Link -> {
-            pushStyle(SpanStyle(pvColors.linkColor, textDecoration = TextDecoration.Underline))
+            pushStyle(SpanStyle(ctx.pvColors.linkColor, textDecoration = TextDecoration.Underline))
             pushStringAnnotation(TAG_URL, child.url.unescape())
-            appendMarkdownChildren(child, pvColors)
+            appendMarkdownChildren(child, ctx)
             pop()
             pop()
         }
         is LinkRef -> {
-            pushStyle(SpanStyle(pvColors.linkColor, textDecoration = TextDecoration.Underline))
+            pushStyle(SpanStyle(ctx.pvColors.linkColor, textDecoration = TextDecoration.Underline))
             val url = child.getReferenceNode(child.document).url.unescape()
             pushStringAnnotation(TAG_URL, url)
-            appendMarkdownChildren(child, pvColors)
+            appendMarkdownChildren(child, ctx)
             pop()
+            pop()
+        }
+        is Code -> {
+            pushStyle(
+                SpanStyle(
+                    fontFamily = FontFamily.Monospace, background = ctx.colors.secondary
+                )
+            )
+            append(child.text.unescape())
             pop()
         }
     }
