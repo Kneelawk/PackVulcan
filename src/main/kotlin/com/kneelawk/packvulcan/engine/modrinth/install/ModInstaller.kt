@@ -15,7 +15,7 @@ object ModInstaller {
     ): Result {
         progressMsg("Getting Mod...")
 
-        val project = ModrinthApi.project(request.projectId).escapeIfRight {
+        val project = ModrinthApi.projectById(request.projectId).escapeIfRight {
             return ProjectError(request.projectId)
         }
 

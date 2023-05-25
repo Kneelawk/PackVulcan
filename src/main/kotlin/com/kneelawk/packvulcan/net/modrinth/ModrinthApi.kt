@@ -33,6 +33,8 @@ object ModrinthApi {
 
     private val projectCache: AsyncCache<String, Either<ProjectJson, MissingProject>> =
         Caffeine.newBuilder().expireAfterWrite(Duration.ofHours(1)).buildAsync()
+    private val project2Cache: AsyncCache<String, Either<ProjectJson, MissingProject>> =
+        Caffeine.newBuilder().expireAfterWrite(Duration.ofHours(1)).buildAsync()
     private val versionCache: AsyncCache<String, Either<VersionJson, MissingVersion>> =
         Caffeine.newBuilder().expireAfterWrite(Duration.ofHours(1)).buildAsync()
     private val teamMemberCache: AsyncCache<String, List<TeamMemberJson>> =
@@ -64,6 +66,17 @@ object ModrinthApi {
             channel.send(Result.success(leftOr(result[id], MissingProject(id))))
         }
     }
+
+    private suspend fun retrieveProject(idOrSlug: String): Either<ProjectJson, MissingProject> =
+        withContext(Dispatchers.IO) {
+            try {
+                return@withContext Either.left(
+                    HTTP_CLIENT.get("https://api.modrinth.com/v2/project/$idOrSlug").body<ProjectJson>()
+                )
+            } catch (e: Exception) {
+                return@withContext Either.right(MissingProject(idOrSlug))
+            }
+        }
 
     private val versionBatcher = Batcher<String, Either<VersionJson, MissingVersion>>(
         ApplicationScope, Duration.ofMillis(500), Dispatchers.IO
@@ -141,8 +154,11 @@ object ModrinthApi {
      * Accessor methods.
      */
 
-    suspend fun project(idOrSlug: String): Either<ProjectJson, MissingProject> =
-        projectCache.suspendGet(idOrSlug, projectBatcher::request)
+    suspend fun projectById(id: String): Either<ProjectJson, MissingProject> =
+        projectCache.suspendGet(id, projectBatcher::request)
+
+    suspend fun projectByIdOrSlug(idOrSlug: String): Either<ProjectJson, MissingProject> =
+        project2Cache.suspendGet(idOrSlug, ::retrieveProject)
 
     suspend fun version(id: String): Either<VersionJson, MissingVersion> =
         versionCache.suspendGet(id, versionBatcher::request)

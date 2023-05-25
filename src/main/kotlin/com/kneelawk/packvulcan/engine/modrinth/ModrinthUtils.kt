@@ -19,14 +19,19 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
 object ModrinthUtils {
+    suspend fun getProjectId(slug: String): String? {
+        val project = ModrinthApi.projectByIdOrSlug(slug).escapeIfRight { return null }
+        return project.id
+    }
+
     suspend fun getModrinthFileInfo(versionId: String): SimpleModFileInfo.Modrinth? {
         val version = ModrinthApi.version(versionId).escapeIfRight { return null }
-        val project = ModrinthApi.project(version.projectId).escapeIfRight { return null }
+        val project = ModrinthApi.projectById(version.projectId).escapeIfRight { return null }
         return getModrinthFileInfo(project, version)
     }
 
-    suspend fun getModrinthFileInfo(projectIdOrSlug: String, versionId: String): SimpleModFileInfo.Modrinth? {
-        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+    suspend fun getModrinthFileInfo(projectId: String, versionId: String): SimpleModFileInfo.Modrinth? {
+        val project = ModrinthApi.projectById(projectId).escapeIfRight { return null }
         val version = ModrinthApi.version(versionId).escapeIfRight { return null }
         return getModrinthFileInfo(project, version)
     }
@@ -50,7 +55,7 @@ object ModrinthUtils {
     }
 
     suspend fun getModrinthProjectInfo(projectIdOrSlug: String): SimpleModInfo.Modrinth? {
-        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+        val project = ModrinthApi.projectById(projectIdOrSlug).escapeIfRight { return null }
         return getModrinthProjectInfo(project)
     }
 
@@ -75,7 +80,7 @@ object ModrinthUtils {
     suspend fun chooseLatest(
         projectIdOrSlug: String, acceptableVersions: AcceptableVersions
     ): SimpleModFileInfo.Modrinth? {
-        val project = ModrinthApi.project(projectIdOrSlug).escapeIfRight { return null }
+        val project = ModrinthApi.projectById(projectIdOrSlug).escapeIfRight { return null }
         val version = latestVersion(projectIdOrSlug, acceptableVersions) ?: return null
 
         return getModrinthFileInfo(project, version)
@@ -90,7 +95,7 @@ object ModrinthUtils {
         val projects = coroutineScope {
             projectIdOrSlugList.map { idOrSlug ->
                 async {
-                    ModrinthApi.project(idOrSlug).escapeIfRight { return@async null }
+                    ModrinthApi.projectById(idOrSlug).escapeIfRight { return@async null }
                 }
             }.awaitAll()
         }
@@ -130,11 +135,11 @@ object ModrinthUtils {
         return when {
             dependency.versionId != null -> {
                 val version = ModrinthApi.version(dependency.versionId).escapeIfRight { return null }
-                val project = ModrinthApi.project(version.projectId).escapeIfRight { return null }
+                val project = ModrinthApi.projectById(version.projectId).escapeIfRight { return null }
                 ProjectAndVersion(project, version)
             }
             dependency.projectId != null -> {
-                val project = ModrinthApi.project(dependency.projectId).escapeIfRight { return null }
+                val project = ModrinthApi.projectById(dependency.projectId).escapeIfRight { return null }
                 val version = latestVersion(dependency.projectId, acceptableVersions) ?: return null
                 ProjectAndVersion(project, version)
             }

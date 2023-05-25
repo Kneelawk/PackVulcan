@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.kneelawk.packvulcan.model.IconSource
+import com.kneelawk.packvulcan.ui.util.LocalCatchingUriHandler
 import com.kneelawk.packvulcan.ui.util.widgets.AsyncIcon
 import com.vladsch.flexmark.ast.Image
 import java.awt.Cursor
@@ -25,7 +25,7 @@ class MDImage(private val src: IconSource, private val link: String? = null, pri
 
     @Composable
     override fun render() {
-        val uriHandler = LocalUriHandler.current
+        val uriHandler = LocalCatchingUriHandler.current
         var modifier: Modifier = Modifier
 
         modifier = with(width) { modifier.applyWidth() }

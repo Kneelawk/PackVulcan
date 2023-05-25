@@ -11,12 +11,15 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import com.kneelawk.packvulcan.GlobalSettings
 import com.kneelawk.packvulcan.ui.theme.PackVulcanTheme
+import com.kneelawk.packvulcan.ui.util.CatchingUriHandler
+import com.kneelawk.packvulcan.ui.util.LocalCatchingUriHandler
 import com.kneelawk.packvulcan.ui.util.layout.DialogContainerBox
 import com.kneelawk.packvulcan.ui.util.layout.slidingTransitionSpec
 import com.kneelawk.packvulcan.ui.util.widgets.ReloadableIcon
@@ -30,15 +33,22 @@ import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
 @Composable
-fun DetailWindow(onCloseRequest: () -> Unit, selector: DetailSelector) {
+fun DetailWindow(onCloseRequest: () -> Unit, selector: DetailSelector, openModrinthProject: (String) -> Unit) {
     val state = rememberWindowState(size = DpSize(1280.dp, 800.dp))
 
     var title by remember { mutableStateOf("Loading...") }
 
     Window(onCloseRequest = onCloseRequest, state = state, title = title) {
+        val scope = rememberCoroutineScope()
+
         PackVulcanTheme(GlobalSettings.darkMode) {
-            DialogContainerBox {
-                DetailView(rememberDetailController(selector = selector, updateTitle = { title = it }))
+            val curUriHandler = LocalUriHandler.current
+            CompositionLocalProvider(
+                LocalCatchingUriHandler provides CatchingUriHandler(curUriHandler, scope, openModrinthProject)
+            ) {
+                DialogContainerBox {
+                    DetailView(rememberDetailController(selector = selector, updateTitle = { title = it }))
+                }
             }
         }
     }

@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -19,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import com.kneelawk.packvulcan.model.IconSource
+import com.kneelawk.packvulcan.ui.util.LocalCatchingUriHandler
 import com.kneelawk.packvulcan.ui.util.widgets.AsyncIcon
 import com.vladsch.flexmark.ast.*
 import com.vladsch.flexmark.ast.Paragraph
@@ -82,10 +82,14 @@ fun AnnotatedString.Builder.appendMarkdownChild(child: Node, ctx: MDContext) {
         }
         is LinkRef -> {
             pushStyle(SpanStyle(ctx.pvColors.linkColor, textDecoration = TextDecoration.Underline))
-            val url = child.getReferenceNode(child.document).url.unescape()
-            pushStringAnnotation(TAG_URL, url)
+            val url = child.getReferenceNode(child.document)?.url?.unescape()
+            if (url != null) {
+                pushStringAnnotation(TAG_URL, url)
+            }
             appendMarkdownChildren(child, ctx)
-            pop()
+            if (url != null) {
+                pop()
+            }
             pop()
         }
         is Code -> {
@@ -111,7 +115,7 @@ fun MarkdownText(
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
-    val uriHandler = LocalUriHandler.current
+    val uriHandler = LocalCatchingUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     var pointerIcon by remember { mutableStateOf(PointerIcon(Cursor.getDefaultCursor())) }
     val pressIndicator = Modifier.pointerInput(Unit) {

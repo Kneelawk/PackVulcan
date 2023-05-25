@@ -66,7 +66,8 @@ fun ModpackModsDialogs(component: ModpackComponent) {
         key(key) {
             DetailWindow(
                 onCloseRequest = { component.openProjectWindows -= key },
-                selector = sel
+                selector = sel,
+                openModrinthProject = { component.openModrinthProject(it) }
             )
         }
     }

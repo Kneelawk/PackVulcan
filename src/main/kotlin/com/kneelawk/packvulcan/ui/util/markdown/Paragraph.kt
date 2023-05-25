@@ -11,13 +11,13 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
+import com.kneelawk.packvulcan.ui.util.LocalCatchingUriHandler
 import com.vladsch.flexmark.ast.*
 import java.awt.Cursor
 
@@ -91,7 +91,7 @@ class MDParagraph(
     @Composable
     override fun render() {
         Column(modifier = Modifier.padding(bottom = padding)) {
-            val uriHandler = LocalUriHandler.current
+            val uriHandler = LocalCatchingUriHandler.current
             var modifier: Modifier = Modifier.fillMaxWidth()
 
             if (link != null) {
@@ -133,7 +133,7 @@ class MDSpan(
 ) : MDNode {
     @Composable
     override fun render() {
-        val uriHandler = LocalUriHandler.current
+        val uriHandler = LocalCatchingUriHandler.current
         var modifier: Modifier = Modifier
 
         if (link != null) {
