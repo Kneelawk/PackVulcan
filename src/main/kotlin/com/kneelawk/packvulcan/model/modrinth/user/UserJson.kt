@@ -13,7 +13,7 @@ data class UserJson(
     val bio: String?,
     val id: String,
     @SerialName("github_id")
-    val githubId: Int,
+    val githubId: Int?,
     @SerialName("avatar_url")
     val avatarUrl: String,
     @Serializable(ZonedDateTimeSerializer::class)
