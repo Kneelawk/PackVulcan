@@ -5,11 +5,12 @@ import com.kneelawk.packvulcan.model.packwiz.FromTomlVersioned
 import com.kneelawk.packvulcan.model.packwiz.ToTomlVersioned
 import com.moandjiezana.toml.Toml
 
-private val overriddenKeys =
-    setOf("meta-folder", "mods-folder", "acceptable-game-versions", "x-packvulcan-acceptable-loaders")
+private val overriddenKeys = setOf(
+    "meta-folder", "mods-folder", "no-internal-hashes", "acceptable-game-versions", "x-packvulcan-acceptable-loaders"
+)
 
 data class OptionsToml(
-    val metaFolder: String? = null, val metaFolderBase: String? = null,
+    val metaFolder: String? = null, val metaFolderBase: String? = null, val noInternalHashes: Boolean = false,
     val acceptableGameVersions: List<String> = listOf(), val acceptableLoaders: List<String> = listOf(),
     val options: Map<String, Any> = mapOf()
 ) : ToTomlVersioned {
@@ -17,6 +18,7 @@ data class OptionsToml(
         override fun fromToml(toml: Toml, packFormat: FormatVersion): OptionsToml {
             val metaFolder = toml.getString("meta-folder") ?: toml.getString("mods-folder")
             val metaFolderBase = toml.getString("meta-folder-base")
+            val noInternalHashes = toml.getBoolean("no-internal-hashes", false)
             val acceptableGameVersions = toml.getList<String>("acceptable-game-versions", listOf())
             val acceptableLoaders = toml.getList<String>("x-packvulcan-acceptable-loaders", listOf())
 
@@ -27,7 +29,9 @@ data class OptionsToml(
                 }
             }
 
-            return OptionsToml(metaFolder, metaFolderBase, acceptableGameVersions, acceptableLoaders, options)
+            return OptionsToml(
+                metaFolder, metaFolderBase, noInternalHashes, acceptableGameVersions, acceptableLoaders, options
+            )
         }
     }
 
@@ -36,6 +40,7 @@ data class OptionsToml(
         map.putAll(options)
         metaFolder?.let { map[packFormat.metaFolderKey] = it }
         metaFolderBase?.let { map["meta-folder-base"] = it }
+        if (noInternalHashes) map["no-internal-hashes"] = true
         if (acceptableGameVersions.isNotEmpty()) map["acceptable-game-versions"] = acceptableGameVersions
         if (acceptableLoaders.isNotEmpty()) map["x-packvulcan-acceptable-loaders"] = acceptableLoaders
         return map
