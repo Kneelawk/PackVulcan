@@ -14,8 +14,8 @@ data class QuiltLoaderJson(
     val jars: List<String>? = null,
     @SerialName("language_adapters")
     val languageAdapters: Map<String, String>? = null,
-    val depends: List<DependencyObjectListJson>? = null,
-    val breaks: List<DependencyObjectListJson>? = null,
+//    val depends: List<DependencyObjectListJson>? = null,
+//    val breaks: List<DependencyObjectListJson>? = null,
     @SerialName("load_type")
     val loadType: LoadTypeJson? = null,
     val repositories: List<String>? = null,

@@ -148,7 +148,7 @@ class PackwizProject(
                             ) to hash
                         }
 
-                        if (fileHash != indexElement.hash) {
+                        if (indexElement.hash != null && fileHash != indexElement.hash) {
                             log.warn(
                                 "File '${indexElement.file}' has differing hash from known hash. This file was likely edited outside of packwiz."
                             )
@@ -211,21 +211,21 @@ class PackwizProject(
     }
 
     private suspend fun updateIndex() = coroutineScope {
+        val doHash = pack.options?.noInternalHashes != true
+
         val loadingFiles = files.map { file ->
             async(Dispatchers.IO) {
                 when (file) {
                     is PackwizMetaFile -> {
-                        FileToml(
-                            file.filePath, TomlHelper.hash(file.toml, index.hashFormat), file.alias, null, true,
-                            file.preserve
-                        )
+                        val hash = if (doHash) TomlHelper.hash(file.toml, index.hashFormat) else null
+
+                        FileToml(file.filePath, hash, file.alias, null, true, file.preserve)
                     }
 
                     is PackwizRealFile -> {
-                        FileToml(
-                            file.filePath, HashHelper.hash(file.file, index.hashFormat), file.alias, null, false,
-                            file.preserve
-                        )
+                        val hash = if (doHash) HashHelper.hash(file.file, index.hashFormat) else null
+
+                        FileToml(file.filePath, hash, file.alias, null, false, file.preserve)
                     }
                 }
             }
@@ -237,7 +237,11 @@ class PackwizProject(
     }
 
     private suspend fun updateIndexHash() {
-        pack = pack.copy(index = pack.index.copy(hash = TomlHelper.hash(index, pack.index.hashFormat)))
+        pack = if (pack.options?.noInternalHashes != true) {
+            pack.copy(index = pack.index.copy(hash = TomlHelper.hash(index, pack.index.hashFormat)))
+        } else {
+            pack.copy(index = pack.index.copy(hash = null))
+        }
     }
 
     suspend fun updateHashes() {
