@@ -1,5 +1,6 @@
 package com.kneelawk.packvulcan.engine.modinfo
 
+import com.kneelawk.packvulcan.engine.curseforge.CurseforgeUtils
 import com.kneelawk.packvulcan.engine.modrinth.ModrinthUtils
 import com.kneelawk.packvulcan.engine.packwiz.PackwizMetaFile
 import com.kneelawk.packvulcan.model.ModProvider
@@ -16,8 +17,12 @@ object ModInfo {
 
     suspend fun getSimpleInfo(mod: PackwizMetaFile): SimpleModInfo? {
         val modToml = mod.toml
-        return modToml.update?.modrinth?.let { modrinth ->
-            ModrinthUtils.getModrinthInfo(modrinth.modId, modrinth.version)
+        return modToml.update?.let { update ->
+            update.modrinth?.let { modrinth ->
+                ModrinthUtils.getModrinthInfo(modrinth.modId, modrinth.version)
+            } ?: update.curseforge?.let { curseforge ->
+                CurseforgeUtils.getCurseforgeInfo(curseforge.projectId, curseforge.fileId)
+            }
         } ?: ModFileInfo.getFileInfo(mod)
     }
 
